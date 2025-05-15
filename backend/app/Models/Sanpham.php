@@ -23,7 +23,10 @@ class Sanpham extends Model
         'danh_muc_id'
         // Thêm các cột khác trong bảng
     ];
+   public function danhmuc()
+    {
+        return $this->belongsTo(Danhmuc::class, 'danh_muc_id');
+    }
    
-    public $timestamps = false;
     protected $primaryKey = 'id';
 }
