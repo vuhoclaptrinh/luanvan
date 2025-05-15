@@ -39,42 +39,8 @@ class SanphamController extends Controller
 
         return response()->json($productone);
     }
-    // hàm sửa sản phẩm
-    public function update(Request $request, $id)
-    {
-        //kiem tra du liệu
-        $request->validate([
-            'ten_san_pham' => 'required|string|max:255',
-            'thuong_hieu' => 'required|string|max:255',
-            'mo_ta' => 'nullable|string',
-            'dung_tich' => 'required|numeric',
-            'gia' => 'required|numeric',
-            'so_luong_ton' => 'required|integer',
-            'hinh_anh' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'danh_muc_id' => 'required|exists:categories,id',  // Giả sử bạn có bảng danh mục với model Category
-        ]);
-        //tim sanpham
-        $sanpham = Sanpham::find($id);
-        if (!$sanpham) {
-            return response()->json(['message' => 'khong tim thay san pham'], 404);
-        }
-        $sanpham->update([
-            'ten_san_pham' => $request->input('ten_san_pham'),
-            'thuong_hieu' => $request->input('thuong_hieu'),
-            'mo_ta' => $request->input('mo_ta'),
-            'dung_tich' => $request->input('dung_tich'),
-            'gia' => $request->input('gia'),
-            'so_luong_ton' => $request->input('so_luong_ton'),
-            'danh_muc_id' => $request->input('danh_muc_id'),
-        ]);
-        // Kiểm tra nếu có hình ảnh mới, xử lý upload
-        if ($request->hasFile('hinh_anh')) {
-            $image = $request->file('hinh_anh');
-            $imagePath = $image->store('images', 'public');
-            $sanpham->update(['hinh_anh' => $imagePath]);
-        }
-        return response()->json(['message' => 'update hinh ảnh thanh công', 'data' => $sanpham], 200);
-    }
+
+
     //them san pham
     public function add(Request $request)
     {
@@ -121,6 +87,50 @@ class SanphamController extends Controller
             ], 500);
         }
     }
+    //sua
+    public function update(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'ten_san_pham' => 'required|string|max:255',
+                'thuong_hieu' => 'required|string|max:255',
+                'mo_ta' => 'nullable|string',
+                'dung_tich' => 'required|string|max:255',
+                'gia' => 'required|string|max:255',
+                'so_luong_ton' => 'required|integer',
+                'hinh_anh' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'danh_muc_id' => 'required|exists:danhmuc,id'
+            ]);
+
+            $sanpham = Sanpham::findOrFail($id);
+
+            $sanpham->update($request->only([
+                'ten_san_pham',
+                'thuong_hieu',
+                'mo_ta',
+                'dung_tich',
+                'gia',
+                'so_luong_ton',
+                'danh_muc_id',
+            ]));
+
+            if ($request->hasFile('hinh_anh')) {
+                $image = $request->file('hinh_anh');
+                $imagePath = $image->store('images', 'public');
+                $sanpham->update(['hinh_anh' => $imagePath]);
+            }
+
+            return response()->json([
+                'message' => 'Cập nhật sản phẩm thành công',
+                'data' => $sanpham
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Lỗi: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
     // xoa san pham
     public function delete($id)
     {
@@ -145,6 +155,21 @@ class SanphamController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+    // lọc theo danh mục
+    public function getByDanhmuc($id)
+    {
+        $sanpham = Sanpham::where('danh_muc_id', $id)->get();
+
+        if ($sanpham->isEmpty()) {
+            return response()->json(['message' => 'Không có sản phẩm nào trong danh mục này'], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Lấy danh sách san pham theo danh muc thành công',
+            'data' => $sanpham
+        ], 200);
     }
 
 
