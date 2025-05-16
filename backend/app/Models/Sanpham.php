@@ -9,7 +9,7 @@ class Sanpham extends Model
 {
     use HasFactory;
 
-    protected $table = 'sanpham'; 
+    protected $table = 'sanpham';
 
     protected $fillable = [
         'id',
@@ -23,10 +23,17 @@ class Sanpham extends Model
         'danh_muc_id'
         // Thêm các cột khác trong bảng
     ];
-   public function danhmuc()
+
+    //thuộc 1 danh mục
+    public function danhmuc()
     {
         return $this->belongsTo(Danhmuc::class, 'danh_muc_id');
     }
-   
+
+    //có khoá ngoại bên đánh giá
+    public function danhgias()
+    {
+        return $this->hasMany(Danhgia::class, 'san_pham_id');
+    }
     protected $primaryKey = 'id';
 }

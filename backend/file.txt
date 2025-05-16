@@ -1,0 +1,10 @@
+- danh mục  //
+- sản phẩm //
+- khách hàng //
+- mã giảm giá //
+- sản phầm //
+- đánh giá //
+- thanh toán
+- đơn hàng
+- chi tiết đơn hàng
+- user
