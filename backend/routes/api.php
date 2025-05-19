@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ChitietdonhangController;
 use App\Http\Controllers\DanhgiaController;
 use App\Http\Controllers\SanphamController;
 
@@ -9,6 +10,7 @@ use App\Http\Controllers\DanhmucController;
 use App\Http\Controllers\DonhangController;
 use App\Http\Controllers\KhachhangController;
 use App\Http\Controllers\MagiamgiaController;
+use App\Models\Chitietdonhang;
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
@@ -100,3 +102,20 @@ Route::get('/donhang/khachhang/{id}/{ngaydat}', [DonhangController::class, 'getB
 
 //getby khach hàng
 Route::get('/donhang/khachhang/{id}', [DonhangController::class, 'getByKhachHang']);
+
+//CHI TIẾT ĐƠN HÀNG
+//Đánh giá
+//GET
+Route::get('/chitietdonhang', [ChitietdonhangController::class, 'get']);
+//get one
+Route::get('/chitietdonhang/{id}', [ChitietdonhangController::class, 'getOne']);
+//add
+Route::post('/chitietdonhang', [ChitietdonhangController::class, 'add']);
+//update
+Route::put('/chitietdonhang/{id}', [ChitietdonhangController::class, 'update']);
+//delete
+Route::delete('/chitietdonhang/{id}', [ChitietdonhangController::class, 'delete']);
+//getby don hang id
+Route::get('/chitietdonhang/donhang/{id}', [ChitietdonhangController::class, 'getByDonhang']);
+//getby khach hang
+//Route::get('/chitietdonhang/khachhang/{id}', [ChitietdonhangController::class, 'getByKhachHang']);
