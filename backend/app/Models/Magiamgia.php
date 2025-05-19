@@ -16,5 +16,11 @@ class Magiamgia extends Model
         'ngay_ket_thuc',
         'dieu_kien_ap_dung'
     ];
+
+    //thuoc khoa ngoai ben don hang
+    public function donhangs()
+    {
+        return $this->hasMany(Donhang::class, 'ma_giam_gia_id');
+    }
     protected $primaryKey = 'id';
 }

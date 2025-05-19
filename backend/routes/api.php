@@ -2,10 +2,11 @@
 
 use App\Http\Controllers\DanhgiaController;
 use App\Http\Controllers\SanphamController;
-use App\Models\Sanpham;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DanhmucController;
+use App\Http\Controllers\DonhangController;
 use App\Http\Controllers\KhachhangController;
 use App\Http\Controllers\MagiamgiaController;
 
@@ -82,3 +83,20 @@ Route::delete('/danhgia/{id}', [DanhgiaController::class, 'delete']);
 Route::get('/danhgia/sanpham/{id}', [DanhgiaController::class, 'getBySanPham']);
 //getby kahch hàng
 Route::get('/danhgia/khachhang/{id}', [DanhgiaController::class, 'getByKhachHang']);
+
+//DON HÀNG
+//GET
+Route::get('/donhang', [DonhangController::class, 'get']);
+//get one
+Route::get('/donhang/{id}', [DonhangController::class, 'getOne']);
+//add
+Route::post('/donhang', [DonhangController::class, 'add']);
+//update
+Route::put('/donhang/{id}', [DonhangController::class, 'update']);
+//delete
+Route::delete('/donhang/{id}', [DonhangController::class, 'delete']);
+//getby naydat
+Route::get('/donhang/khachhang/{id}/{ngaydat}', [DonhangController::class, 'getByDate']);
+
+//getby khach hàng
+Route::get('/donhang/khachhang/{id}', [DonhangController::class, 'getByKhachHang']);

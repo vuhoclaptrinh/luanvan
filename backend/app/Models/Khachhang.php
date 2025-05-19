@@ -22,5 +22,10 @@ class Khachhang extends Model
     {
         return $this->hasMany(Danhgia::class, 'khach_hang_id');
     }
+    //khoa ngoai cua don hang 
+    public function donhangs()
+    {
+        return $this->hasMany(Donhang::class, 'khach_hang_id');
+    }
     protected $primaryKey = 'id';
 }
