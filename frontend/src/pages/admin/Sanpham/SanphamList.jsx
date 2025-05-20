@@ -50,7 +50,7 @@ const SanphamList = () => {
     { field: 'mo_ta', headerName: 'Mô tả', width: 250 },
     { field: 'dung_tich', headerName: 'Dung tích', width: 100 },
     { field: 'gia', headerName: 'Giá (VND)', width: 150 },
-    { field: 'so_luong_ton', headerName: 'Tồn kho', width: 100 },
+    { field: 'so_luong_ton', headerName: 'Số Lượng', width: 100 },
     {
       field: 'hinh_anh',
       headerName: 'Hình ảnh',

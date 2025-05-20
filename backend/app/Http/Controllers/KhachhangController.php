@@ -127,4 +127,27 @@ class KhachhangController extends Controller
         }
     }
 
+    //login
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'mat_khau' => 'required|string',
+        ]);
+
+        // Tìm khách hàng theo email
+        $khachhang = Khachhang::where('email', $request->email)->first();
+
+        if (!$khachhang || $khachhang->mat_khau !== $request->mat_khau) {
+            return response()->json([
+                'message' => 'Email hoặc mật khẩu không đúng'
+            ], 401);
+        }
+
+        return response()->json([
+            'message' => 'Đăng nhập thành công',
+            'user' => $khachhang
+        ]);
+    }
+
 }

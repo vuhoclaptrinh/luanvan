@@ -1,10 +1,11 @@
 import React from "react";
-import "./App.css"; // Import CSS
+import "./App.css";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
+  Outlet,
 } from "react-router-dom";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material";
@@ -14,11 +15,13 @@ import theme from "./theme";
 import Layoutmain from "./components/layoutmain";
 import SanphamList from "./pages/admin/Sanpham/SanphamList";
 import NotFound from "./components/Notfound";
+import Login from "./pages/Login";
 
-// const PrivateRoute = ({ children }) => {
-//   const user = localStorage.getItem("user");
-//   return user ? children : <Navigate to="/login" />;
-// };
+// Route bảo vệ: nếu có "user" trong localStorage thì cho vào, không thì chuyển tới /login
+const PrivateRoute = () => {
+  const user = localStorage.getItem("user");
+  return user ? <Outlet /> : <Navigate to="/login" />;
+};
 
 function App() {
   return (
@@ -26,22 +29,21 @@ function App() {
       <CssBaseline />
       <Router>
         <Routes>
-          {/* Route chính dùng Layout bọc */}
-          <Route
-            path="/"
-            element={ 
-                <Layoutmain  />   
-            }
-          >
-            {/* Đây là các route con nằm trong Layout */}
-            <Route
-              index
-              element={<h1>Trang chủ - thêm /sanpham để xem sản phẩm</h1>}
-            />
-            <Route path="sanpham" element={<SanphamList />} />
+          {/* Route đăng nhập */}
+          <Route path="/login" element={<Login />} />
+
+          {/* Các route cần đăng nhập, nằm trong layout chính */}
+          <Route element={<PrivateRoute />}>
+            <Route path="/" element={<Layoutmain />}>
+              <Route
+                index
+                element={<h1>Trang chủ - thêm /sanpham để xem sản phẩm</h1>}
+              />
+              <Route path="sanpham" element={<SanphamList />} />
+            </Route>
           </Route>
 
-          {/* Route cho các path không khớp */}
+          {/* Route cho path không khớp */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
