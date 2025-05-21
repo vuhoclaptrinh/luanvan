@@ -13,9 +13,13 @@ import theme from "./theme";
 
 // Gọi các component
 import Layoutmain from "./components/layoutmain";
-import SanphamList from "./pages/admin/Sanpham/SanphamList";
 import NotFound from "./components/Notfound";
 import Login from "./pages/Login";
+
+
+import SanphamList from "./pages/admin/Sanpham/SanphamList";
+import SanphamEdit from "./pages/admin/Sanpham/SanphamEdit";
+
 
 // Route bảo vệ: nếu có "user" trong localStorage thì cho vào, không thì chuyển tới /login
 const PrivateRoute = () => {
@@ -40,6 +44,7 @@ function App() {
                 element={<h1>Trang chủ - thêm /sanpham để xem sản phẩm</h1>}
               />
               <Route path="sanpham" element={<SanphamList />} />
+              <Route path="sanpham/edit/:id" element={<SanphamEdit />} />
             </Route>
           </Route>
 

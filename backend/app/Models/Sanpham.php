@@ -35,5 +35,12 @@ class Sanpham extends Model
     {
         return $this->hasMany(Danhgia::class, 'san_pham_id');
     }
+    public function getHinhAnhUrlAttribute()
+    {
+        if ($this->hinh_anh) {
+            return asset('storage/' . $this->hinh_anh); // tạo URL đầy đủ
+        }
+        return null;
+    }
     protected $primaryKey = 'id';
 }

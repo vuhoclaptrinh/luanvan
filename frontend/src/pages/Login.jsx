@@ -31,7 +31,7 @@ const Login = () => {
         // Lưu user vào localStorage
         localStorage.setItem('user', JSON.stringify(user));
         alert('Đăng nhập thành công!');
-        navigate('/');  // chuyển trang dashboard
+        navigate('/');  // chuyển trang main
       } else {
         setError('Đăng nhập thất bại!');
       }
