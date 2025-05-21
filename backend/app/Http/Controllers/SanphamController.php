@@ -12,13 +12,27 @@ class SanphamController extends Controller
     //get
     public function get()
     {
-        // Lấy toàn bộ sản phẩm
         try {
-            $sanpham = Sanpham::all();
+            $sanpham = Sanpham::all()->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'ten_san_pham' => $item->ten_san_pham,
+                    'thuong_hieu' => $item->thuong_hieu,
+                    'mo_ta' => $item->mo_ta,
+                    'dung_tich' => $item->dung_tich,
+                    'gia' => (float) $item->gia,
+                    'gia_format' => number_format($item->gia, 0, ',', '.') . ' ₫',
+                    'so_luong_ton' => $item->so_luong_ton,
+                    'hinh_anh' => $item->hinh_anh,
+                    'danh_muc_id' => $item->danh_muc_id,
+                    'created_at' => $item->created_at,
+                    'updated_at' => $item->updated_at,
+                ];
+            });
 
             return response()->json([
                 'status' => true,
-                'message' => 'Lấy danh sách san pham thành công',
+                'message' => 'Lấy danh sách sản phẩm thành công',
                 'data' => $sanpham
             ]);
         } catch (\Exception $e) {
