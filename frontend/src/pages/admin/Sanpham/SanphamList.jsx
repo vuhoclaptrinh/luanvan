@@ -14,6 +14,7 @@ import {
   Add as AddIcon,
   Visibility as VisibilityIcon,
 } from '@mui/icons-material';
+import { useSnackbar } from 'notistack';
 
 import SanphamEdit from './SanphamEdit';
 import SanphamAdd from './SanphamAdd';
@@ -22,17 +23,28 @@ import SanphamView from './SanphamView';
 const API_BASE = 'http://127.0.0.1:8000/api/';
 
 const SanphamList = () => {
+  const { enqueueSnackbar } = useSnackbar(); // ✅ Di chuyển vào đây
+
   const [sanpham, setSanpham] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  // Dialogs
   const [editOpen, setEditOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [viewOpen, setViewOpen] = useState(false);
   const [selectedSanphamId, setSelectedSanphamId] = useState(null);
 
+  // Lọc
   const [danhMucMap, setDanhMucMap] = useState({});
-  const [searchText, setSearchText] = useState('');
   const [selectedDanhMuc, setSelectedDanhMuc] = useState('');
+  const [searchText, setSearchText] = useState('');
+ 
+
+  // Phân trang
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10,
+  });
 
   const fetchSanpham = async () => {
     setLoading(true);
@@ -84,7 +96,10 @@ const SanphamList = () => {
     if (window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
       try {
         await axios.delete(`${API_BASE}sanpham/${id}`);
+        alert('Xóa sản phẩm thành công!');
+        enqueueSnackbar('Xóa sản phẩm thành công!', { variant: 'success' });
         setSanpham((prev) => prev.filter((sp) => sp.id !== id));
+        
       } catch (error) {
         console.error('Lỗi xóa sản phẩm:', error);
       }
@@ -105,7 +120,6 @@ const SanphamList = () => {
     setSelectedSanphamId(null);
   };
 
-  // Lọc dữ liệu hiển thị
   const sanphamFiltered = sanpham.filter((sp) => {
     const matchSearch = sp.ten_san_pham.toLowerCase().includes(searchText.toLowerCase());
     const matchThuongHieu = sp.thuong_hieu.toLowerCase().includes(searchText.toLowerCase());
@@ -120,7 +134,7 @@ const SanphamList = () => {
     { field: 'mo_ta', headerName: 'Mô tả', width: 250 },
     { field: 'dung_tich', headerName: 'Dung tích', width: 100 },
     {
-      field: 'gia',
+      field: 'gia_format',
       headerName: 'Giá (VND)',
       width: 150,
     },
@@ -131,16 +145,13 @@ const SanphamList = () => {
       width: 120,
       renderCell: (params) => {
         if (!params.value) return null;
-
         let imagePath = params.value;
         if (imagePath.startsWith('images/')) {
           imagePath = imagePath.replace(/^images\//, '');
         }
-
         const url = imagePath.startsWith('http')
           ? imagePath
           : `http://127.0.0.1:8000/storage/images/${imagePath}`;
-
         return (
           <img
             src={url}
@@ -161,7 +172,7 @@ const SanphamList = () => {
     {
       field: 'actions',
       headerName: 'Thao tác',
-      width: '250',
+      width: 250,
       sortable: false,
       filterable: false,
       renderCell: (params) => (
@@ -199,65 +210,62 @@ const SanphamList = () => {
   ];
 
   return (
-  <Box p={2}>
-    
-    <Typography variant="h5" gutterBottom>
-      Danh sách sản phẩm
-    </Typography>
+    <Box p={2}>
+      <Typography variant="h5" gutterBottom>
+        Danh sách sản phẩm
+      </Typography>
 
-   
-    <Stack direction="row" spacing={2} alignItems="center" mb={2} flexWrap="wrap">
-      <TextField
-        label="Tìm kiếm theo tên"
-        size="small"
-        value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
-      />
-      <TextField
-        select
-        label="Lọc theo danh mục"
-        size="small"
-        value={selectedDanhMuc}
-        onChange={(e) => setSelectedDanhMuc(e.target.value)}
-        SelectProps={{ native: true }}
-      >
-        <option value=""></option>
-        {Object.entries(danhMucMap).map(([id, name]) => (
-          <option key={id} value={id}>{name}</option>
-        ))}
-      </TextField>
-      <Box sx={{ flexGrow: 1 }} />
-      <Button
-        variant="contained"
-        startIcon={<AddIcon />}
-        onClick={() => setAddOpen(true)}
-        sx={{ whiteSpace: 'nowrap' }}
-      >
-        Thêm sản phẩm
-      </Button>
-    </Stack>
+      <Stack direction="row" spacing={2} alignItems="center" mb={2} flexWrap="wrap">
+        <TextField
+          label="Tìm kiếm theo tên"
+          size="small"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+        />
+        <TextField
+          select
+          label="Lọc theo danh mục"
+          size="small"
+          value={selectedDanhMuc}
+          onChange={(e) => setSelectedDanhMuc(e.target.value)}
+          SelectProps={{ native: true }}
+        >
+          <option value=""></option>
+          {Object.entries(danhMucMap).map(([id, name]) => (
+            <option key={id} value={id}>{name}</option>
+          ))}
+        </TextField>
+        <Box sx={{ flexGrow: 1 }} />
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => setAddOpen(true)}
+          sx={{ whiteSpace: 'nowrap' }}
+        >
+          Thêm sản phẩm
+        </Button>
+      </Stack>
 
-    {/* dâtgird */}
-    <Box sx={{ width: '100%' }}>
-      <DataGrid
-        rows={sanphamFiltered}
-        columns={columns}
-        loading={loading}
-        autoHeight
-        pageSize={10}
-        rowsPerPageOptions={[10, 20, 50]}
-        getRowId={(row) => row.id}
-        disableSelectionOnClick
-      />
+      <Box sx={{ width: '100%' }}>
+        <DataGrid
+          rows={sanphamFiltered}
+          columns={columns}
+          loading={loading}
+          autoHeight
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
+          pageSizeOptions={[5, 10, 20, 50]}
+          getRowId={(row) => row.id}
+          disableRowSelectionOnClick
+        />
+      </Box>
+
+      {/* Dialogs */}
+      <SanphamAdd open={addOpen} onClose={handleCloseAdd} onUpdate={fetchSanpham} />
+      <SanphamEdit open={editOpen} onClose={handleCloseEdit} sanphamId={selectedSanphamId} onUpdate={fetchSanpham} />
+      <SanphamView open={viewOpen} onClose={handleCloseView} sanphamId={selectedSanphamId} />
     </Box>
-
-    {/* Dialog */}
-    <SanphamAdd open={addOpen} onClose={handleCloseAdd} onUpdate={fetchSanpham} />
-    <SanphamEdit open={editOpen} onClose={handleCloseEdit} sanphamId={selectedSanphamId} onUpdate={fetchSanpham} />
-    <SanphamView open={viewOpen} onClose={handleCloseView} sanphamId={selectedSanphamId} />
-  </Box>
-);
-
+  );
 };
 
 export default SanphamList;

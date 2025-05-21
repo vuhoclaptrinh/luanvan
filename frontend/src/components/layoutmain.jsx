@@ -216,17 +216,19 @@ console.log("User hiện tại:", user);
 
       {/* Main Content */}
       <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          height: "auto",
-        }}
-      >
-        <Toolbar />
-        <Outlet />
-      </Box>
+  component="main"
+  sx={{
+    flexGrow: 1,
+    width: { sm: `calc(100% - ${drawerWidth}px)` },
+    height: "100vh",          // giữ 100vh để layout full chiều cao
+    overflow: "auto",         // ✅ thêm dòng này để cuộn nội dung
+    display: "flex",          // (tùy chọn nếu cần layout con)
+    flexDirection: "column",  // (tùy chọn nếu cần)
+  }}
+>
+  <Toolbar />
+  <Outlet />
+</Box>
     </Box>
   );
 };

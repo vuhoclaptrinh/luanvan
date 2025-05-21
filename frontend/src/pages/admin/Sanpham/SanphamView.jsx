@@ -8,8 +8,8 @@ import {
   Typography,
   CircularProgress,
   Box,
-  Divider,
   Paper,
+  Grid,
 } from '@mui/material';
 import axios from 'axios';
 
@@ -42,7 +42,7 @@ const SanphamView = ({ open, onClose, sanphamId }) => {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle sx={{ backgroundColor: '#1976d2', color: 'white', fontWeight: 'bold' }}>
         Chi tiết sản phẩm
       </DialogTitle>
@@ -53,63 +53,61 @@ const SanphamView = ({ open, onClose, sanphamId }) => {
             <CircularProgress />
           </Box>
         ) : sanpham ? (
-          <Paper
-            elevation={3}
-            sx={{ p: 3, borderRadius: 2, backgroundColor: 'white', mb: 2 }}
-          >
-            {/* Hình ảnh */}
-            {sanpham.hinh_anh && (
-              <Box
-                component="img"
-                src={getImageUrl(sanpham.hinh_anh)}
-                alt={sanpham.ten_san_pham}
-                sx={{
-                  display: 'block',
-                  maxWidth: '100%',
-                  maxHeight: 300,
-                  marginBottom: 3,
-                  borderRadius: 2,
-                  objectFit: 'contain',
-                  boxShadow: 3,
-                }}
-              />
-            )}
+          <Paper elevation={3} sx={{ p: 3, borderRadius: 2, backgroundColor: 'white' }}>
+            <Grid container spacing={3}>
+              {/* Hình ảnh bên trái */}
+              <Grid item xs={12} md={5}>
+                {sanpham.hinh_anh ? (
+                  <Box
+                    component="img"
+                    src={getImageUrl(sanpham.hinh_anh)}
+                    alt={sanpham.ten_san_pham}
+                    sx={{
+                      width: '100%',
+                      height: 'auto',
+                     
+                      maxHeight: 300,
+                      borderRadius: 2,
+                      objectFit: 'contain',
+                      boxShadow: 3,
+                    }}
+                  />
+                ) : (
+                  <Typography align="center">Không có hình ảnh</Typography>
+                )}
+              </Grid>
 
-            {/* Thông tin sản phẩm */}
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-              <Typography variant="h6" fontWeight="bold" gutterBottom>
-                {sanpham.ten_san_pham}
-              </Typography>
+              {/* Thông tin bên phải */}
+              <Grid item xs={12} md={7}>
+                <Typography variant="h6" fontWeight="bold" gutterBottom>
+                  {sanpham.ten_san_pham}
+                </Typography>
 
-              <Typography>
-                <strong>ID:</strong> {sanpham.id}
-              </Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {[
+                    ['ID', sanpham.id],
+                    ['Thương hiệu', sanpham.thuong_hieu || 'N/A'],
+                    ['Dung tích', sanpham.dung_tich || 'N/A'],
+                    ['Giá (VND)', new Intl.NumberFormat('vi-VN').format(sanpham.gia || 0)],
+                    ['Số lượng tồn', sanpham.so_luong_ton ?? 0],
+                    ['Danh mục ID', sanpham.danh_muc_id || 'N/A'],
+                  ].map(([label, value], index) => (
+                    <Box key={index} display="flex">
+                      <Typography sx={{ width: 130, fontWeight: 500 }}>{label}:</Typography>
+                      <Typography>{value}</Typography>
+                    </Box>
+                  ))}
 
-              <Typography>
-                <strong>Thương hiệu:</strong> {sanpham.thuong_hieu || 'N/A'}
-              </Typography>
-
-              <Typography sx={{ whiteSpace: 'pre-line' }}>
-                <strong>Mô tả:</strong> {sanpham.mo_ta || 'Không có mô tả'}
-              </Typography>
-
-              <Typography>
-                <strong>Dung tích:</strong> {sanpham.dung_tich || 'N/A'}
-              </Typography>
-
-              <Typography>
-                <strong>Giá (VND):</strong>{' '}
-                {new Intl.NumberFormat('vi-VN').format(sanpham.gia || 0)}
-              </Typography>
-
-              <Typography>
-                <strong>Số lượng tồn:</strong> {sanpham.so_luong_ton ?? 0}
-              </Typography>
-
-              <Typography>
-                <strong>Danh mục ID:</strong> {sanpham.danh_muc_id || 'N/A'}
-              </Typography>
-            </Box>
+                  {/* Mô tả */}
+                  <Box display="flex" alignItems="flex-start">
+                    <Typography sx={{ width: 130, fontWeight: 500 }}>Mô tả:</Typography>
+                    <Typography sx={{ whiteSpace: 'pre-line' }}>
+                      {sanpham.mo_ta || 'Không có mô tả'}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Grid>
+            </Grid>
           </Paper>
         ) : (
           <Typography align="center" color="error" sx={{ py: 5 }}>

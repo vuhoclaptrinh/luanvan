@@ -10,6 +10,7 @@ import {
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material";
 import theme from "./theme";
+import { SnackbarProvider } from 'notistack';
 
 // Gọi các component
 import Layoutmain from "./components/layoutmain";
@@ -29,8 +30,10 @@ const PrivateRoute = () => {
 
 function App() {
   return (
+    
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <SnackbarProvider maxSnack={3} autoHideDuration={3000}></SnackbarProvider>
       <Router>
         <Routes>
           {/* Route đăng nhập */}

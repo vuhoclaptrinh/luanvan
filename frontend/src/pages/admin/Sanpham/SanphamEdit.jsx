@@ -5,6 +5,7 @@ import {
   FormControl, CircularProgress, Box, Typography
 } from '@mui/material';
 import axios from 'axios';
+import { enqueueSnackbar } from 'notistack';
 
 const API_SANPHAM = 'http://127.0.0.1:8000/api/sanpham';
 const API_DANHMUC = 'http://127.0.0.1:8000/api/danhmuc';
@@ -42,6 +43,7 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
       axios.get(`${API_SANPHAM}/${sanphamId}`)
         .then(res => {
           const sp = res.data?.data;
+          console.log('Chi tiết sản phẩm:', sp); // Kiểm tra dữ liệu trả về từ API
           if (sp) {
             setFormdata({
               ten_san_pham: sp.ten_san_pham || '',
@@ -93,7 +95,8 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
   const getImageUrl = () => {
     if (!currentImage) return null;
     if (currentImage.startsWith('blob:')) return currentImage;
-    return `http://127.0.0.1:8000/storage/images/${currentImage}`;
+    if (currentImage.startsWith('http')) return currentImage;
+    return `http://127.0.0.1:8000/storage/${currentImage}`;
   };
 
   const handleSubmit = async () => {
@@ -109,12 +112,12 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      alert('Cập nhật thành công!');
+       enqueueSnackbar('Cập nhật sản phẩm thành công!', { variant: 'success' });
       onUpdate();
       onClose();
     } catch (err) {
       console.error('Lỗi cập nhật:', err);
-      alert('Cập nhật thất bại!');
+      enqueueSnackbar('Cập nhật sản phẩm thất bại!', { variant: 'error' });
     } finally {
       setLoading(false);
     }

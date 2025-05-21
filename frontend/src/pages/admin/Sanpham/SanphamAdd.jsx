@@ -4,6 +4,7 @@ import {
   TextField, Button, Stack, MenuItem, Select, InputLabel, FormControl, Box
 } from '@mui/material';
 import axios from 'axios';
+import { enqueueSnackbar } from 'notistack';
 
 const API = 'http://127.0.0.1:8000/api/sanpham';
 const DM_API = 'http://127.0.0.1:8000/api/danhmuc';
@@ -23,10 +24,7 @@ const SanphamAdd = ({ open, onClose, onUpdate }) => {
   const [danhMucList, setDanhMucList] = useState([]);
 
   useEffect(() => {
-    axios.get(DM_API)
-      .then(res => {
-        if (res.data && res.data.data) setDanhMucList(res.data.data);
-      })
+    axios.get(DM_API).then(res => { if (res.data && res.data.data) setDanhMucList(res.data.data); })
       .catch(console.error);
   }, []);
 
@@ -59,7 +57,7 @@ const SanphamAdd = ({ open, onClose, onUpdate }) => {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      alert('Thêm sản phẩm thành công!');
+       enqueueSnackbar('Thêm sản phẩm thành công!', { variant: 'success' });
       onUpdate();
       onClose();
 
@@ -77,7 +75,7 @@ const SanphamAdd = ({ open, onClose, onUpdate }) => {
 
     } catch (error) {
       console.error(error.response?.data || error);
-      alert('Thêm sản phẩm thất bại!');
+      enqueueSnackbar('Thêm sản phẩm thất bại!', { variant: 'error' });
     }
   };
 
@@ -129,6 +127,7 @@ const SanphamAdd = ({ open, onClose, onUpdate }) => {
           </FormControl>
         </Stack>
       </DialogContent>
+
       <DialogActions>
         <Button variant="outlined" onClick={onClose}>Hủy</Button>
         <Button variant="contained" onClick={handleSubmit}>Thêm</Button>
