@@ -40,7 +40,7 @@ const LayoutMain = () => {
   // const user = userJson ? JSON.parse(userJson) : null;
   // const userName = user ? user.name : "Khách";
 
-  const userStr = localStorage.getItem('user');
+  const userStr = sessionStorage.getItem('user');
 const user = userStr ? JSON.parse(userStr) : null;
 console.log("User hiện tại:", user);
 
@@ -59,8 +59,8 @@ console.log("User hiện tại:", user);
 
   const handleLogout = () => {
     handleAccountMenuClose();
-    localStorage.removeItem("user"); // Xóa thông tin user khi logout
-    localStorage.removeItem("token"); // Xóa token nếu có
+    sessionStorage.removeItem("user"); // Xóa thông tin user khi logout
+    sessionStorage.removeItem("token"); // Xóa token nếu có
     navigate("/login"); // Chuyển về trang đăng nhập
   };
 

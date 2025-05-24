@@ -11,6 +11,7 @@ import {
   Paper,
   Grid,
 } from '@mui/material';
+
 import axios from 'axios';
 
 const API_BASE = 'http://127.0.0.1:8000/api/';
@@ -18,7 +19,24 @@ const API_BASE = 'http://127.0.0.1:8000/api/';
 const SanphamView = ({ open, onClose, sanphamId }) => {
   const [sanpham, setSanpham] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [danhMucMap, setDanhMucMap] = useState({});
 
+  // Lấy danh mục
+  useEffect(() => {
+    axios.get(`${API_BASE}danhmuc`)
+      .then(res => {
+        const map = {};
+        res.data.data.forEach(item => {
+          map[item.id] = item.ten_danh_muc;
+        });
+        setDanhMucMap(map);
+      })
+      .catch(err => {
+        console.error('Lỗi lấy danh mục:', err);
+      });
+  }, []);
+
+  // Lấy sản phẩm theo ID
   useEffect(() => {
     if (open && sanphamId) {
       setLoading(true);
@@ -65,7 +83,6 @@ const SanphamView = ({ open, onClose, sanphamId }) => {
                     sx={{
                       width: '100%',
                       height: 'auto',
-                     
                       maxHeight: 300,
                       borderRadius: 2,
                       objectFit: 'contain',
@@ -74,6 +91,32 @@ const SanphamView = ({ open, onClose, sanphamId }) => {
                   />
                 ) : (
                   <Typography align="center">Không có hình ảnh</Typography>
+                )}
+
+                {/* Ảnh phụ */}
+               {sanpham.images && sanpham.images.length > 0 && (
+                  <>
+                    <Typography variant="subtitle1" fontWeight="bold" sx={{ mt: 2 }}>
+                      Ảnh phụ:
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
+                      {sanpham.images.map((imgObj, idx) => (
+                        <Box
+                          key={idx}
+                          component="img"
+                          src={getImageUrl(imgObj.image_path)}
+                          alt={`Ảnh phụ ${idx + 1}`}
+                          sx={{
+                            width: 100,
+                            height: 100,
+                            objectFit: 'cover',
+                            borderRadius: 1,
+                            boxShadow: 2,
+                          }}
+                        />
+                      ))}
+                    </Box>
+                  </>
                 )}
               </Grid>
 
@@ -89,8 +132,9 @@ const SanphamView = ({ open, onClose, sanphamId }) => {
                     ['Thương hiệu', sanpham.thuong_hieu || 'N/A'],
                     ['Dung tích', sanpham.dung_tich || 'N/A'],
                     ['Giá (VND)', new Intl.NumberFormat('vi-VN').format(sanpham.gia || 0)],
-                    ['Số lượng tồn', sanpham.so_luong_ton ?? 0],
+                    ['Số lượng', sanpham.so_luong_ton ?? 0],
                     ['Danh mục ID', sanpham.danh_muc_id || 'N/A'],
+                    ['Tên danh mục', danhMucMap[sanpham.danh_muc_id] || 'N/A'],
                   ].map(([label, value], index) => (
                     <Box key={index} display="flex">
                       <Typography sx={{ width: 130, fontWeight: 500 }}>{label}:</Typography>
@@ -98,7 +142,6 @@ const SanphamView = ({ open, onClose, sanphamId }) => {
                     </Box>
                   ))}
 
-                  {/* Mô tả */}
                   <Box display="flex" alignItems="flex-start">
                     <Typography sx={{ width: 130, fontWeight: 500 }}>Mô tả:</Typography>
                     <Typography sx={{ whiteSpace: 'pre-line' }}>

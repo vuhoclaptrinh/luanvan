@@ -14,7 +14,8 @@ import {
   Add as AddIcon,
   Visibility as VisibilityIcon,
 } from '@mui/icons-material';
-import { useSnackbar } from 'notistack';
+import ConfirmDeleteDialog from '../../../components/cfdelete';
+import { enqueueSnackbar } from 'notistack';
 
 import SanphamEdit from './SanphamEdit';
 import SanphamAdd from './SanphamAdd';
@@ -23,8 +24,6 @@ import SanphamView from './SanphamView';
 const API_BASE = 'http://127.0.0.1:8000/api/';
 
 const SanphamList = () => {
-  const { enqueueSnackbar } = useSnackbar(); // ✅ Di chuyển vào đây
-
   const [sanpham, setSanpham] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -34,11 +33,14 @@ const SanphamList = () => {
   const [viewOpen, setViewOpen] = useState(false);
   const [selectedSanphamId, setSelectedSanphamId] = useState(null);
 
+  // Confirm delete
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+
   // Lọc
   const [danhMucMap, setDanhMucMap] = useState({});
   const [selectedDanhMuc, setSelectedDanhMuc] = useState('');
   const [searchText, setSearchText] = useState('');
- 
 
   // Phân trang
   const [paginationModel, setPaginationModel] = useState({
@@ -92,17 +94,22 @@ const SanphamList = () => {
     setViewOpen(true);
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
-      try {
-        await axios.delete(`${API_BASE}sanpham/${id}`);
-        alert('Xóa sản phẩm thành công!');
-        enqueueSnackbar('Xóa sản phẩm thành công!', { variant: 'success' });
-        setSanpham((prev) => prev.filter((sp) => sp.id !== id));
-        
-      } catch (error) {
-        console.error('Lỗi xóa sản phẩm:', error);
-      }
+  const handleDelete = (id) => {
+    setDeleteId(id);
+    setOpenConfirm(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await axios.delete(`${API_BASE}sanpham/${deleteId}`);
+      enqueueSnackbar('Xoá sản phẩm thành công!', { variant: 'success' });
+      setSanpham((prev) => prev.filter((sp) => sp.id !== deleteId));
+    } catch (error) {
+      console.error('Lỗi xóa sản phẩm:', error);
+      enqueueSnackbar('Xóa thất bại!', { variant: 'error' });
+    } finally {
+      setOpenConfirm(false);
+      setDeleteId(null);
     }
   };
 
@@ -264,6 +271,11 @@ const SanphamList = () => {
       <SanphamAdd open={addOpen} onClose={handleCloseAdd} onUpdate={fetchSanpham} />
       <SanphamEdit open={editOpen} onClose={handleCloseEdit} sanphamId={selectedSanphamId} onUpdate={fetchSanpham} />
       <SanphamView open={viewOpen} onClose={handleCloseView} sanphamId={selectedSanphamId} />
+      <ConfirmDeleteDialog
+        open={openConfirm}
+        onClose={() => setOpenConfirm(false)}
+        onConfirm={handleConfirmDelete}
+      />
     </Box>
   );
 };

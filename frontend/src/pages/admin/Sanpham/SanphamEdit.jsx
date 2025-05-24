@@ -2,13 +2,11 @@ import React, { useState, useEffect } from 'react';
 import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   TextField, Button, Stack, MenuItem, Select, InputLabel,
-  FormControl, CircularProgress, Box, Typography
+  FormControl, CircularProgress, Box, Typography, IconButton
 } from '@mui/material';
 import axios from 'axios';
 import { enqueueSnackbar } from 'notistack';
-
-const API_SANPHAM = 'http://127.0.0.1:8000/api/sanpham';
-const API_DANHMUC = 'http://127.0.0.1:8000/api/danhmuc';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
   const [formdata, setFormdata] = useState({
@@ -22,28 +20,31 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
   });
 
   const [danhmucList, setDanhmucList] = useState([]);
-  const [currentImage, setCurrentImage] = useState('');
+
+  const [currentImage, setCurrentImage] = useState('');  
   const [newImageFile, setNewImageFile] = useState(null);
+
+  const [imagesPhu, setImagesPhu] = useState([]); 
+  const [newImagesPhuFiles, setNewImagesPhuFiles] = useState([]); 
+  const [imagesPhuDeletedIds, setImagesPhuDeletedIds] = useState([]); 
+
   const [loading, setLoading] = useState(false);
 
-  // Load danh mục khi mở
+  // Load danh mục khi mở dialog
   useEffect(() => {
     if (open) {
-      axios.get(API_DANHMUC)
-        .then(res => {
-          setDanhmucList(res.data?.data || []);
-        })
-        .catch(err => console.error('Lỗi load danh mục:', err));
+      axios.get('http://127.0.0.1:8000/api/danhmuc')
+        .then(res => setDanhmucList(res.data?.data || []))
+        .catch(console.error);
     }
   }, [open]);
 
-  // Load chi tiết sản phẩm
+  // Load chi tiết sản phẩm khi mở dialog
   useEffect(() => {
     if (sanphamId && open) {
-      axios.get(`${API_SANPHAM}/${sanphamId}`)
+      axios.get(`http://127.0.0.1:8000/api/sanpham/${sanphamId}`)
         .then(res => {
           const sp = res.data?.data;
-          console.log('Chi tiết sản phẩm:', sp); // Kiểm tra dữ liệu trả về từ API
           if (sp) {
             setFormdata({
               ten_san_pham: sp.ten_san_pham || '',
@@ -56,13 +57,18 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
             });
             setCurrentImage(sp.hinh_anh || '');
             setNewImageFile(null);
+
+            // Ảnh phụ hiện có
+            setImagesPhu(sp.images || []);
+            setNewImagesPhuFiles([]);
+            setImagesPhuDeletedIds([]);
           }
         })
         .catch(console.error);
     }
   }, [sanphamId, open]);
 
-  // Reset khi đóng
+  // Reset form khi đóng dialog
   useEffect(() => {
     if (!open) {
       setFormdata({
@@ -76,47 +82,100 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
       });
       setCurrentImage('');
       setNewImageFile(null);
+      setImagesPhu([]);
+      setNewImagesPhuFiles([]);
+      setImagesPhuDeletedIds([]);
       setLoading(false);
     }
   }, [open]);
 
+  // Xử lý thay đổi input form
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormdata(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleFileChange = (e) => {
+  // Xử lý chọn file ảnh chính mới
+  const handleMainImageChange = (e) => {
     if (e.target.files?.[0]) {
       setNewImageFile(e.target.files[0]);
       setCurrentImage(URL.createObjectURL(e.target.files[0]));
     }
   };
 
-  const getImageUrl = () => {
-    if (!currentImage) return null;
-    if (currentImage.startsWith('blob:')) return currentImage;
-    if (currentImage.startsWith('http')) return currentImage;
-    return `http://127.0.0.1:8000/storage/${currentImage}`;
+  // Xử lý chọn nhiều ảnh phụ mới
+  const handleNewImagesPhuChange = (e) => {
+    if (e.target.files?.length) {
+      // Thêm ảnh mới vào mảng newImagesPhuFiles
+      const filesArray = Array.from(e.target.files);
+      setNewImagesPhuFiles(prev => [...prev, ...filesArray]);
+    }
   };
 
+  // Xóa ảnh phụ hiện tại (có id)
+  const handleDeleteExistingImagePhu = (id) => {
+    // Thêm id ảnh bị xóa vào danh sách xóa
+    setImagesPhuDeletedIds(prev => [...prev, id]);
+   
+    setImagesPhu(prev => prev.filter(img => img.id !== id));
+  };
+
+  // Xóa ảnh phụ mới (chưa upload) 
+  const handleDeleteNewImagePhu = (index) => {
+    setNewImagesPhuFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const getImageUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith('blob:')) return path;
+    if (path.startsWith('http')) return path;
+    return `http://127.0.0.1:8000/storage/${path}`;
+  };
+
+  // Submit form cập nhật
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const data = new FormData();
+      const formPayload = new FormData();
+
+      // Thêm các trường dữ liệu
       Object.entries(formdata).forEach(([key, value]) => {
-        data.append(key, value);
-      });
-      if (newImageFile) data.append('hinh_anh', newImageFile);
-
-      await axios.post(`${API_SANPHAM}/${sanphamId}?_method=PUT`, data, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        formPayload.append(key, value);
       });
 
-       enqueueSnackbar('Cập nhật sản phẩm thành công!', { variant: 'success' });
-      onUpdate();
-      onClose();
-    } catch (err) {
-      console.error('Lỗi cập nhật:', err);
+      // Ảnh chính mới
+      if (newImageFile) {
+        formPayload.append('hinh_anh', newImageFile);
+      }
+
+      // Ảnh phụ mới
+      newImagesPhuFiles.forEach((file, ) => { 
+        formPayload.append('images_phu[]', file);
+      });
+
+      // Danh sách ảnh phụ bị xóa (gửi id về backend để xóa)
+      formPayload.append('images_phu_deleted', JSON.stringify(imagesPhuDeletedIds));
+
+      // Gửi request PUT
+      const response = await axios.post(
+        `http://127.0.0.1:8000/api/sanpham/${sanphamId}?_method=PUT`,
+        formPayload,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        enqueueSnackbar('Cập nhật sản phẩm thành công!', { variant: 'success' });
+        onUpdate();
+        onClose();
+      } else {
+        enqueueSnackbar('Cập nhật sản phẩm thất bại!', { variant: 'error' });
+      }
+    } catch (error) {
+      console.error('Lỗi cập nhật:', error);
       enqueueSnackbar('Cập nhật sản phẩm thất bại!', { variant: 'error' });
     } finally {
       setLoading(false);
@@ -128,6 +187,8 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
       <DialogTitle>Chỉnh sửa sản phẩm</DialogTitle>
       <DialogContent dividers>
         <Stack spacing={2} mt={1}>
+
+          {/* Các input như trước */}
           <TextField
             label="Tên sản phẩm"
             name="ten_san_pham"
@@ -136,7 +197,8 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
             fullWidth
             required
           />
-          <TextField
+        
+        <TextField
             label="Thương hiệu"
             name="thuong_hieu"
             value={formdata.thuong_hieu}
@@ -197,13 +259,13 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
               ))}
             </Select>
           </FormControl>
-
-          {getImageUrl() && (
+          {/* Ảnh chính */}
+          {currentImage && (
             <Box textAlign="center">
-              <Typography variant="subtitle2" gutterBottom>Ảnh hiện tại</Typography>
+              <Typography variant="subtitle2" gutterBottom>Ảnh chính hiện tại</Typography>
               <Box
                 component="img"
-                src={getImageUrl()}
+                src={getImageUrl(currentImage)}
                 alt="Ảnh sản phẩm"
                 sx={{
                   width: 150,
@@ -212,26 +274,96 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
                   borderRadius: 2,
                   boxShadow: 1,
                   border: '1px solid #ccc',
+                  mx: 'auto',
                 }}
               />
             </Box>
           )}
 
           <Button variant="outlined" component="label">
-            Chọn ảnh mới
+            Chọn ảnh chính mới
             <input
               type="file"
               accept="image/*"
               hidden
-              onChange={handleFileChange}
+              onChange={handleMainImageChange}
             />
           </Button>
+
+          {/* Ảnh phụ */}
+          <Typography variant="subtitle1" mt={2}>Ảnh phụ hiện có</Typography>
+          <Stack direction="row" spacing={1} flexWrap="wrap">
+            {imagesPhu.length === 0 && <Typography>Chưa có ảnh phụ</Typography>}
+            {imagesPhu.map(img => (
+              <Box key={img.id} position="relative" sx={{ width: 100, height: 100 }}>
+                <Box
+                  component="img"
+                  src={getImageUrl(img.image_path)}
+                  alt="Ảnh phụ"
+                  sx={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    borderRadius: 1,
+                    border: '1px solid #ccc',
+                  }}
+                />
+                <IconButton
+                  size="small"
+                  color="error"
+                  onClick={() => handleDeleteExistingImagePhu(img.id)}
+                  sx={{ position: 'absolute', top: 0, right: 0 }}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            ))}
+          </Stack>
+
+          {/* Thêm ảnh phụ mới */}
+          <Typography variant="subtitle1" mt={2}>Thêm ảnh phụ mới</Typography>
+          <Stack direction="row" spacing={1} flexWrap="wrap" mb={1}>
+            {newImagesPhuFiles.map((file, idx) => (
+              <Box key={idx} position="relative" sx={{ width: 100, height: 100 }}>
+                <Box
+                  component="img"
+                  src={URL.createObjectURL(file)}
+                  alt="Ảnh phụ mới"
+                  sx={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    borderRadius: 1,
+                    border: '1px solid #ccc',
+                  }}
+                />
+                <IconButton
+                  size="small"
+                  color="error"
+                  onClick={() => handleDeleteNewImagePhu(idx)}
+                  sx={{ position: 'absolute', top: 0, right: 0 }}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            ))}
+          </Stack>
+
+          <Button variant="outlined" component="label">
+            Chọn ảnh phụ mới
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              multiple
+              onChange={handleNewImagesPhuChange}
+            />
+          </Button>
+
         </Stack>
       </DialogContent>
-      <DialogActions sx={{ px: 3, py: 2 }}>
-        <Button onClick={onClose} variant="outlined" disabled={loading}>
-          Hủy
-        </Button>
+      <DialogActions>
+        <Button onClick={onClose} disabled={loading}>Hủy</Button>
         <Button onClick={handleSubmit} variant="contained" disabled={loading}>
           {loading ? <CircularProgress size={24} /> : 'Lưu'}
         </Button>

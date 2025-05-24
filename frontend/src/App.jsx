@@ -24,7 +24,7 @@ import SanphamEdit from "./pages/admin/Sanpham/SanphamEdit";
 
 // Route bảo vệ: nếu có "user" trong localStorage thì cho vào, không thì chuyển tới /login
 const PrivateRoute = () => {
-  const user = localStorage.getItem("user");
+  const user = JSON.parse(sessionStorage.getItem("user"));
   return user ? <Outlet /> : <Navigate to="/login" />;
 };
 
