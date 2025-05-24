@@ -58,6 +58,8 @@ Route::put('/khachhang/{id}', [KhachhangController::class, 'update']);
 //delete
 Route::delete('/khachhang/{id}', [KhachhangController::class, 'delete']);
 Route::post('/login', [KhachhangController::class, 'login']);
+//add
+Route::post('/khachhang/register', [KhachhangController::class, 'register']);
 
 //Mã Giàm Giá
 //GET

@@ -42,5 +42,9 @@ class Sanpham extends Model
         }
         return null;
     }
+    public function images()
+    {
+        return $this->hasMany(SanphamImage::class, 'sanpham_id');
+    }
     protected $primaryKey = 'id';
 }

@@ -149,5 +149,27 @@ class KhachhangController extends Controller
             'user' => $khachhang
         ]);
     }
+    //register
+    public function register(Request $request)
+    {
+        $request->validate([
+            'ho_ten' => 'required|string|max:255',
+            'email' => 'required|email|unique:khachhang,email',
+            'mat_khau' => 'required|string|min:6|max:255',
+        ]);
+
+        $khachhang = new Khachhang();
+        $khachhang->ho_ten = $request->ho_ten;
+        $khachhang->email = $request->email;
+        $khachhang->mat_khau = $request->mat_khau;  // Mã hóa mật khẩu
+
+        $khachhang->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Đăng ký thành công',
+            'user' => $khachhang
+        ], 201);
+    }
 
 }
