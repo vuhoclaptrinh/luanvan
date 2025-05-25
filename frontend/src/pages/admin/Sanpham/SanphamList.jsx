@@ -27,13 +27,13 @@ const SanphamList = () => {
   const [sanpham, setSanpham] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Dialogs
+  // Dialog
   const [editOpen, setEditOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [viewOpen, setViewOpen] = useState(false);
   const [selectedSanphamId, setSelectedSanphamId] = useState(null);
 
-  // Confirm delete
+  // xác nhận delete
   const [openConfirm, setOpenConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
 
@@ -105,7 +105,11 @@ const SanphamList = () => {
       enqueueSnackbar('Xoá sản phẩm thành công!', { variant: 'success' });
       setSanpham((prev) => prev.filter((sp) => sp.id !== deleteId));
     } catch (error) {
-      console.error('Lỗi xóa sản phẩm:', error);
+      if (error.response?.status === 409) {
+             enqueueSnackbar(error.response.data.message || 'Không thể xoá do ràng buộc dữ liệu', {
+               variant: 'error',
+             });
+           } else 
       enqueueSnackbar('Xóa thất bại!', { variant: 'error' });
     } finally {
       setOpenConfirm(false);
@@ -185,7 +189,7 @@ const SanphamList = () => {
       renderCell: (params) => (
         <Stack direction="row" spacing={1}>
           <Button
-            size="small"
+            size='small'
             variant="outlined"
             color="info"
             onClick={() => handleView(params.row)}
@@ -194,17 +198,17 @@ const SanphamList = () => {
             <VisibilityIcon fontSize="small" />
           </Button>
           <Button
-            size="small"
-            variant="contained"
-            color="primary"
+            size='small'
+            variant="outlined"
+            color="warning"
             onClick={() => handleEdit(params.row)}
             title="Chỉnh sửa"
           >
             <EditIcon fontSize="small" />
           </Button>
           <Button
-            size="small"
-            variant="contained"
+            size='small'  
+            variant="outlined"
             color="error"
             onClick={() => handleDelete(params.row.id)}
             title="Xóa"
@@ -217,7 +221,7 @@ const SanphamList = () => {
   ];
 
   return (
-    <Box p={2}>
+    <Box >
       <Typography variant="h5" gutterBottom>
         Danh sách sản phẩm
       </Typography>

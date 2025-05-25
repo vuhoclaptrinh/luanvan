@@ -243,6 +243,13 @@ class SanphamController extends Controller
 
             return response()->json(['message' => 'Xoá sản phẩm thành công'], 200);
         } catch (\Exception $e) {
+            if ($e->getCode() == '23000') {
+                // 23000 = SQLSTATE ràng buộc khóa ngoại
+                return response()->json([
+                    'message' => 'Không thể xoá sản phẩm vì có ràng buộc dữ liệu đã tồn tại',
+                    'error' => $e->getMessage()
+                ], 409); // Conflict
+            }
             return response()->json([
                 'message' => 'Đã xảy ra lỗi khi xoá sản phẩm',
                 'error' => $e->getMessage()

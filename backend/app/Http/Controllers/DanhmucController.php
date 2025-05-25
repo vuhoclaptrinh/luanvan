@@ -112,7 +112,7 @@ class DanhmucController extends Controller
                 return response()->json([
                     'message' => 'Không thể xoá danh mục vì có ràng buộc dữ liệu',
                     'error' => $e->getMessage()
-                ], 409); // Conflict
+                ], 409);
             }
             return response()->json([
                 'message' => 'Đã xảy ra lỗi khi xoá danh muc',

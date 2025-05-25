@@ -70,7 +70,7 @@ console.log("User hiện tại:", user);
     { text: "Quản Lý Đơn Hàng", icon: <ShoppingCartIcon />, path: "/donhang" },
     { text: "Quản Lý Mã Giảm Giá", icon: <DiscountIcon />, path: "/magiamgia" },
     { text: "Quản Lý Đánh Giá", icon: <RateReviewIcon />, path: "/danhgia" },
-    { text: "Quản Lý Khách Hàng", icon: <GroupIcon />, path: "/khachhang" },
+    { text: "Quản Lý Người Dùng", icon: <GroupIcon />, path: "/nguoidung" },
     { text: "Thống Kê", icon: <BarChartIcon />, path: "/thongke" },
   ];
 
