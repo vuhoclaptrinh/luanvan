@@ -14,7 +14,7 @@ import { enqueueSnackbar } from 'notistack';
 import axios from 'axios';
 
 const LoginRegister = () => {
-  const [tab, setTab] = useState(0); // 0: login, 1: register
+  const [tab, setTab] = useState(0); 
   const [email, setEmail] = useState('');
   const [matKhau, setMatKhau] = useState('');
   const [hoTen, setHoTen] = useState('');
