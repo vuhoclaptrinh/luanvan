@@ -19,6 +19,6 @@ class Danhmuc extends Model
     //có sản phảm phụ thuộc
     public function sanphams()
     {
-        return $this->hasMany(Sanpham::class, 'danh_muc_id');
+        return $this->hasMany(Sanpham::class, 'danh_muc_id', 'id');
     }
 }

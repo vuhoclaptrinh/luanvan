@@ -29,7 +29,7 @@ class DanhmucController extends Controller
     //get one danh muc
     public function getOne($id)
     {
-        $danhmuc = Danhmuc::Find($id);
+        $danhmuc = Danhmuc::with(['sanphams:id,ten_san_pham,danh_muc_id'])->find($id);
 
         if (!$danhmuc) {
             return response()->json(['messsage' => 'khoong tim thay']);
@@ -107,6 +107,13 @@ class DanhmucController extends Controller
             $danhmuc->delete();
             return response()->json(['message' => 'Xoá danh muc thành công'], 200);
         } catch (\Exception $e) {
+            if ($e->getCode() == '23000') {
+                // 23000 = SQLSTATE ràng buộc khóa ngoại
+                return response()->json([
+                    'message' => 'Không thể xoá danh mục vì có ràng buộc dữ liệu',
+                    'error' => $e->getMessage()
+                ], 409); // Conflict
+            }
             return response()->json([
                 'message' => 'Đã xảy ra lỗi khi xoá danh muc',
                 'error' => $e->getMessage()
