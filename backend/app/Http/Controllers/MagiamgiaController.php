@@ -86,7 +86,7 @@ class MagiamgiaController extends Controller
         try {
             $request->validate(
                 [
-                    'ma' => 'required|string|max:255|unique:magiamgia,ma',
+                    'ma' => 'required|string|max:255|unique:magiamgia,ma,' . $id,
                     'phan_tram_giam' => 'required|integer|min:0|max:100',
                     'ngay_bat_dau' => 'required|date',
                     'ngay_ket_thuc' => 'required|date|after_or_equal:ngay_bat_dau',
@@ -137,8 +137,15 @@ class MagiamgiaController extends Controller
             $magiamgia->delete();
             return response()->json(['message' => 'Xoá Giảm giá thành công'], 200);
         } catch (\Exception $e) {
+            if ($e->getCode() == '23000') {
+                // 23000 = SQLSTATE ràng buộc khóa ngoại
+                return response()->json([
+                    'message' => 'Không thể xoá Giảm giá vì có ràng buộc dữ liệu',
+                    'error' => $e->getMessage()
+                ], 409);
+            }
             return response()->json([
-                'message' => 'Đã xảy ra lỗi khi xoá dGiảm giá',
+                'message' => 'Đã xảy ra lỗi khi xoá Giảm giá',
                 'error' => $e->getMessage()
             ], 500);
         }

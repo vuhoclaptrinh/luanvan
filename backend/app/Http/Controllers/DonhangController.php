@@ -10,33 +10,33 @@ class DonhangController extends Controller
     public function get()
     {
         try {
-            $donhang = Donhang::all();
-            // $donhangs = Donhang::with(['khachhang', 'magiamgia'])->get(); //lấy tên theo khoá
+            $donhangs = Donhang::with(['khachhang', 'magiamgia'])->get()->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'khach_hang_id' => $item->khach_hang_id,
+                    'ten_khach_hang' => optional($item->khachhang)->ho_ten,
+                    'ngay_dat' => $item->ngay_dat,
+                    'tong_tien' => (float) $item->tong_tien,
+                    'tong_tien_format' => number_format($item->tong_tien, 0, ',', '.') . ' ₫',
+                    'trang_thai' => $item->trang_thai,
+                    'ma_giam_gia_id' => $item->ma_giam_gia_id,
+                    'ten_ma_giam_gia' => optional($item->magiamgia)->ma,
+                ];
+            });
 
-            // $donhang = $donhangs->map(function ($item) {
-            //     return [
-            //         'id' => $item->id,
-            //         'khach_hang_id' => $item->khach_hang_id,
-            //         'ten_khach_hang' => $item->khachhang->ho_ten ?? null,
-            //         'ngay_dat' => $item->ngay_dat,
-            //         'tong_tien' => $item->tong_tien,
-            //         'trang_thai' => $item->trang_thai,
-            //         'ma_giam_gia_id' => $item->ma_giam_gia_id,
-            //         'ten_ma_giam_gia' => $item->magiamgia->ma ?? null,
-            //     ];
-            // });
             return response()->json([
                 'status' => true,
                 'message' => 'Lấy thành công danh sách đơn hàng',
-                'data' => $donhang //trả về dữ liệu
+                'data' => $donhangs
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra :' . $e->getMessage()
+                'message' => 'Có lỗi xảy ra: ' . $e->getMessage()
             ], 500);
         }
     }
+
     //get one donhang
     public function getOne($id)
     {
