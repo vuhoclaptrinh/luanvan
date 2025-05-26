@@ -187,7 +187,13 @@ const SanphamList = () => {
       sortable: false,
       filterable: false,
       renderCell: (params) => (
-        <Stack direction="row" spacing={1}>
+        <Stack direction="row" spacing={1}  sx={{
+        width: '100%',
+        height: '100%', 
+        alignItems: 'center',       
+        justifyContent: 'center',
+         
+      }}>
           <Button
             size='small'
             variant="outlined"
