@@ -21,8 +21,12 @@ import Login from "./pages/Login";
 import SanphamList from "./pages/admin/Sanpham/SanphamList";
 
 import DanhmucList from "./pages/admin/Danhmuc/DanhmucList";
+import MagiamgiaList from "./pages/admin/Magiamgia/MagiamgiaList";
+import DonhangList from "./pages/admin/Donhang/DonhangList";
 
 
+//component HOme
+ import Home from "./pages/Home"; 
 
 // Route bảo vệ: nếu có "user" trong sessionStorage thì cho vào, không thì chuyển tới /login
 const PrivateRoute = () => {
@@ -44,9 +48,12 @@ function App() {
               <Route index element={<h1>Trang chủ - thêm /sanpham để xem sản phẩm</h1>}/>
               <Route path="sanpham" element={<SanphamList />} />
               <Route path="danhmuc" element={<DanhmucList />} />
+              <Route path="magiamgia" element={<MagiamgiaList />} />
+              <Route path="donhang" element={<DonhangList />} />  
               {/* Thêm các route khác ở đây */}
-             
-            </Route>  
+            
+            </Route>
+              <Route path="Home" element={<Home />} />
           </Route>
 
          
