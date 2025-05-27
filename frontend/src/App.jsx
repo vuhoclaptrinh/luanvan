@@ -27,6 +27,9 @@ import SanphamList from "./pages/admin/Sanpham/SanphamList";
 import DanhmucList from "./pages/admin/Danhmuc/DanhmucList";
 import MagiamgiaList from "./pages/admin/Magiamgia/MagiamgiaList";
 import DonhangList from "./pages/admin/Donhang/DonhangList";
+import NguoidungList from "./pages/admin/Nguoidung/NguoidungList";
+import NguoidungView from "./pages/admin/Nguoidung/NguoidungView";
+import Profile from "./pages/Profile";
 
 // Protected Route Component
 const PrivateRoute = () => {
@@ -70,6 +73,9 @@ function App() {
                 <Route path="danhmuc" element={<DanhmucList />} />
                 <Route path="magiamgia" element={<MagiamgiaList />} />
                 <Route path="donhang" element={<DonhangList />} />
+                <Route path="nguoidung" element={<NguoidungList />} />
+                <Route path="profile" element={<Profile/>}/>
+                {/* Nested Routes for Nguoidung */}
               </Route>
               
               {/* Separate Home Route (outside admin layout) */}

@@ -22,8 +22,8 @@ const SanphamAdd = ({ open, onClose, onUpdate }) => {
   });
 
   // 2 state riêng để xử lý nhập và hiển thị giá tiền có định dạng
-  const [giaRaw, setGiaRaw] = useState('');
-  const [giaHienThi, setGiaHienThi] = useState('');
+  const [ giaRaw, setGiaRaw] = useState('');
+  const [ giaHienThi, setGiaHienThi] = useState('');
 
   const [fileAnh, setFileAnh] = useState(null);
   const [anhPhu, setAnhPhu] = useState([]);

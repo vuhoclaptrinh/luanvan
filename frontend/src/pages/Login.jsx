@@ -80,32 +80,40 @@ const LoginRegister = () => {
   };
 
   const handleRegister = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    
-    if (!hoTen.trim()) {
-      setError('Vui lòng nhập họ tên');
-      setLoading(false);
-      return;
-    }
-    
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      enqueueSnackbar('Đăng ký thành công! Vui lòng đăng nhập.', { variant: 'success' });
-      setTab(0);
-      setEmail('');
-      setMatKhau('');
-      setHoTen('');
-    } catch (error) {
-      console.error(error);
+  e.preventDefault();
+  setError('');
+  setLoading(true);
+
+  if (!hoTen.trim() || !email.trim() || !matKhau.trim()) {
+    setError('Vui lòng điền đầy đủ thông tin');
+    setLoading(false);
+    return;
+  }
+
+  try {
+    const response = await axios.post('http://127.0.0.1:8000/api/khachhang/register', {
+      ho_ten: hoTen,
+      email: email,
+      mat_khau: matKhau,
+    });
+
+    enqueueSnackbar('Đăng ký thành công! Vui lòng đăng nhập.', { variant: 'success' });
+    setTab(0); // chuyển về tab đăng nhập
+    setEmail('');
+    setMatKhau('');
+    setHoTen('');
+  } catch (error) {
+    console.error(error);
+    if (error.response?.data?.message) {
+      setError(error.response.data.message);
+    } else {
       setError('Có lỗi xảy ra khi đăng ký!');
-    } finally {
-      setLoading(false);
     }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);

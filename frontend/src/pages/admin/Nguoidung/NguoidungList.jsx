@@ -19,65 +19,66 @@ import {
 import ConfirmDeleteDialog from '../../../components/cfdelete';
 import { enqueueSnackbar } from 'notistack';
 
-import MagiamgiaAdd from './MagiamgiaAdd';
-import MagiamgiaView from './MagiamgiaView';    
-import MagiamgiaEdit from './MagiamgiaEdit';
+
+import NguoidungView from './NguoidungView';
+import NguoidungEdit from './NguoidungEdit';
 
 const API_BASE = 'http://127.0.0.1:8000/api/';
-const MagiamgiaList = () => {
 
-    const [Magiamgia,setMagiamgia] = useState([]);
+
+const NguoidungList = () => {
+    const [Nguoidung,setNguoidung   ] = useState([]);
     const [loading, setLoading] = useState(false);
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
     // hành động mở dialog
     const [editOpen, setEditOpen] = useState(false);
-    const [addOpen, setAddOpen] = useState(false);
+    // const [addOpen, setAddOpen] = useState(false);
     const [viewOpen, setViewOpen] = useState(false);
-    const [selectedMagiamgiaId, setSelectedMagiamgiaId] = useState(null);
+    const [selectedNguoidungId, setSelectedNguoidungId] = useState(null);
 
     const [openConfirm, setOpenConfirm] = useState(false);
     const [deleteId, setDeleteId] = useState(null);
-// lấy danh sách mã giảm giá
-  const fetchMagiamgia = async () => {
+
+const fetchNguoidung   = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_BASE}magiamgia`);
+      const res = await axios.get(`${API_BASE}khachhang`);
       if (res.data?.data && Array.isArray(res.data.data)) {
-        setMagiamgia(res.data.data);
+        setNguoidung(res.data.data);
       } else {
-        console.error('Dữ liệu mã giảm giá không đúng định dạng:', res.data);
+        console.error('Dữ liệu người dùng không đúng định dạng:', res.data);
       }
     } catch (error) {
-      console.error('Lỗi khi lấy mã giảm giá:', error);
+      console.error('Lỗi khi lấy người dùng:', error);
     } finally {
       setLoading(false);
     }
   };
-// Handlers: Add
-  const handleCloseAdd = () => {
-    setAddOpen(false);
-  };
+// // Handlers: Add
+//   const handleCloseAdd = () => {
+//     setAddOpen(false);
+//   };
 
   // Handlers: Edit
   const handleEdit = (row) => {
-    setSelectedMagiamgiaId(row.id);
+    setSelectedNguoidungId(row.id);
     setEditOpen(true);
   };
 
   const handleCloseEdit = () => {
     setEditOpen(false);
-    setSelectedMagiamgiaId(null);
+    setSelectedNguoidungId(null);
   };
 
   // Handlers: View
   const handleView = (row) => {
-    setSelectedMagiamgiaId(row.id);
+    setSelectedNguoidungId(row.id);
     setViewOpen(true);
   };
 
   const handleCloseView = () => {
     setViewOpen(false);
-    setSelectedMagiamgiaId(null);
+    setSelectedNguoidungId(null);
   };
 
   // Handlers: Delete
@@ -88,16 +89,16 @@ const MagiamgiaList = () => {
 
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`${API_BASE}magiamgia/${deleteId}`);
-      enqueueSnackbar('Xoá mã giảm giá  thành công!', { variant: 'success' });
-      setMagiamgia((prev) => prev.filter((dm) => dm.id !== deleteId));
+      await axios.delete(`${API_BASE}khachhang/${deleteId}`);
+      enqueueSnackbar('Xoá người dùng thành công!', { variant: 'success' });
+      setNguoidung((prev) => prev.filter((dm) => dm.id !== deleteId));
     } catch (error) {
       if (error.response?.status === 409) {
         enqueueSnackbar(error.response.data.message || 'Không thể xoá do ràng buộc dữ liệu', {
           variant: 'error',
         });
       } else {
-        enqueueSnackbar('Lỗi khi xoá mã giảm giá', { variant: 'error' });
+        enqueueSnackbar('Lỗi khi xoá người dùng', { variant: 'error' });
       }
     } finally {
       setOpenConfirm(false);
@@ -106,15 +107,28 @@ const MagiamgiaList = () => {
   };
 
   useEffect(() => {
-    fetchMagiamgia();
+    fetchNguoidung();
   }, []);
-    const columns = [
+ const columns = [
         { field: 'id', headerName: 'ID', width: 90 },
-        { field: 'ma', headerName: 'Tên mã giảm giá', flex: 1, minWidth: 150 },
-        { field: 'phan_tram_giam', headerName: 'Phần trăm giảm', flex: 1, minWidth: 200 },
-        { field: 'ngay_bat_dau', headerName: 'Ngày bắt đầu', width: 150 },
-        { field: 'ngay_ket_thuc', headerName: 'Ngày kết thúc', width: 150 },
-        { field: 'dieu_kien_ap_dung', headerName: 'Điều kiện áp dụng', width: 150 },
+        { field: 'ho_ten', headerName: 'Họ tên', flex: 1, minWidth: 150 },
+        { field: 'email', headerName: 'Email', flex: 1, minWidth: 200 },
+        { field: 'mat_khau', headerName: 'Mật khẩu', width: 150 },
+        { field: 'so_dien_thoai', headerName: 'Số điện thoại', width: 150 },
+        { field: 'dia_chi', headerName: 'Địa chỉ', width: 150 },
+        {
+        field: 'role',
+        headerName: 'Chức vụ',
+        width: 150,
+        renderCell: (params) => {
+            const role = params.row?.role;
+            return (
+            <span style={{ color: role === 1 ? 'red' : 'blue', fontWeight: 'bold' }}>
+                {role === 1 ? 'Admin' : 'Người dùng'}
+            </span>
+            );
+        }
+        },  
         {
         field: 'actions',
         headerName: 'Thao tác',
@@ -139,15 +153,12 @@ const MagiamgiaList = () => {
     ];
 
 
-
-
-
   return (
    <Box>
       <Typography variant="h4" gutterBottom>
-        Danh sách Mã giảm giá
+        Danh sách Người dùng
       </Typography>
-
+{/* 
       <Stack direction="row" spacing={2} alignItems="center" mb={2} flexWrap="wrap">
         <Box sx={{ flexGrow: 1 }} />
         <Button
@@ -156,13 +167,13 @@ const MagiamgiaList = () => {
           onClick={() => setAddOpen(true)}
           sx={{ whiteSpace: 'nowrap' }}
         >
-          Thêm Mã giảm giá
+          Thêm Người dùng
         </Button>
-      </Stack>
+      </Stack> */}
 
       <Box sx={{ width: '100%', height: 600, marginTop: 2 }}>
         <DataGrid
-          rows={Magiamgia}
+          rows={Nguoidung}
           columns={columns}
           loading={loading}
           paginationModel={paginationModel}
@@ -174,9 +185,9 @@ const MagiamgiaList = () => {
       </Box>
 
       {/* Dialogs */}
-      <MagiamgiaAdd open={addOpen} onClose={handleCloseAdd} onUpdate={fetchMagiamgia} />
-      <MagiamgiaEdit open={editOpen} onClose={handleCloseEdit} MagiamgiaId={selectedMagiamgiaId} onUpdate={fetchMagiamgia} />
-      <MagiamgiaView open={viewOpen} onClose={handleCloseView} MagiamgiaId={selectedMagiamgiaId} />
+      {/* <NguoidungAdd open={addOpen} onClose={handleCloseAdd} onUpdate={fetchNguoidung} /> */}
+      <NguoidungEdit open={editOpen} onClose={handleCloseEdit} NguoidungId={selectedNguoidungId} onUpdate={fetchNguoidung} />
+      <NguoidungView open={viewOpen} onClose={handleCloseView} NguoidungId={selectedNguoidungId} />
       <ConfirmDeleteDialog
         open={openConfirm}
         onClose={() => setOpenConfirm(false)}
@@ -184,6 +195,7 @@ const MagiamgiaList = () => {
       />
     </Box>
   );
+
 };
 
-export default MagiamgiaList
+export default NguoidungList

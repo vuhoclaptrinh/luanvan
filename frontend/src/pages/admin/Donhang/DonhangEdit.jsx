@@ -181,7 +181,7 @@ useEffect(() => {
             </Button>
           </DialogActions>
   </Dialog>
-  )
-}
+  );
+};
 
 export default DonhangEdit
