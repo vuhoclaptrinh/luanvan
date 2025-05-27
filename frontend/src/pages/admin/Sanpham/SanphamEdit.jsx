@@ -19,6 +19,7 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
     danh_muc_id: '',
   });
 
+  
   const [danhmucList, setDanhmucList] = useState([]);
 
   const [currentImage, setCurrentImage] = useState('');  

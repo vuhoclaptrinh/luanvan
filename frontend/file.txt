@@ -2,3 +2,23 @@ npm install @mui/x-data-grid
 npm install axios
 npm install react-router-dom
     
+     { 
+      field: 'created_at', 
+      headerName: 'Ngày tạo', 
+      width: 160,
+      renderCell: (params) => (
+        <Typography variant="caption" color="text.secondary">
+          {formatDate(params.value)}
+        </Typography>
+      )
+    },
+    const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('vi-VN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };

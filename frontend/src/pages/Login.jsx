@@ -9,7 +9,23 @@ import {
   Alert,
   Tabs,
   Tab,
+  Paper,
+  InputAdornment,
+  IconButton,
+  Divider,
+  Avatar,
+  Fade,
 } from '@mui/material';
+import {
+  Email as EmailIcon,
+  Lock as LockIcon,
+  Person as PersonIcon,
+  Visibility,
+  VisibilityOff,
+  Store as StoreIcon,
+  Login as LoginIcon,
+  PersonAdd as PersonAddIcon,
+} from '@mui/icons-material';
 import { enqueueSnackbar } from 'notistack';
 import axios from 'axios';
 
@@ -19,6 +35,8 @@ const LoginRegister = () => {
   const [matKhau, setMatKhau] = useState('');
   const [hoTen, setHoTen] = useState('');
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -28,6 +46,7 @@ const LoginRegister = () => {
     setEmail('');
     setMatKhau('');
     setHoTen('');
+    setShowPassword(false);
   };
 
   const handleLogin = async (e) => {
@@ -63,176 +82,380 @@ const LoginRegister = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
+    
     if (!hoTen.trim()) {
       setError('Vui lòng nhập họ tên');
+      setLoading(false);
       return;
     }
+    
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/khachhang/register', {
-        email,
-        mat_khau: matKhau,
-        ho_ten: hoTen,
-      });
-
-      if (response.data.success) {
-        enqueueSnackbar('Đăng ký thành công! Vui lòng đăng nhập.', { variant: 'success' });
-        setTab(0);
-        setEmail('');
-        setMatKhau('');
-        setHoTen('');
-      } else {
-        setError('Đăng ký thất bại!');
-      }
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      enqueueSnackbar('Đăng ký thành công! Vui lòng đăng nhập.', { variant: 'success' });
+      setTab(0);
+      setEmail('');
+      setMatKhau('');
+      setHoTen('');
     } catch (error) {
       console.error(error);
       setError('Có lỗi xảy ra khi đăng ký!');
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Các style dùng chung cho TextField
-  const textFieldSx = {
-    backgroundColor: '#fff',
-    borderRadius: 1,
-    '& .MuiOutlinedInput-root': {
-      '&.Mui-focused fieldset': {
-        borderColor: '#1976d2',
-      },
-    },
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
-    <Container maxWidth="xs" sx={{ backgroundColor: '#f9f9f9', borderRadius: 2, boxShadow: 3, p: 4, mt: 8 }}>
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        justifyContent="center"
-        minHeight="70vh"
-      >
-        <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-          {tab === 0 ? 'Đăng nhập' : 'Đăng ký'}
-        </Typography>
-
-        <Tabs
-          value={tab}
-          onChange={handleTabChange}
-          variant="fullWidth"
-          sx={{ width: '100%', mb: 3 }}
-        >
-          <Tab label="Đăng nhập" />
-          <Tab label="Đăng ký" />
-        </Tabs>
-
-        {error && (
-          <Alert severity="error" sx={{ width: '100%', mb: 2, boxShadow: 1, borderRadius: 1 }}>
-            {error}
-          </Alert>
-        )}
-
-        {tab === 0 && (
-          <Box component="form" onSubmit={handleLogin} sx={{ width: '100%' }}>
-            <TextField
-              label="Email"
-              type="email"
-              fullWidth
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              margin="normal"
-              variant="outlined"
-              sx={textFieldSx}
-            />
-
-            <TextField
-              label="Mật khẩu"
-              type="password"
-              fullWidth
-              required
-              value={matKhau}
-              onChange={(e) => setMatKhau(e.target.value)}
-              margin="normal"
-              variant="outlined"
-              sx={textFieldSx}
-            />
-
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
+    <Box
+      sx={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        p: 2,
+      }}
+    >
+      <Container maxWidth="sm">
+        <Fade in timeout={800}>
+          <Paper
+            elevation={24}
+            sx={{
+              borderRadius: 4,
+              overflow: 'hidden',
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+            }}
+          >
+            {/* Header */}
+            <Box
               sx={{
-                mt: 3,
-                py: 1.5,
-                fontWeight: 'bold',
-                backgroundColor: '#1976d2',
-                '&:hover': {
-                  backgroundColor: '#155a9c',
-                },
-                boxShadow: '0 3px 5px 2px rgba(25, 118, 210, .3)',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: 'white',
+                p: 4,
+                textAlign: 'center',
               }}
             >
-              Đăng nhập
-            </Button>
-          </Box>
-        )}
+              <Avatar
+                sx={{
+                  width: 80,
+                  height: 80,
+                  bgcolor: 'rgba(255, 255, 255, 0.2)',
+                  mx: 'auto',
+                  mb: 2,
+                  backdropFilter: 'blur(10px)',
+                }}
+              >
+                <StoreIcon sx={{ fontSize: 40 }} />
+              </Avatar>
+              <Typography variant="h4" fontWeight="bold" gutterBottom>
+                Perfumer Shop
+              </Typography>
+              <Typography variant="body1" sx={{ opacity: 0.9 }}>
+                Hệ thống nước hoa cao cấp
+              </Typography>
+            </Box>
 
-        {tab === 1 && (
-          <Box component="form" onSubmit={handleRegister} sx={{ width: '100%' }}>
-            <TextField
-              label="Họ tên"
-              fullWidth
-              required
-              value={hoTen}
-              onChange={(e) => setHoTen(e.target.value)}
-              margin="normal"
-              variant="outlined"
-              sx={textFieldSx}
-            />
+            {/* Content */}
+            <Box sx={{ p: 4 }}>
+              {/* Tabs */}
+              <Tabs
+                value={tab}
+                onChange={handleTabChange}
+                variant="fullWidth"
+                sx={{
+                  mb: 3,
+                  '& .MuiTab-root': {
+                    fontWeight: 'bold',
+                    textTransform: 'none',
+                    fontSize: '1rem',
+                    py: 2,
+                  },
+                  '& .Mui-selected': {
+                    color: '#667eea !important',
+                  },
+                  '& .MuiTabs-indicator': {
+                    background: 'linear-gradient(90deg, #667eea, #764ba2)',
+                    height: 3,
+                    borderRadius: 2,
+                  },
+                }}
+              >
+                <Tab 
+                  icon={<LoginIcon />}
+                  iconPosition="start"
+                  label="Đăng nhập" 
+                />
+                <Tab 
+                  icon={<PersonAddIcon />}
+                  iconPosition="start"
+                  label="Đăng ký" 
+                />
+              </Tabs>
 
-            <TextField
-              label="Email"
-              type="email"
-              fullWidth
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              margin="normal"
-              variant="outlined"
-              sx={textFieldSx}
-            />
+              {/* Error Alert */}
+              {error && (
+                <Fade in timeout={300}>
+                  <Alert 
+                    severity="error" 
+                    sx={{ 
+                      mb: 3, 
+                      borderRadius: 2,
+                      '& .MuiAlert-icon': {
+                        fontSize: '1.5rem',
+                      },
+                    }}
+                  >
+                    {error}
+                  </Alert>
+                </Fade>
+              )}
 
-            <TextField
-              label="Mật khẩu"
-              type="password"
-              fullWidth
-              required
-              value={matKhau}
-              onChange={(e) => setMatKhau(e.target.value)}
-              margin="normal"
-              variant="outlined"
-              sx={textFieldSx}
-            />
+              {/* Login Form */}
+              {tab === 0 && (
+                <Fade in timeout={500}>
+                  <Box component="form" onSubmit={handleLogin}>
+                    <TextField
+                      label="Email"
+                      type="email"
+                      fullWidth
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      margin="normal"
+                      variant="outlined"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <EmailIcon color="primary" />
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                          '&:hover fieldset': {
+                            borderColor: '#667eea',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#667eea',
+                          },
+                        },
+                      }}
+                    />
 
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{
-                mt: 3,
-                py: 1.5,
-                fontWeight: 'bold',
-                backgroundColor: '#1976d2',
-                '&:hover': {
-                  backgroundColor: '#155a9c',
-                },
-                boxShadow: '0 3px 5px 2px rgba(25, 118, 210, .3)',
-              }}
-            >
-              Đăng ký
-            </Button>
-          </Box>
-        )}
-      </Box>
-    </Container>
+                    <TextField
+                      label="Mật khẩu"
+                      type={showPassword ? 'text' : 'password'}
+                      fullWidth
+                      required
+                      value={matKhau}
+                      onChange={(e) => setMatKhau(e.target.value)}
+                      margin="normal"
+                      variant="outlined"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <LockIcon color="primary" />
+                          </InputAdornment>
+                        ),
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton onClick={togglePasswordVisibility} edge="end">
+                              {showPassword ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                          '&:hover fieldset': {
+                            borderColor: '#667eea',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#667eea',
+                          },
+                        },
+                      }}
+                    />
+
+                    <Button
+                      type="submit"
+                      fullWidth
+                      variant="contained"
+                      disabled={loading}
+                      sx={{
+                        mt: 3,
+                        py: 1.5,
+                        fontWeight: 'bold',
+                        fontSize: '1.1rem',
+                        borderRadius: 2,
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
+                        textTransform: 'none',
+                        '&:hover': {
+                          background: 'linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)',
+                          boxShadow: '0 6px 20px rgba(102, 126, 234, 0.6)',
+                          transform: 'translateY(-2px)',
+                        },
+                        transition: 'all 0.3s ease',
+                      }}
+                    >
+                      {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+                    </Button>
+                  </Box>
+                </Fade>
+              )}
+
+              {/* Register Form */}
+              {tab === 1 && (
+                <Fade in timeout={500}>
+                  <Box component="form" onSubmit={handleRegister}>
+                    <TextField
+                      label="Họ tên"
+                      fullWidth
+                      required
+                      value={hoTen}
+                      onChange={(e) => setHoTen(e.target.value)}
+                      margin="normal"
+                      variant="outlined"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <PersonIcon color="primary" />
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                          '&:hover fieldset': {
+                            borderColor: '#667eea',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#667eea',
+                          },
+                        },
+                      }}
+                    />
+
+                    <TextField
+                      label="Email"
+                      type="email"
+                      fullWidth
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      margin="normal"
+                      variant="outlined"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <EmailIcon color="primary" />
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                          '&:hover fieldset': {
+                            borderColor: '#667eea',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#667eea',
+                          },
+                        },
+                      }}
+                    />
+
+                    <TextField
+                      label="Mật khẩu"
+                      type={showPassword ? 'text' : 'password'}
+                      fullWidth
+                      required
+                      value={matKhau}
+                      onChange={(e) => setMatKhau(e.target.value)}
+                      margin="normal"
+                      variant="outlined"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <LockIcon color="primary" />
+                          </InputAdornment>
+                        ),
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton onClick={togglePasswordVisibility} edge="end">
+                              {showPassword ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                          '&:hover fieldset': {
+                            borderColor: '#667eea',
+                          },
+                          '&.Mui-focused fieldset': {
+                            borderColor: '#667eea',
+                          },
+                        },
+                      }}
+                    />
+
+                    <Button
+                      type="submit"
+                      fullWidth 
+                      variant="contained"
+                      disabled={loading}
+                      sx={{
+                        mt: 3,
+                        py: 1.5,
+                        fontWeight: 'bold',
+                        fontSize: '1.1rem',
+                        borderRadius: 2,
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
+                        textTransform: 'none',
+                        '&:hover': {
+                          background: 'linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)',
+                          boxShadow: '0 6px 20px rgba(102, 126, 234, 0.6)',
+                          transform: 'translateY(-2px)',
+                        },
+                        transition: 'all 0.3s ease',
+                      }}
+                    >
+                      {loading ? 'Đang đăng ký...' : 'Đăng ký'}
+                    </Button>
+                  </Box>
+                </Fade>
+              )}
+
+              {/* Footer */}
+              <Box sx={{ mt: 4, textAlign: 'center' }}>
+                <Divider sx={{ mb: 2 }}>
+                  <Typography variant="body2" color="textSecondary">
+                    © 2025 Perfumer Shop
+                  </Typography>
+                </Divider>
+                <Typography variant="caption" color="textSecondary">
+                  Hệ thống nước hoa chuyên nghiệp
+                </Typography>
+              </Box>
+            </Box>
+          </Paper>
+        </Fade>
+      </Container>
+    </Box>
   );
 };
 

@@ -19,7 +19,7 @@ import ConfirmDeleteDialog from '../../../components/cfdelete';
 import { enqueueSnackbar } from 'notistack';
 
 import DonhangEdit from './DonhangEdit';
-import DonhangAdd from './DonhangAdd';  
+  
 import DonhangView from './DonhangView';
 
 const API_BASE = 'http://127.0.0.1:8000/api/';
@@ -136,12 +136,12 @@ const columns = [
     //{ field: 'khach_hang_id', headerName: 'Mã Khách Hàng', width: 200 },
     { field: 'ten_khach_hang', headerName: 'Tên Khách Hàng', width: 200 },
     { field: 'ngay_dat', headerName: 'Ngày Đặt  ', width: 150 },
-    { field: 'tong_tien_format', headerName: 'Tổng tiền (VND)', width: 250 },
+    { field: 'tong_tien_format', headerName: 'Tổng tiền (VND)', width: 200 },
+    { field: 'tong_tien_format_giam', headerName: 'Tổng tiền sau giảm(VND)', width: 200 },
     { field: 'trang_thai', headerName: 'Trạng Thái', width: 250,
      renderCell: (params) => {
     const { value } = params;
 
-    
     let chipColor = 'default'; // fallback nếu không xác định
 
     switch (value.toLowerCase()) {

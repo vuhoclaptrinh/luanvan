@@ -103,14 +103,42 @@ const DanhmucList = () => {
       setDeleteId(null);
     }
   };
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('vi-VN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
 
   // DataGrid Columns
   const columns = [
     { field: 'id', headerName: 'ID', width: 90 },
     { field: 'ten_danh_muc', headerName: 'Tên danh mục', flex: 1, minWidth: 150 },
     { field: 'mo_ta', headerName: 'Mô tả', flex: 1, minWidth: 200 },
-    { field: 'created_at', headerName: 'Tạo lúc', width: 150 },
-    { field: 'updated_at', headerName: 'Cập nhật', width: 150 },
+    { 
+      field: 'created_at', 
+      headerName: 'Ngày tạo', 
+      width: 160,
+      renderCell: (params) => (
+        <Typography variant="caption" color="text.secondary">
+          {formatDate(params.value)}
+        </Typography>
+      )
+    },
+     { 
+      field: 'updated_at', 
+      headerName: 'Ngày cập nhật', 
+      width: 160,
+      renderCell: (params) => (
+        <Typography variant="caption" color="text.secondary">
+          {formatDate(params.value)}
+        </Typography>
+      )
+    },
     {
       field: 'actions',
       headerName: 'Thao tác',

@@ -21,8 +21,12 @@ const SanphamAdd = ({ open, onClose, onUpdate }) => {
     danh_muc_id: '',
   });
 
-  const [fileAnh, setFileAnh] = useState(null);       // Ảnh chính
-  const [anhPhu, setAnhPhu] = useState([]);           // Danh sách ảnh phụ
+  // 2 state riêng để xử lý nhập và hiển thị giá tiền có định dạng
+  const [giaRaw, setGiaRaw] = useState('');
+  const [giaHienThi, setGiaHienThi] = useState('');
+
+  const [fileAnh, setFileAnh] = useState(null);
+  const [anhPhu, setAnhPhu] = useState([]);
   const [danhMucList, setDanhMucList] = useState([]);
 
   useEffect(() => {
@@ -33,9 +37,27 @@ const SanphamAdd = ({ open, onClose, onUpdate }) => {
       .catch(console.error);
   }, []);
 
+  // Hàm định dạng số thành tiền VND dạng chuỗi
+  const formatVND = (value) => {
+    if (!value) return '';
+    // Loại bỏ tất cả ký tự không phải số rồi parse
+    const number = parseInt(value.replace(/\D/g, ''), 10);
+    if (isNaN(number)) return '';
+    return number.toLocaleString('vi-VN') ;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormdata(prev => ({ ...prev, [name]: value }));
+    // Xử lý riêng cho trường 'gia' (giá)
+    if (name === 'gia') {
+      // Lấy chỉ số nguyên từ chuỗi nhập vào
+      const rawValue = value.replace(/\D/g, '');
+      setGiaRaw(rawValue);
+      setGiaHienThi(formatVND(rawValue));
+      setFormdata(prev => ({ ...prev, gia: rawValue }));
+    } else {
+      setFormdata(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleFileChange = (e) => {
@@ -86,6 +108,8 @@ const SanphamAdd = ({ open, onClose, onUpdate }) => {
         so_luong_ton: '',
         danh_muc_id: '',
       });
+      setGiaRaw('');
+      setGiaHienThi('');
       setFileAnh(null);
       setAnhPhu([]);
 
@@ -100,12 +124,56 @@ const SanphamAdd = ({ open, onClose, onUpdate }) => {
       <DialogTitle>Thêm sản phẩm</DialogTitle>
       <DialogContent>
         <Stack spacing={2} mt={1}>
-          <TextField label="Tên sản phẩm" name="ten_san_pham" value={formdata.ten_san_pham} onChange={handleChange} fullWidth />
-          <TextField label="Thương hiệu" name="thuong_hieu" value={formdata.thuong_hieu} onChange={handleChange} fullWidth />
-          <TextField label="Mô tả" name="mo_ta" value={formdata.mo_ta} onChange={handleChange} fullWidth multiline rows={3} />
-          <TextField label="Dung tích" name="dung_tich" value={formdata.dung_tich} onChange={handleChange} fullWidth />
-          <TextField label="Giá" name="gia" type="number" value={formdata.gia} onChange={handleChange} fullWidth />
-          <TextField label="Số lượng" name="so_luong_ton" type="number" value={formdata.so_luong_ton} onChange={handleChange} fullWidth />
+          <TextField
+            label="Tên sản phẩm"
+            name="ten_san_pham"
+            value={formdata.ten_san_pham}
+            onChange={handleChange}
+            fullWidth
+          />
+          <TextField
+            label="Thương hiệu"
+            name="thuong_hieu"
+            value={formdata.thuong_hieu}
+            onChange={handleChange}
+            fullWidth
+          />
+          <TextField
+            label="Mô tả"
+            name="mo_ta"
+            value={formdata.mo_ta}
+            onChange={handleChange}
+            fullWidth
+            multiline
+            rows={3}
+          />
+          <TextField
+            label="Dung tích"
+            name="dung_tich"
+            value={formdata.dung_tich}
+            onChange={handleChange}
+            fullWidth
+          />
+
+          {/* Trường giá dùng nhập kiểu text để dễ định dạng */}
+          <TextField
+            label="Giá"
+            name="gia"
+            value={giaHienThi}
+            onChange={handleChange}
+            fullWidth
+            inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+            placeholder="Nhập giá sản phẩm"
+          />
+
+          <TextField
+            label="Số lượng"
+            name="so_luong_ton"
+            type="number"
+            value={formdata.so_luong_ton}
+            onChange={handleChange}
+            fullWidth
+          />
 
           {/* Chọn ảnh chính */}
           <Button variant="contained" component="label">
