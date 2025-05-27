@@ -28,4 +28,8 @@ class Donhang extends Model
     {
         return $this->belongsTo(Magiamgia::class, 'ma_giam_gia_id');
     }
+    public function chitietdonhang()
+    {
+        return $this->hasMany(Chitietdonhang::class, 'don_hang_id');
+    }
 }

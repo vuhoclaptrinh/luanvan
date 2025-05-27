@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Sanpham;
 use Illuminate\Auth\Events\Validated;
-use Illuminate\Container\Attributes\Storage;
+
+use Illuminate\Support\Facades\Storage;
 
 class SanphamController extends Controller
 {
@@ -187,10 +188,13 @@ class SanphamController extends Controller
                 'so_luong_ton' => 'required|integer',
                 'danh_muc_id' => 'nullable|exists:danhmuc,id',
                 'hinh_anh' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'hinh_phu.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'images_phu_deleted' => 'nullable|string', // JSON mảng id ảnh phụ cần xóa
             ]);
 
             $sanpham = Sanpham::findOrFail($id);
 
+            // Cập nhật thông tin sản phẩm
             $sanpham->ten_san_pham = $request->ten_san_pham;
             $sanpham->thuong_hieu = $request->thuong_hieu;
             $sanpham->mo_ta = $request->mo_ta;
@@ -199,6 +203,7 @@ class SanphamController extends Controller
             $sanpham->so_luong_ton = $request->so_luong_ton;
             $sanpham->danh_muc_id = $request->danh_muc_id;
 
+            // Cập nhật ảnh chính nếu có
             if ($request->hasFile('hinh_anh')) {
                 $file = $request->file('hinh_anh');
                 $filename = time() . '_' . $file->getClientOriginalName();
@@ -207,11 +212,41 @@ class SanphamController extends Controller
             }
 
             $sanpham->save();
+
+            // Xóa ảnh phụ 
+            if ($request->filled('images_phu_deleted')) {
+                $deletedIds = json_decode($request->images_phu_deleted, true);
+                if (is_array($deletedIds) && count($deletedIds) > 0) {
+                    $imagesToDelete = $sanpham->images()->whereIn('id', $deletedIds)->get();
+
+                    foreach ($imagesToDelete as $img) {
+                        // Xóa file ảnh trong storage
+                        if ($img->image_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($img->image_path)) {
+                            \Illuminate\Support\Facades\Storage::disk('public')->delete($img->image_path);
+                        }
+
+                        $img->delete();
+                    }
+                }
+            }
+
+            // Thêm ảnh phụ mới nếu có
+            if ($request->hasFile('hinh_phu')) {
+                foreach ($request->file('hinh_phu') as $file) {
+                    $filename = time() . '_' . $file->getClientOriginalName();
+                    $path = $file->storeAs('images', $filename, 'public');
+
+                    $sanpham->images()->create([
+                        'image_path' => $path,
+                    ]);
+                }
+            }
+
             $sanpham->refresh();
 
             return response()->json([
                 'message' => 'Cập nhật sản phẩm thành công',
-                'data' => $sanpham
+                'data' => $sanpham->load('images')
             ], 200);
 
         } catch (\Exception $e) {
@@ -221,6 +256,8 @@ class SanphamController extends Controller
             ], 500);
         }
     }
+
+
 
 
 
