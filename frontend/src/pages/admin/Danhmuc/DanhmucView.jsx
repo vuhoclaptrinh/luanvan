@@ -10,16 +10,29 @@ import {
   Box,
   Paper,
   Grid,
+  Stack,
 } from '@mui/material';
+
 import axios from 'axios';
 
+import CategoryIcon from '@mui/icons-material/Category';
+//import Inventory2Icon from '@mui/icons-material/Inventory2';
+
 const API_BASE = 'http://127.0.0.1:8000/api/';
+
+const InfoRow = ({ label, value }) => (
+  <Box display="flex" mb={1}>
+    <Typography sx={{ width: 130, fontWeight: '600', color: 'text.secondary' }}>
+      {label}:
+    </Typography>
+    <Typography sx={{ wordBreak: 'break-word' }}>{value}</Typography>
+  </Box>
+);
 
 const DanhmucView = ({ open, onClose, DanhmucId }) => {
   const [danhmuc, setDanhmuc] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Fetch chi tiết danh mục khi mở dialog
   useEffect(() => {
     if (open && DanhmucId) {
       setLoading(true);
@@ -39,60 +52,65 @@ const DanhmucView = ({ open, onClose, DanhmucId }) => {
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      {/* Tiêu đề */}
       <DialogTitle
         sx={{
           backgroundColor: '#1976d2',
           color: 'white',
           fontWeight: 'bold',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          fontSize: 20,
         }}
       >
+        <CategoryIcon fontSize="large" />
         Chi tiết danh mục
       </DialogTitle>
 
-      {/* Nội dung */}
       <DialogContent dividers sx={{ backgroundColor: '#f9f9f9' }}>
         {loading ? (
-          <Box display="flex" justifyContent="center" alignItems="center" height={150}>
+          <Box display="flex" justifyContent="center" alignItems="center" height={180}>
             <CircularProgress />
           </Box>
         ) : danhmuc ? (
           <Paper elevation={3} sx={{ p: 3, borderRadius: 2, backgroundColor: 'white' }}>
             <Grid container spacing={3}>
               <Grid item xs={12} md={7}>
-                {/* Tên danh mục */}
-                <Typography variant="h6" fontWeight="bold" gutterBottom>
+                <Typography variant="h5" fontWeight="bold" gutterBottom>
                   {danhmuc.ten_danh_muc}
                 </Typography>
 
-                {/* Thông tin chi tiết */}
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  {[
-                    ['ID', danhmuc.id],
-                    ['Mô tả', danhmuc.mo_ta || 'N/A'],
-                  ].map(([label, value], index) => (
-                    <Box key={index} display="flex">
-                      <Typography sx={{ width: 130, fontWeight: 500 }}>{label}:</Typography>
-                      <Typography>{value}</Typography>
-                    </Box>
-                  ))}
+                <Box>
+                  <InfoRow label="ID" value={danhmuc.id} />
+                  <InfoRow label="Mô tả" value={danhmuc.mo_ta || 'N/A'} />
                 </Box>
 
-                {/* hiển thị danh sách sản phẩm */}
                 {danhmuc.sanphams?.length > 0 && (
-                  <Box mt={3}>
-                    <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                      Sản phẩm thuộc danh mục ({danhmuc.sanphams.length}):
-                    </Typography>
+                  <Box mt={4}>
+                    <Stack direction="row" alignItems="center" spacing={1} mb={1}>
+                      
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        Sản phẩm thuộc danh mục ({danhmuc.sanphams.length})
+                      </Typography>
+                    </Stack>
 
                     {danhmuc.sanphams.map((sp) => (
-                      <Box key={sp.id} display="flex" gap={2} mb={0.5}>
-                        <Typography sx={{ width: 100, fontWeight: 500 }}>
+                      <Box
+                        key={sp.id}
+                        display="flex"
+                        gap={2}
+                        mb={1}
+                        px={1}
+                        py={0.75}
+                        sx={{
+                          borderBottom: '1px solid #e0e0e0',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <Typography sx={{ width: 80, fontWeight: '600', color: 'text.secondary' }}>
                           ID: {sp.id}
                         </Typography>
-                        <Typography>
-                          Tên: {sp.ten_san_pham}
-                        </Typography>
+                        <Typography sx={{ fontWeight: '500' }}>{sp.ten_san_pham}</Typography>
                       </Box>
                     ))}
                   </Box>
@@ -107,9 +125,8 @@ const DanhmucView = ({ open, onClose, DanhmucId }) => {
         )}
       </DialogContent>
 
-     
-      <DialogActions sx={{ padding: '12px 24px' }}>
-        <Button onClick={onClose} variant="contained" color="primary">
+      <DialogActions sx={{ px: 3, py: 2 }}>
+        <Button onClick={onClose} variant="contained" color="primary" fullWidth>
           Đóng
         </Button>
       </DialogActions>

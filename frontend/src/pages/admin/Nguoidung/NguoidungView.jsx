@@ -10,7 +10,10 @@ import {
   Box,
   Paper,
   Grid,
+  Avatar,
+  Divider,
 } from '@mui/material';
+import { Person as PersonIcon, Close as CloseIcon } from '@mui/icons-material';
 import axios from 'axios';
 
 const API_BASE = 'http://127.0.0.1:8000/api/';
@@ -27,6 +30,7 @@ const NguoidungView = ({ open, onClose, NguoidungId }) => {
         setNguoidung(res.data);
       } catch (error) {
         console.error('Lỗi khi lấy thông tin người dùng:', error);
+        setNguoidung(null);
       } finally {
         setLoading(false);
       }
@@ -34,120 +38,145 @@ const NguoidungView = ({ open, onClose, NguoidungId }) => {
 
     if (NguoidungId && open) {
       fetchNguoidung();
+    } else {
+      setNguoidung(null);
     }
   }, [NguoidungId, open]);
 
-  if (loading) {
-    return <CircularProgress />;
-  }
-
-  if (!Nguoidung) {
-    return <Typography variant="body1">Không tìm thấy thông tin người dùng.</Typography>;
-  }
-
-  return(
-      <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-        {/* Tiêu đề */}
-        <DialogTitle
-          sx={{
-            backgroundColor: '#1976d2',
-            color: 'white',
-            fontWeight: 'bold',
-          }}
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: 3,
+          boxShadow: '0 24px 48px rgba(0,0,0,0.12)',
+          overflow: 'visible',
+        },
+      }}
+    >
+      <DialogTitle
+        sx={{
+          bgcolor: 'primary.main',
+          color: 'primary.contrastText',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          py: 1.5,
+          px: 3,
+          fontWeight: 'bold',
+        }}
+      >
+        <Box display="flex" alignItems="center" gap={1}>
+          <PersonIcon />
+          <Typography variant="h5" fontWeight="bold">
+            Chi tiết người dùng
+          </Typography>
+        </Box>
+        <Button
+          onClick={onClose}
+          sx={{ color: 'inherit', minWidth: 'auto', p: 1, borderRadius: 2 }}
+          aria-label="close"
         >
-          Chi tiết người dùng: {Nguoidung.ho_ten}
-        </DialogTitle>
-  
-        {/* Nội dung */}
-        <DialogContent dividers sx={{ backgroundColor: '#f9f9f9' }}>
-          {loading ? (
-            <Box display="flex" justifyContent="center" alignItems="center" height={150}>
-              <CircularProgress />
-            </Box>
-          ) : Nguoidung ? (
-            <Paper elevation={3} sx={{ p: 3, borderRadius: 2, backgroundColor: 'white' }}>
-              <Grid container spacing={2}>
-               <Grid container spacing={3}>
-                <Grid item xs={12} sm={6}>
-                  <Box>
-                    <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-                      Mã:
-                    </Typography>
-                    <Typography variant="h6" fontWeight="bold">
-                      {Nguoidung.id}
-                    </Typography>
+          <CloseIcon />
+        </Button>
+      </DialogTitle>
 
-                  </Box>
-                </Grid>
-  
-                <Grid item xs={12} sm={6}>
-                  <Box>
-                    <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-                      Họ tên:
-                    </Typography>
-                    <Typography variant="h6" fontWeight="bold">
-                      {Nguoidung.ho_ten}
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Box>
-                    <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-                      Email:
-                    </Typography>
-                    <Typography variant="h6" fontWeight="bold">
-                      {Nguoidung.email}
-                    </Typography>
-                  </Box>
-                </Grid>
-  
-                <Grid item xs={12} sm={6}>
-                  <Box>
-                    <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-                      Số điện thoại:
-                    </Typography>
-                    <Typography variant="h6" fontWeight="bold">
-                      {Nguoidung.so_dien_thoai}
-                    </Typography>
-                  </Box>
-                </Grid>
-  
-                <Grid item xs={12} sm={6}>
-                  <Box>
-                    <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-                     Điạ chỉ:
-                    </Typography>
-                    <Typography variant="h6" fontWeight="bold">
-                     {Nguoidung.dia_chi}
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Box>
-                    <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-                     Chức vụ:
-                    </Typography>
-                    <Typography variant="h6" fontWeight="bold">
-                     {Nguoidung.role === 1 ? 'Admin' : 'Người dùng'}
-                    </Typography>
-                  </Box>
-                </Grid>
+      <DialogContent sx={{ p: 0, bgcolor: '#f9f9f9' }}>
+        {loading ? (
+          <Box display="flex" justifyContent="center" alignItems="center" minHeight={250}>
+            <CircularProgress size={48} />
+          </Box>
+        ) : Nguoidung ? (
+          <Paper
+            elevation={3}
+            sx={{ m: 3, p: 3, borderRadius: 3, boxShadow: '0 4px 12px rgba(0,0,0,0.08)', bgcolor: 'white' }}
+          >
+            <Box textAlign="center" mb={3}>
+              <Avatar sx={{ width: 80, height: 80, bgcolor: 'primary.main', mx: 'auto' }}>
+                <PersonIcon sx={{ fontSize: 40 }} />
+              </Avatar>
+              <Typography variant="h6" fontWeight="bold" mt={1}>
+                {Nguoidung.ho_ten || 'Người dùng'}
+              </Typography>
+            </Box>
+
+            <Divider sx={{ mb: 3 }} />
+
+            <Grid container spacing={3}>
+              <Grid item xs={6}>
+                <Typography variant="subtitle2" color="textSecondary" gutterBottom>
+                  Mã:
+                </Typography>
+                <Typography variant="body1" fontWeight="bold">
+                  {Nguoidung.id}
+                </Typography>
               </Grid>
+
+              <Grid item xs={6}>
+                <Typography variant="subtitle2" color="textSecondary" gutterBottom>
+                  Email:
+                </Typography>
+                <Typography variant="body1" fontWeight="bold">
+                  {Nguoidung.email}
+                </Typography>
               </Grid>
-            </Paper>
-          ) : (
-            <Typography variant="body1">Không tìm thấy thông tin </Typography>
-          )}
-        </DialogContent>
-  
-        {/* Hành động */}
-        <DialogActions>
-          <Button onClick={onClose} color="primary">
-            Đóng
-          </Button>
-        </DialogActions>
-      </Dialog>
-    );
+
+              <Grid item xs={6}>
+                <Typography variant="subtitle2" color="textSecondary" gutterBottom>
+                  Số điện thoại:
+                </Typography>
+                <Typography variant="body1" fontWeight="bold">
+                  {Nguoidung.so_dien_thoai}
+                </Typography>
+              </Grid>
+
+              <Grid item xs={6}>
+                <Typography variant="subtitle2" color="textSecondary" gutterBottom>
+                  Địa chỉ:
+                </Typography>
+                <Typography variant="body1" fontWeight="bold">
+                  {Nguoidung.dia_chi}
+                </Typography>
+              </Grid>
+
+              <Grid item xs={12}>
+                <Typography variant="subtitle2" color="textSecondary" gutterBottom>
+                  Chức vụ:
+                </Typography>
+                <Typography variant="body1" fontWeight="bold">
+                  {Nguoidung.role === 1 ? 'Admin' : 'Người dùng'}
+                </Typography>
+              </Grid>
+            </Grid>
+          </Paper>
+        ) : (
+          <Box textAlign="center" py={8}>
+            <PersonIcon sx={{ fontSize: 80, color: 'text.disabled', mb: 2 }} />
+            <Typography variant="h6" color="error" gutterBottom>
+              Không tìm thấy thông tin người dùng
+            </Typography>
+            <Typography color="textSecondary">
+              Thông tin có thể đã bị xóa hoặc không tồn tại
+            </Typography>
+          </Box>
+        )}
+      </DialogContent>
+
+      <DialogActions sx={{ p: 3, bgcolor: 'grey.50' }}>
+        <Button
+          onClick={onClose}
+          variant="contained"
+          size="large"
+          sx={{ borderRadius: 2, px: 4, fontWeight: 'bold' }}
+        >
+          Đóng
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
 };
 
 export default NguoidungView;

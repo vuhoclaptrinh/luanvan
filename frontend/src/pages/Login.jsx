@@ -64,7 +64,7 @@ const LoginRegister = () => {
         enqueueSnackbar('Đăng nhập thành công!', { variant: 'success' });
       
         if (user.role === 1) {
-          navigate('/');  // chuyển trang admin
+          navigate('/thongke');  // chuyển trang admin
           enqueueSnackbar('Đăng nhập bằng admin!', { variant: 'info' });
         } else {
           navigate('/Home'); // chuyển trang người dùng thường

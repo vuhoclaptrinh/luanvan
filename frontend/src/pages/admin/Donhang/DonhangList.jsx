@@ -8,6 +8,7 @@ import {
   Stack,
   TextField,
   Chip,
+  MenuItem,
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -210,9 +211,15 @@ const columns = [
 
   return (
    <Box >
-      <Typography variant="h5" gutterBottom>
-        Danh sách Đơn hàng
-      </Typography>
+       <Typography
+              variant="h4"
+              fontWeight="bold"
+              mb={2}
+              color="primary.main"
+              textAlign="center"
+            >
+              Danh Sách Đơn Hàng
+            </Typography>
 
       <Stack direction="row" spacing={2} alignItems="center" mb={2} flexWrap="wrap">
         <TextField
@@ -227,11 +234,11 @@ const columns = [
           size="small"
           value={selectedKhachhang}
           onChange={(e) => setSelectedKhachhang(e.target.value)}
-          SelectProps={{ native: true }}
+         sx={{ width: 200 }}
         >
-          <option value=""></option>
+          <MenuItem value="">Tất Cả </MenuItem>
           {Object.entries(khachhangmap).map(([id, name]) => (
-            <option key={id} value={id}>{name}</option>
+            <MenuItem key={id} value={id}>{name}</MenuItem>
           ))}
         </TextField>
         <Box sx={{ flexGrow: 1 }} />

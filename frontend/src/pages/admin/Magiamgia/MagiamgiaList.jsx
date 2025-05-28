@@ -144,9 +144,15 @@ const MagiamgiaList = () => {
 
   return (
    <Box>
-      <Typography variant="h4" gutterBottom>
-        Danh sách Mã giảm giá
-      </Typography>
+       <Typography
+              variant="h4"
+              fontWeight="bold"
+              mb={2}
+              color="primary.main"
+              textAlign="center"
+            >
+              Danh Sách Mã Giảm Giá
+            </Typography>
 
       <Stack direction="row" spacing={2} alignItems="center" mb={2} flexWrap="wrap">
         <Box sx={{ flexGrow: 1 }} />

@@ -164,9 +164,15 @@ const DanhmucList = () => {
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>
-        Danh sách danh mục
-      </Typography>
+       <Typography
+              variant="h4"
+              fontWeight="bold"
+              mb={2}
+              color="primary.main"
+              textAlign="center"
+            >
+              Danh Sách Danh Mục
+            </Typography>
 
       <Stack direction="row" spacing={2} alignItems="center" mb={2} flexWrap="wrap">
         <Box sx={{ flexGrow: 1 }} />

@@ -21,6 +21,7 @@ import NotFound from "./components/Notfound";
 // Import pages
 import Login from "./pages/Login";
 import Home from "./pages/Home";
+import Thongke from "./pages/Thongke";
 
 // Import admin pages
 import SanphamList from "./pages/admin/Sanpham/SanphamList";
@@ -30,6 +31,7 @@ import DonhangList from "./pages/admin/Donhang/DonhangList";
 import NguoidungList from "./pages/admin/Nguoidung/NguoidungList";
 import NguoidungView from "./pages/admin/Nguoidung/NguoidungView";
 import Profile from "./pages/Profile";
+import DanhgiaList from "./pages/admin/Danhgia/DanhgiaList";
 
 // Protected Route Component
 const PrivateRoute = () => {
@@ -75,6 +77,9 @@ function App() {
                 <Route path="donhang" element={<DonhangList />} />
                 <Route path="nguoidung" element={<NguoidungList />} />
                 <Route path="profile" element={<Profile/>}/>
+                <Route path="danhgia" element={<DanhgiaList/>}/>
+                <Route path="thongke" element={<Thongke/>}/>
+
                 {/* Nested Routes for Nguoidung */}
               </Route>
               

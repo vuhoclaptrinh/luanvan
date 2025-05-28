@@ -8,6 +8,7 @@ import {
   Button,
   Typography,
   Stack,
+  MenuItem,
   TextField,
 } from '@mui/material';
 import {
@@ -155,9 +156,15 @@ const fetchNguoidung   = async () => {
 
   return (
    <Box>
-      <Typography variant="h4" gutterBottom>
-        Danh sách Người dùng
-      </Typography>
+    <Typography
+          variant="h4"
+          fontWeight="bold"
+          mb={2}
+          color="primary.main"
+          textAlign="center"
+        >
+          Danh Sách Người Dùng
+        </Typography>
 {/* 
       <Stack direction="row" spacing={2} alignItems="center" mb={2} flexWrap="wrap">
         <Box sx={{ flexGrow: 1 }} />

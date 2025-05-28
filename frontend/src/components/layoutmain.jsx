@@ -86,7 +86,7 @@ const LayoutMain = () => {
       text: "Quản Lý Sản Phẩm", 
       icon: <InventoryIcon />, 
       path: "/sanpham",
-      description: "Quản lý kho hàng và sản phẩm"
+      description: "Quản lý sản phẩm"
     },
     { 
       text: "Quản Lý Đơn Hàng", 
