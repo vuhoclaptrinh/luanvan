@@ -106,6 +106,11 @@ Route::get('/donhang/khachhang/{id}/{ngaydat}', [DonhangController::class, 'getB
 //getby khach hàng
 Route::get('/donhang/khachhang/{id}', [DonhangController::class, 'getByKhachHang']);
 
+//thong ke doanh thu
+Route::get('/doanhthutheothang/{year?}', [DonhangController::class, 'getDoanhThuTheoThang']);
+
+
+
 //CHI TIẾT ĐƠN HÀNG
 //Đánh giá
 //GET

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Donhang;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class DonhangController extends Controller
 {
@@ -263,34 +264,40 @@ class DonhangController extends Controller
     //lọc theo ngày đặt
 
 
-    // public function getbydate($ngaydat)
-    // {
-    //     try {
-    //         $donhangs = Donhang::where('ngay_dat', $ngaydat)->get();
+    public function getDoanhThuTheoThang($year = null)
+    {
+        try {
+            $year = $year ?? Carbon::now()->year;
 
-    //         $donhang = $donhangs->map(function ($item) {
-    //             return [
-    //                 'id' => $item->id,
-    //                 'khach_hang_id' => $item->khach_hang_id,
-    //                 'ten_khach_hang' => $item->khachHang->ho_ten ?? null,
-    //                 'ngay_dat' => $item->ngay_dat,
-    //                 'tong_tien' => $item->tong_tien,
-    //                 'trang_thai' => $item->trang_thai,
-    //                 'ma_giam_gia_id' => $item->ma_giam_gia_id,
-    //             ];
-    //         });
-    //         return response()->json([
-    //             'status' => true,
-    //             'message' => 'Lấy thành công danh sách đơn hàng theo ngày đặt ' . $ngaydat . '.',
-    //             'data' => $donhang
-    //         ]);
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'status' => false,
-    //             'message' => 'Có lỗi xảy ra :' . $e->getMessage()
-    //         ], 500);
-    //     }
-    // }
+            // Dùng Eloquent với selectRaw
+            $doanhThuTheoThang = Donhang::whereYear('ngay_dat', $year)
+                ->selectRaw('MONTH(ngay_dat) as thang, SUM(tong_tien) as doanh_thu')
+                ->groupBy('thang')
+                ->orderBy('thang')
+                ->get();
+
+            // Đảm bảo có đủ 12 tháng
+            $result = [];
+            for ($i = 1; $i <= 12; $i++) {
+                $thangData = $doanhThuTheoThang->firstWhere('thang', $i);
+                $result[] = [
+                    'month' => 'Tháng ' . $i,
+                    'revenue' => $thangData ? (int) $thangData->doanh_thu : 0
+                ];
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => "Lấy doanh thu theo tháng năm $year thành công.",
+                'data' => $result
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Có lỗi xảy ra: ' . $e->getMessage()
+            ], 500);
+        }
+    }
     // lay theo ngày đặt
     public function getByDate($ngaydat)
     {

@@ -12,18 +12,21 @@ class DanhgiaController extends Controller
     public function get()
     {
         try {
-            //$danhgias = Danhgia::with(['khachHang', 'sanPham'])->get(); //lấy tên theo khoá
-            $danhgia = Danhgia::all();
+            $danhgias = Danhgia::with(['khachHang', 'sanPham'])->get(); //lấy tên theo khoá
+            // $danhgia = Danhgia::all();
             // Biến đổi dữ liệu
-            /*$danhgia = $danhgias->map(function ($item) {
+            $danhgia = $danhgias->map(function ($item) {
                 return [
+                    'id' => $item->id,
+                    'ma_khach_hang' => $item->khach_hang_id,
+                    'ma_san_pham' => $item->san_pham_id,
                     'so_sao' => $item->so_sao,
                     'noi_dung' => $item->noi_dung,
                     'ngay_danh_gia' => $item->ngay_danh_gia,
                     'ten_khach_hang' => $item->khachHang->ho_ten ?? null,
                     'ten_san_pham' => $item->sanPham->ten_san_pham ?? null,
                 ];
-            });*/
+            });
 
             return response()->json([
                 'status' => true,
@@ -40,13 +43,24 @@ class DanhgiaController extends Controller
 
     //get one danh muc
     public function getOne($id)
-    {
-        $danhgia = Danhgia::Find($id);
+    { {
+            $danhgia = DanhGia::with(['sanpham', 'khachhang'])->find($id);
 
-        if (!$danhgia) {
-            return response()->json(['messsage' => 'không tim thay']);
+            if (!$danhgia) {
+                return response()->json(null, 404);
+            }
+
+            return response()->json([
+                'id' => $danhgia->id,
+                'san_pham_id' => $danhgia->san_pham_id,
+                'ten_san_pham' => optional($danhgia->sanpham)->ten_san_pham,
+                'so_sao' => $danhgia->so_sao,
+                'noi_dung' => $danhgia->noi_dung,
+                'ngay_danh_gia' => $danhgia->created_at->format('d/m/Y'),
+                'ten_khach_hang' => optional($danhgia->khachhang)->ten,
+                'email' => optional($danhgia->khachhang)->email,
+            ]);
         }
-        return response()->json($danhgia);
     }
     // add
     public function add(Request $request)

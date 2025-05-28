@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Khachhang;
+use Illuminate\Support\Facades\Hash;
+
 class KhachhangController extends Controller
 {
     // get danh sách khách hàng
@@ -50,7 +52,7 @@ class KhachhangController extends Controller
             $khachhang = new Khachhang();
             $khachhang->ho_ten = $request->ho_ten;
             $khachhang->email = $request->email;
-            $khachhang->mat_khau = $request->mat_khau;
+            $khachhang->mat_khau = Hash::make($request->mat_khau);
             //$khachhang->email = $request->email;
             $khachhang->so_dien_thoai = $request->so_dien_thoai;
             $khachhang->dia_chi = $request->dia_chi;
@@ -138,7 +140,8 @@ class KhachhangController extends Controller
         // Tìm khách hàng theo email
         $khachhang = Khachhang::where('email', $request->email)->first();
 
-        if (!$khachhang || $khachhang->mat_khau !== $request->mat_khau) {
+        // So sánh mật khẩu
+        if (!$khachhang || !Hash::check($request->mat_khau, $khachhang->mat_khau)) {
             return response()->json([
                 'message' => 'Email hoặc mật khẩu không đúng'
             ], 401);
@@ -152,16 +155,26 @@ class KhachhangController extends Controller
     //register
     public function register(Request $request)
     {
-        $request->validate([
-            'ho_ten' => 'required|string|max:255',
-            'email' => 'required|email|unique:khachhang,email',
-            'mat_khau' => 'required|string|min:6|max:255',
-        ]);
+        $request->validate(
+            [
+                'ho_ten' => 'required|string|max:255',
+                'email' => 'required|email|unique:khachhang,email',
+                'mat_khau' => 'required|string|min:6|max:255',
+            ],
+            [
+                'ho_ten.required' => 'Họ tên là bắt buộc',
+                'email.required' => 'Email là bắt buộc',
+                'email.email' => 'Email không hợp lệ',
+                'email.unique' => 'Email đã được sử dụng',
+                'mat_khau.required' => 'Mật khẩu là bắt buộc',
+                'mat_khau.min' => 'Mật khẩu phải có ít nhất 6 ký tự',
+            ]
+        );
 
         $khachhang = new Khachhang();
         $khachhang->ho_ten = $request->ho_ten;
         $khachhang->email = $request->email;
-        $khachhang->mat_khau = $request->mat_khau;  // Mã hóa mật khẩu
+        $khachhang->mat_khau = Hash::make($request->mat_khau); // 🔒 Mã hoá mật khẩu
 
         $khachhang->save();
 
