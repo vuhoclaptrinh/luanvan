@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\ChitietdonhangController;
 use App\Http\Controllers\DanhgiaController;
+use App\Http\Controllers\KhoaController;
 use App\Http\Controllers\SanphamController;
 
+use App\Http\Controllers\SinhvienController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DanhmucController;
@@ -32,6 +34,11 @@ Route::delete('/sanpham/{id}', [SanphamController::class, 'delete']);
 //getby Danh mục
 Route::get('/sanpham/danhmuc/{id}', [SanphamController::class, 'getByDanhmuc']);
 
+
+//khoa
+Route::get('/khoa', [KhoaController::class, 'get']);
+Route::get('/khoa/{id}', [KhoaController::class, 'getOne']);
+Route::get('/sinhvien', [SinhvienController::class, 'get']);
 
 
 //DANH MỤC 

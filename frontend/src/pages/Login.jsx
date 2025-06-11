@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';  
+import { Link, useNavigate } from 'react-router-dom';  
 import {
   Container,
   Box,
@@ -28,6 +28,8 @@ import {
 } from '@mui/icons-material';
 import { enqueueSnackbar } from 'notistack';
 import axios from 'axios';
+import Logo from "../assets/img/logo.jpg";
+import { Navbar } from "react-bootstrap";
 
 const LoginRegister = () => {
   const [tab, setTab] = useState(0); 
@@ -152,6 +154,7 @@ const LoginRegister = () => {
               }}
             >
               <Avatar
+              
                 sx={{
                   width: 80,
                   height: 80,
@@ -159,13 +162,15 @@ const LoginRegister = () => {
                   mx: 'auto',
                   mb: 2,
                   backdropFilter: 'blur(10px)',
+                  
                 }}
               >
-                <StoreIcon sx={{ fontSize: 40 }} />
+                <img src={Logo} alt="Logo" width="200" height="200" className="rounded-circle" />
               </Avatar>
               <Typography variant="h4" fontWeight="bold" gutterBottom>
                 Perfumer Shop
               </Typography>
+              
               <Typography variant="body1" sx={{ opacity: 0.9 }}>
                 Hệ thống nước hoa cao cấp
               </Typography>

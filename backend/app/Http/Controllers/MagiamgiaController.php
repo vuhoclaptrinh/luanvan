@@ -50,7 +50,7 @@ class MagiamgiaController extends Controller
                 [
                     'ma.unique' => 'Mã giảm giá này đã tồn tại. Vui lòng nhập mã khác.',
                     'ma.required' => 'Mã giảm giá không được để trống.',
-                    // các thông báo khác nếu muốn:
+
                     'phan_tram_giam.integer' => 'Phần trăm giảm phải là số nguyên.',
                     'ngay_ket_thuc.after_or_equal' => 'Ngày kết thúc phải sau hoặc bằng ngày bắt đầu.'
                 ]

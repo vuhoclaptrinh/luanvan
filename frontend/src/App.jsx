@@ -1,5 +1,6 @@
 import React from "react";
 import "./App.css";
+
 import {
   BrowserRouter as Router,
   Routes,
@@ -32,11 +33,15 @@ import NguoidungList from "./pages/admin/Nguoidung/NguoidungList";
 import NguoidungView from "./pages/admin/Nguoidung/NguoidungView";
 import Profile from "./pages/Profile";
 import DanhgiaList from "./pages/admin/Danhgia/DanhgiaList";
+//test cho thai đoi tu thong ke qua
+
+
+
 
 // Protected Route Component
 const PrivateRoute = () => {
   const user = JSON.parse(sessionStorage.getItem("user"));
-  return user ? <Outlet /> : <Navigate to="/login" />;
+  return user ? <Outlet /> : <Navigate to="/home" />;
 };
 
 // Main Dashboard Component
@@ -64,7 +69,8 @@ function App() {
         <Router>
           <Routes>
             {/* Public Routes */}
-            <Route path="/login" element={<Login />} />
+            <Route path="/home" element={<Home />} />
+             <Route path="/login" element={<Login />} />
             
             {/* Protected Routes */}
             <Route element={<PrivateRoute />}>
@@ -79,12 +85,14 @@ function App() {
                 <Route path="profile" element={<Profile/>}/>
                 <Route path="danhgia" element={<DanhgiaList/>}/>
                 <Route path="thongke" element={<Thongke/>}/>
+                {/* <Route path="list" element={<DSlist/>}></Route> */}
 
                 {/* Nested Routes for Nguoidung */}
               </Route>
               
               {/* Separate Home Route (outside admin layout) */}
               <Route path="/home" element={<Home />} />
+            
             </Route>
 
             {/* 404 Not Found */}

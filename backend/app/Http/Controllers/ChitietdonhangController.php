@@ -75,12 +75,16 @@ class ChitietdonhangController extends Controller
     public function add(Request $request)
     {
         try {
-            $request->validate([
-                'don_hang_id' => 'required|exists:donhang,id',
-                'san_pham_id' => 'required|exists:sanpham,id',
-                'so_luong' => 'required|integer|min:1',
-                'gia' => 'required|numeric|min:0',
-            ]);
+            $request->validate(
+                [
+                    'don_hang_id' => 'required|exists:donhang,id',
+                    'san_pham_id' => 'required|exists:sanpham,id',
+                    'so_luong' => 'required|integer|min:1',
+                    'gia' => 'required|numeric|min:0',
+                ]
+
+
+            );
             $chitietdonhang = new Chitietdonhang();
             $chitietdonhang->don_hang_id = $request->don_hang_id;
             $chitietdonhang->san_pham_id = $request->san_pham_id;

@@ -74,7 +74,7 @@ const LayoutMain = () => {
       text: "Thống Kê", 
       icon: <BarChartIcon />, 
       path: "/thongke",
-      description: "Xem báo cáo và phân tích"
+      description: "Thống Kê"
     },
     { 
       text: "Quản Lý Danh Mục", 

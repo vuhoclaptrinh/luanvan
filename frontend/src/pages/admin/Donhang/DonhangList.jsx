@@ -43,6 +43,7 @@ const DonhangList = () => {
   const [khachhangmap, setKhachhangmap] = useState({});
   const [selectedKhachhang, setSelectedKhachhang] = useState('');
   const [searchText, setSearchText] = useState('');
+  const [searchName,setSearchName]= useState('');
 
   // Phân trang
   const [paginationModel, setPaginationModel] = useState({
@@ -129,7 +130,8 @@ const DonhangList = () => {
   const donhangFiltered = Donhang.filter((dh) => {
   const matchSearch = dh.trang_thai?.toLowerCase().includes(searchText.toLowerCase());
   const matchKhachhang = selectedKhachhang ? dh.khach_hang_id === parseInt(selectedKhachhang) : true;
-  return matchSearch && matchKhachhang;
+  const matchName=dh.ten_khach_hang?.toLowerCase().includes(searchName.toLowerCase());
+  return matchSearch && matchKhachhang && matchName;
 });
 
 const columns = [
@@ -223,8 +225,15 @@ const columns = [
 
       <Stack direction="row" spacing={2} alignItems="center" mb={2} flexWrap="wrap">
         <TextField
-          label="Tìm kiếm theo trạng thái"
+          label="Tìm kiếm theo tên khách hàng"
           size="small"
+          value={searchName}
+          onChange={(e) => setSearchName(e.target.value)}
+          sx={{ width: 250 }}
+        />
+        <TextField
+          label="Tìm kiếm theo trạng thái"
+          size="small"  
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
         />

@@ -14,7 +14,7 @@ class DanhgiaController extends Controller
         try {
             $danhgias = Danhgia::with(['khachHang', 'sanPham'])->get(); //lấy tên theo khoá
             // $danhgia = Danhgia::all();
-            // Biến đổi dữ liệu
+            //map 
             $danhgia = $danhgias->map(function ($item) {
                 return [
                     'id' => $item->id,
@@ -31,7 +31,7 @@ class DanhgiaController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'Lấy thành công danh sách đánh giá',
-                'data' => $danhgia //trả về dữ liệu
+                'data' => $danhgia
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -73,7 +73,7 @@ class DanhgiaController extends Controller
                 'so_sao' => 'required|integer|min:1|max:5',
                 'noi_dung' => 'nullable|string',
                 'ngay_danh_gia' => 'required|date',
-            ]);
+            ], );
 
 
             $danhgia = new Danhgia();
@@ -169,7 +169,7 @@ class DanhgiaController extends Controller
     public function getBySanPham($sanPhamId)
     {
         try {
-            // Lấy đánh giá theo sản phẩm, kèm tên khách hàng
+            // lấy đánh giá theo sản phẩm kèm tên khách hàng
             $danhgias = Danhgia::with(['khachHang', 'sanPham'])->where('san_pham_id', $sanPhamId)->get();
 
             // Biến đổi dữ liệu

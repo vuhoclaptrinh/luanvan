@@ -160,7 +160,7 @@ useEffect(() => {
           value={formdata.ma_giam_gia_id}
           onChange={handleChange}
           fullWidth
-
+          disabled
           
         />
         <TextField

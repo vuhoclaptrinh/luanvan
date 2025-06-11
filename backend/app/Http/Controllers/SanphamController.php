@@ -119,7 +119,7 @@ class SanphamController extends Controller
 
             return response()->json([
                 'message' => 'Thêm sản phẩm thành công',
-                'data' => $sanpham->load('images') // load quan hệ images để trả về luôn
+                'data' => $sanpham->load('images')
             ], 201);
 
         } catch (\Exception $e) {
@@ -130,51 +130,6 @@ class SanphamController extends Controller
         }
     }
 
-    // public function add(Request $request)
-    // {
-    //     try {
-    //         $request->validate([
-    //             'ten_san_pham' => 'required|string|max:255',
-    //             'thuong_hieu' => 'required|string|max:100',
-    //             'mo_ta' => 'nullable|string',
-    //             'dung_tich' => 'required|string|max:255',
-    //             'gia' => 'required|numeric',
-    //             'so_luong_ton' => 'required|integer',
-    //             'danh_muc_id' => 'nullable|exists:danhmuc,id',
-    //             'hinh_anh' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-    //         ]);
-
-    //         $sanpham = new Sanpham();
-    //         $sanpham->ten_san_pham = $request->ten_san_pham;
-    //         $sanpham->thuong_hieu = $request->thuong_hieu;
-    //         $sanpham->mo_ta = $request->mo_ta;
-    //         $sanpham->dung_tich = $request->dung_tich;
-    //         $sanpham->gia = $request->gia;
-    //         $sanpham->so_luong_ton = $request->so_luong_ton;
-    //         $sanpham->danh_muc_id = $request->danh_muc_id;
-
-    //         // Xử lý upload hình ảnh nếu có
-    //         if ($request->hasFile('hinh_anh')) {
-    //             $file = $request->file('hinh_anh');
-    //             $filename = time() . '_' . $file->getClientOriginalName();
-    //             $path = $file->storeAs('images', $filename, 'public');
-    //             $sanpham->hinh_anh = $path;
-    //         }
-
-    //         $sanpham->save();
-
-    //         return response()->json([
-    //             'message' => 'Thêm sản phẩm thành công',
-    //             'data' => $sanpham
-    //         ], 201);
-
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'message' => 'Đã xảy ra lỗi khi thêm sản phẩm',
-    //             'error' => $e->getMessage()
-    //         ], 500);
-    //     }
-    // }
 
     public function update(Request $request, $id)
     {
@@ -203,7 +158,7 @@ class SanphamController extends Controller
             $sanpham->so_luong_ton = $request->so_luong_ton;
             $sanpham->danh_muc_id = $request->danh_muc_id;
 
-            // Cập nhật ảnh chính nếu có
+            // Cập nhật ảnh chính 
             if ($request->hasFile('hinh_anh')) {
                 $file = $request->file('hinh_anh');
                 $filename = time() . '_' . $file->getClientOriginalName();
@@ -230,7 +185,7 @@ class SanphamController extends Controller
                 }
             }
 
-            // Thêm ảnh phụ mới nếu có
+            // Thêm ảnh phụ mới 
             if ($request->hasFile('hinh_phu')) {
                 foreach ($request->file('hinh_phu') as $file) {
                     $filename = time() . '_' . $file->getClientOriginalName();
@@ -271,11 +226,7 @@ class SanphamController extends Controller
                 return response()->json(['message' => 'Không tìm thấy sản phẩm'], 404);
             }
 
-            // Xoá ảnh nếu có
-            /* if ($sanpham->hinh_anh && Storage::disk('public')->exists($sanpham->hinh_anh)) {
-                 Storage::disk('public')->delete($sanpham->hinh_anh);
-             }
-             */
+
             $sanpham->delete();
 
             return response()->json(['message' => 'Xoá sản phẩm thành công'], 200);
