@@ -270,7 +270,7 @@ const SanphamList = () => {
         </Button>
       </Stack>
 
-      <Box sx={{ width: '100%' }}>
+      <Box sx={{ width: '100%', overflowX: 'auto' }}>
         <DataGrid
           rows={sanphamFiltered}
           columns={columns}

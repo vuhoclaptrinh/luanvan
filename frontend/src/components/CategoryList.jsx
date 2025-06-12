@@ -33,13 +33,9 @@ const getCategoryIcon = (name) => {
 function FeaturedCategories() {
 
   //  State
-
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(false)
-
-
   //  Lấy danh sách danh mục + số lượng sản phẩm
-
   useEffect(() => {
     const fetchCategories = async () => {
       setLoading(true)
@@ -75,9 +71,7 @@ function FeaturedCategories() {
   return (
     <section className="py-5 bg-light">
       <Container>
-       
         {/*  Tiêu đề */}
-        
         <div className="text-center mb-5">
           <h2 className="display-5 fw-bold mb-3">
             <span className="text-primary">Danh mục</span> nổi bật
@@ -96,19 +90,14 @@ function FeaturedCategories() {
             ></div>
           </div>
         </div>
-
-     
         {/*  Loading */}
-       
         {loading ? (
           <div className="text-center py-5">
             <Spinner animation="border" variant="primary" style={{ width: "3rem", height: "3rem" }} />
             <p className="mt-3 text-muted">Đang tải danh mục...</p>
           </div>
         ) : (
-          
           //  Hiển thị danh sách danh mục
-          
           <Row className="g-4">
             {categories.map((cat) => (
               <Col key={cat.id} xs={12} sm={6} lg={4} xl={3}>
@@ -162,9 +151,7 @@ function FeaturedCategories() {
           </Row>
         )}
 
-       
         {/*  Thống kê  */}
-       
         {!loading && categories.length > 0 && (
           <div className="text-center mt-5 pt-4 border-top">
             <Row className="justify-content-center">

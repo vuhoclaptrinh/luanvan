@@ -10,13 +10,13 @@ const getImageUrl = (path) => {
   return `http://127.0.0.1:8000/storage/images/${path.replace(/^images\//, "")}`
 }
 
-const ProductList = () => {
+const ViewSP = () => {
   const [products, setProducts] = useState([])
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [visibleCount, setVisibleCount] = useState(3) 
+  const [visibleCount, setVisibleCount] = useState(6) 
 
   useEffect(() => {
     setLoading(true)
@@ -54,9 +54,9 @@ const ProductList = () => {
     }
   }
 
-  // const handleShowMore = () => {
-  //   setVisibleCount((prevCount) => Math.min(prevCount + 6, products.length))
-  // }
+  const handleShowMore = () => {
+    setVisibleCount((prevCount) => Math.min(prevCount + 6, products.length))
+  }
 
   if (loading) {
     return (
@@ -83,12 +83,12 @@ const ProductList = () => {
   return (
     <section className="py-5 bg-light">
       <Container>
-        <div className="text-center mb-5">
+        {/* <div className="text-center mb-5">
           <h2 className="display-6 fw-bold">Sản phẩm nổi bật</h2>
           <p className="text-muted mx-auto" style={{ maxWidth: "700px" }}>
             Khám phá bộ sưu tập nước hoa cao cấp được yêu thích nhất
           </p>
-        </div>
+        </div> */}
 
         <Row className="g-4">
           {products.slice(0, visibleCount).map((product) => (
@@ -159,13 +159,13 @@ const ProductList = () => {
           ))}
         </Row>
 
-        {/* {visibleCount < products.length && (
+        {visibleCount < products.length && (
           <div className="text-center mt-5">
             <Button variant="outline-primary" size="lg" onClick={handleShowMore} className="px-4">
               Xem thêm sản phẩm
             </Button>
           </div>
-        )} */}
+        )}
 
         {/* Modal xem chi tiết sản phẩm */}
         <Modal
@@ -324,4 +324,4 @@ const ProductList = () => {
   )
 }
 
-export default ProductList
+export default ViewSP

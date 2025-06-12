@@ -186,7 +186,7 @@ const DanhmucList = () => {
         </Button>
       </Stack>
 
-      <Box sx={{ width: '100%', height: 600, marginTop: 2 }}>
+      <Box sx={{ width: '100%', overflowX: 'auto' }}>
         <DataGrid
           rows={danhmuc}
           columns={columns}

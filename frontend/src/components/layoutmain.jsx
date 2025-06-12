@@ -37,6 +37,7 @@ import {
   Notifications as NotificationsIcon,
 } from "@mui/icons-material";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import Logo from "../assets/img/logo.jpg";
 
 const drawerWidth = 280;
 
@@ -129,7 +130,7 @@ const LayoutMain = () => {
     >
       {/* Header */}
       <Box sx={{ p: 3, textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
-        <StoreIcon sx={{ fontSize: 48, mb: 1, color: "white" }} />
+          <img src={Logo} alt="Logo" width="150" height="150" className="rounded-circle" />
         <Typography variant="h5" fontWeight="bold" gutterBottom>
           Perfumer Shop
         </Typography>

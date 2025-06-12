@@ -178,7 +178,7 @@ const columns = [
     );
      },
     },
-    { field: 'ten_ma_giam_gia', headerName: 'Mã Giảm Giá', width: 100 },
+    // { field: 'ten_ma_giam_gia', headerName: 'Mã Giảm Giá', width: 100 },
     {
       field: 'actions',
       headerName: 'Thao tác',

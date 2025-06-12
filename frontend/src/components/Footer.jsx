@@ -1,11 +1,12 @@
 import { Container, Row, Col, Form, Button, InputGroup } from "react-bootstrap"
 import Logo from  '../assets/img/logo.jpg';
+
 function Footer() {
   return (
     <footer className="bg-light border-top mt-5">
       <Container className="py-5">
         <Row className="gy-4">
-          {/* Company Info */}
+          {/* thương hiệu */}
           <Col xs={12} md={6} lg={3}>
             <div className="mb-4">
               <div className="d-flex align-items-center mb-3">
@@ -148,7 +149,7 @@ function Footer() {
 
         {/* Copyright */}
         <div className="border-top pt-4 mt-4 text-center">
-          <p className="text-muted small">© 2025 PerfumeShop. Tất cả quyền được bảo lưu.</p>
+          <p className="text-muted small">© 2025 PerfumeShop..</p>
         </div>
       </Container>
     </footer>

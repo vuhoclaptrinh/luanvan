@@ -7,7 +7,8 @@ import { Link, useNavigate } from "react-router-dom";
 import Logo from "../assets/img/logo.jpg";
 import { Box, Avatar, Typography } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
-// Navigation Links
+
+  //Nav
 const NAV_LINKS = [
   { href: "/home", label: "Trang chủ" },
   { href: "/products", label: "Sản phẩm" },
@@ -17,7 +18,7 @@ const NAV_LINKS = [
   { href: "/contact", label: "Liên hệ" },
 ];
 
-// Lấy tên đầy đủ từ user object
+//set ten
 const getFullName = (user) => {
   if (!user) return "";
   return `${user.first_name || ""} ${user.last_name || ""}`.trim();
@@ -30,7 +31,7 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
-  // Lấy user từ sessionStorage
+  // Lấy user 
   useEffect(() => {
     const storedUser = sessionStorage.getItem("user");
     if (storedUser) {
@@ -52,7 +53,7 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
   const handleLogout = () => {
     sessionStorage.removeItem("user");
     setUser(null);
-    navigate("/login");
+    navigate("/home");
   };
 
   return (
@@ -70,6 +71,7 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
             <Button variant="link" className="text-dark me-2" onClick={() => setShowSearch(!showSearch)}>
               <i className="bi bi-search"></i>
             </Button>
+            
             <Link to="/cart" className="text-dark position-relative me-2">
               <i className="bi bi-bag"></i>
               {cartCount > 0 && (
@@ -78,6 +80,7 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
                 </Badge>
               )}
             </Link>
+
             <Button variant="link" className="text-dark" onClick={() => setShowOffcanvas(true)}>
               <i className="bi bi-list fs-4"></i>
             </Button>
@@ -92,9 +95,9 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
             ))}
           </Nav>
 
-          {/* Right side (desktop) */}
+          {/* phải */}
           <div className="d-none d-lg-flex align-items-center">
-            {/* Search */}
+            {/* tìm kiếm */}
             <Form onSubmit={handleSearch} className="me-3">
               <InputGroup>
                 <Form.Control
@@ -108,7 +111,7 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
               </InputGroup>
             </Form>
 
-            {/* Wishlist */}
+            {/* yêu thích */}
             <Link to="/wishlist" className="text-dark position-relative me-2">
               <i className="bi bi-heart"></i>
               {wishlistCount > 0 && (
@@ -118,7 +121,7 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
               )}
             </Link>
 
-            {/* Cart */}
+            {/* giỏ hàng */}
             <Link to="/cart" className="text-dark position-relative me-2">
               <i className="bi bi-bag"></i>
               {cartCount > 0 && (
@@ -128,7 +131,7 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
               )}
             </Link>
 
-            {/* User menu */}
+            {/* tài khoản */}
            {user ? (
             <Dropdown align="end">
               <Dropdown.Toggle
@@ -164,13 +167,14 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
                 </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
-          ) : (
-            <Link to="/login" className="text-dark p-1">
-              <i className="bi bi-person fs-5"></i>
-            </Link>
-          )}
+            ) : (
+              <Link to="/login" className="text-dark p-1">
+                <i className="bi bi-person fs-5"></i>
+              </Link>
+            )}
 
           </div>
+          
         </Container>
       </Navbar>
 

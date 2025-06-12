@@ -33,6 +33,10 @@ import NguoidungList from "./pages/admin/Nguoidung/NguoidungList";
 import NguoidungView from "./pages/admin/Nguoidung/NguoidungView";
 import Profile from "./pages/Profile";
 import DanhgiaList from "./pages/admin/Danhgia/DanhgiaList";
+
+
+import SanphamUser from "./pages/user/SanphamUser";
+
 //test cho thai đoi tu thong ke qua
 
 
@@ -71,6 +75,7 @@ function App() {
             {/* Public Routes */}
             <Route path="/home" element={<Home />} />
              <Route path="/login" element={<Login />} />
+              <Route path="/products" element={<SanphamUser />} />
             
             {/* Protected Routes */}
             <Route element={<PrivateRoute />}>
@@ -92,6 +97,7 @@ function App() {
               
               {/* Separate Home Route (outside admin layout) */}
               <Route path="/home" element={<Home />} />
+             
             
             </Route>
 
