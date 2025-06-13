@@ -27,4 +27,5 @@ export const addToCart = (product) => {
   }
 
   sessionStorage.setItem("cart", JSON.stringify(existingCart))
+   window.dispatchEvent(new Event("cart-updated"))
 }

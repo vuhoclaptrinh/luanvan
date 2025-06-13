@@ -4,7 +4,10 @@ import { useEffect, useState } from "react"
 import { Container, Row, Col } from "react-bootstrap"
 import { Link } from "react-router-dom"
 import { ArrowLeft, Trash2, Plus, Minus, X, ShoppingBag, CreditCard, Gift } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 import "./cart.css"
+
+
 
 const Cart = () => {
   const [cart, setCart] = useState([])
@@ -12,7 +15,7 @@ const Cart = () => {
   const [couponCode, setCouponCode] = useState("")
   const [couponApplied, setCouponApplied] = useState(false)
   const [discountAmount, setDiscountAmount] = useState(0)
-
+  const navigate = useNavigate()  
   // Shipping options
   const shippingOptions = [
     { id: 1, name: "Giao hàng tiêu chuẩn", price: 30000, days: "3-5" },
@@ -129,6 +132,27 @@ const Cart = () => {
     )
   }
 
+  //chéc out
+  
+
+  const handleCheckout = () => {
+    
+    const user = JSON.parse(sessionStorage.getItem("user"))
+    if (!user) {
+      alert("Vui lòng đăng nhập để tiếp tục đặt hàng.")
+      navigate("/login")
+      return
+    }
+
+    navigate("/checkout", {
+      state: {
+        cart: cart,
+        shipping: selectedShipping,
+        discount: discountAmount,
+        coupon: couponCode    
+      }
+    })
+  }
   
 
   return (
@@ -228,10 +252,10 @@ const Cart = () => {
                     <div className="summary-total">
                       <span>Tổng cộng</span>
                       <span>{formatPrice(total)}</span>
-                    </div>
-                    <button className="checkout-button">
+                    </div>  
+                    <button className="checkout-button"  onClick={handleCheckout}>
                       <CreditCard size={16} />
-                      <span>Tiến hành thanh toán</span>
+                      <span>Tiến hành đặt hàng</span>
                     </button>
                   </div>
                 </div>
