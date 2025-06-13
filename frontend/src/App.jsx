@@ -38,6 +38,9 @@ import DanhgiaList from "./pages/admin/Danhgia/DanhgiaList";
 
 import SanphamUser from "./pages/userSanpham/SanphamUser";
 import Cartuser from "./pages/userCart/Cartuser";
+import Checkout from "./pages/userCart/Checkout";
+import OrderDetails from "./pages/userCart/Detailcart";
+import Detailproducts from "./pages/userCart/Detailproducts";
 
 //test cho thai đoi tu thong ke qua
 
@@ -81,6 +84,9 @@ function App() {
              <Route path="/login" element={<Login />} />
               <Route path="/products" element={<SanphamUser />} />
               <Route path="/cart" element={<Cartuser/>}/>
+               <Route path="/checkout" element={<Checkout/>}/>
+                <Route path="/orders" element={<OrderDetails/>}/>
+                 <Route path="/donhang/:id" element={<Detailproducts/>}/>
             
             {/* Protected Routes */}
             <Route element={<PrivateRoute />}>

@@ -69,6 +69,7 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
   const [user, setUser] = useState(null)
   const [showMegaMenu, setShowMegaMenu] = useState(null)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [cartItemCount, setCartItemCount] = useState(cartCount)
 
   // Thêm state cho danh mục
   const [categories, setCategories] = useState([])
@@ -78,6 +79,19 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
   // Thêm state cho thuonghieu
   const [thuonghieu, setThuonghieu] = useState([])
   const [loadingThuonghieu, setLoadingThuonghieu] = useState(false)
+
+  // Hàm để lấy số lượng sản phẩm trong giỏ hàng
+  const getCartItemsCount = () => {
+    try {
+      const cartItems = JSON.parse(sessionStorage.getItem("cart")) || []
+
+       return cartItems.reduce((total, item) => total + item.quantity, 0) //tổng tất cả sản phẩm
+      //return cartItems.length
+    } catch (error) { 
+      console.error("Lỗi khi đọc giỏ hàng:", error) 
+      return 0
+    }
+  }
 
   // Lấy user từ sessionStorage và fetch danh mục
   useEffect(() => {
@@ -90,12 +104,23 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
       }
     }
 
+    // Cập nhật số lượng sản phẩm trong giỏ hàng
+    setCartItemCount(getCartItemsCount())
+
     // Theo dõi scroll để thay đổi header style
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 100)
     }
 
+    // Lắng nghe sự kiện cập nhật giỏ hàng
+    const handleStorageChange = (e) => {
+      if (e.key === "cart") {
+        setCartItemCount(getCartItemsCount())
+      }
+    }
+
     window.addEventListener("scroll", handleScroll)
+    window.addEventListener("storage", handleStorageChange)
 
     // Fetch danh mục từ API
     setLoadingCategories(true)
@@ -132,7 +157,27 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
         setLoadingThuonghieu(false)
       })
 
-    return () => window.removeEventListener("scroll", handleScroll)
+    // Cleanup event listeners
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+      window.removeEventListener("storage", handleStorageChange)
+    }
+  }, [])
+
+  // Hàm để cập nhật số lượng sản phẩm
+  useEffect(() => {
+    // cập nhật
+    const handleCartUpdate = () => {
+      setCartItemCount(getCartItemsCount())
+    }
+
+    // Đăng ký lắng nghe sự kiện
+    window.addEventListener("cart-updated", handleCartUpdate)
+
+    // Cleanup
+    return () => {
+      window.removeEventListener("cart-updated", handleCartUpdate)
+    }
   }, [])
 
   const handleLogout = () => {
@@ -406,14 +451,14 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
                 <Tooltip title="Giỏ hàng">
                   <Link to="/cart" className="text-dark position-relative me-3 p-1">
                     <ShoppingCartIcon />
-                    {cartCount > 0 && (
+                    {cartItemCount > 0 && (
                       <Badge
                         pill
                         bg="primary"
                         className="position-absolute top-0 start-100 translate-middle"
                         style={{ fontSize: "0.6rem" }}
                       >
-                        {cartCount}
+                        {cartItemCount}
                       </Badge>
                     )}
                   </Link>
@@ -525,14 +570,14 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
 
               <Link to="/cart" className="text-dark position-relative p-1">
                 <ShoppingCartIcon />
-                {cartCount > 0 && (
+                {cartItemCount > 0 && (
                   <Badge
                     pill
                     bg="primary"
                     className="position-absolute top-0 start-100 translate-middle"
                     style={{ fontSize: "0.6rem" }}
                   >
-                    {cartCount}
+                    {cartItemCount}
                   </Badge>
                 )}
               </Link>

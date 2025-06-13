@@ -119,7 +119,7 @@ class DonhangController extends Controller
                     'tong_tien' => 'required|numeric|min:1|max:999999999',
                     'trang_thai' => 'nullable|string',
 
-                    'ma_giam_gia_id' => 'required|exists:magiamgia,id',
+                    'ma_giam_gia_id' => 'nullable|exists:magiamgia,id',
                 ],
                 [
                     'khach_hang_id.required' => 'Khách hàng không được để trống.',
@@ -132,13 +132,7 @@ class DonhangController extends Controller
                     'tong_tien.min' => 'Tổng tiền phải lớn hơn 0.',
                     'tong_tien.max' => 'Tổng tiền không được vượt quá 999.999.999 đồng.',
                 ],
-                [
-                    'ma.unique' => 'Mã giảm giá này đã tồn tại. Vui lòng nhập mã khác.',
-                    'ma.required' => 'Mã giảm giá không được để trống.',
 
-                    'phan_tram_giam.integer' => 'Phần trăm giảm phải là số nguyên.',
-                    'ngay_ket_thuc.after_or_equal' => 'Ngày kết thúc phải sau hoặc bằng ngày bắt đầu.'
-                ]
             );
 
 
@@ -175,7 +169,7 @@ class DonhangController extends Controller
             $request->validate(
                 [
                     'khach_hang_id' => 'required|exists:khachhang,id',
-                    'ma_giam_gia_id' => 'required|exists:magiamgia,id',
+                    'ma_giam_gia_id' => 'nullable|exists:magiamgia,id',
                     'ngay_dat' => 'required|date',
                     'tong_tien' => 'required|numeric|min:1|max:999999999',
                     'trang_thai' => 'nullable|string',
@@ -193,13 +187,7 @@ class DonhangController extends Controller
                     'tong_tien.min' => 'Tổng tiền phải lớn hơn 0.',
                     'tong_tien.max' => 'Tổng tiền không được vượt quá 999.999.999 đồng.',
                 ],
-                [
-                    'ma.unique' => 'Mã giảm giá này đã tồn tại. Vui lòng nhập mã khác.',
-                    'ma.required' => 'Mã giảm giá không được để trống.',
 
-                    'phan_tram_giam.integer' => 'Phần trăm giảm phải là số nguyên.',
-                    'ngay_ket_thuc.after_or_equal' => 'Ngày kết thúc phải sau hoặc bằng ngày bắt đầu.'
-                ]
             );
 
 

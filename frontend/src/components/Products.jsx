@@ -17,7 +17,7 @@ const ProductList = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [visibleCount, setVisibleCount] = useState(3) 
+  const [visibleCount, setVisibleCount ] = useState(3) 
 
   useEffect(() => {
     setLoading(true)
