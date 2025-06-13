@@ -23,6 +23,7 @@ import NotFound from "./components/Notfound";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Thongke from "./pages/Thongke";
+import BackToTop from "./components/Backtotop";
 
 // Import admin pages
 import SanphamList from "./pages/admin/Sanpham/SanphamList";
@@ -35,7 +36,8 @@ import Profile from "./pages/Profile";
 import DanhgiaList from "./pages/admin/Danhgia/DanhgiaList";
 
 
-import SanphamUser from "./pages/user/SanphamUser";
+import SanphamUser from "./pages/userSanpham/SanphamUser";
+import Cartuser from "./pages/userCart/Cartuser";
 
 //test cho thai đoi tu thong ke qua
 
@@ -62,20 +64,23 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <SnackbarProvider 
+      <SnackbarProvider   
         maxSnack={3} 
         autoHideDuration={3000}
         anchorOrigin={{
           vertical: 'top',
           horizontal: 'right',
         }}
+        
       >
+        <BackToTop/>  
         <Router>
           <Routes>
             {/* Public Routes */}
             <Route path="/home" element={<Home />} />
              <Route path="/login" element={<Login />} />
               <Route path="/products" element={<SanphamUser />} />
+              <Route path="/cart" element={<Cartuser/>}/>
             
             {/* Protected Routes */}
             <Route element={<PrivateRoute />}>
@@ -103,6 +108,7 @@ function App() {
 
             {/* 404 Not Found */}
             <Route path="*" element={<NotFound />} />
+            
           </Routes>
         </Router>
       </SnackbarProvider>

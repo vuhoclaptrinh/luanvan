@@ -1,4 +1,3 @@
-"use client"
 
 import { useState, useEffect } from "react"
 import { Container, Row, Col, Button } from "react-bootstrap"
@@ -16,6 +15,7 @@ function HeroSection() {
         "Bộ sưu tập nước hoa chính hãng từ các thương hiệu nổi tiếng thế giới. Tìm kiếm hương thơm hoàn hảo cho phong cách của bạn.",
     },
     {
+      
       src: "src/assets/img/logo1.png",
       title: "Hương thơm quyến rũ",
       subtitle: "Dành cho phái đẹp",
@@ -38,13 +38,13 @@ function HeroSection() {
     return () => clearInterval(interval)
   }, [heroImages.length])
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % heroImages.length)
-  }
+  // const nextSlide = () => {
+  //   setCurrentSlide((prev) => (prev + 1) % heroImages.length)
+  // }
 
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length)
-  }
+  // const prevSlide = () => {
+  //   setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length)
+  // }
 
   const goToSlide = (index) => {
     setCurrentSlide(index)
@@ -87,7 +87,7 @@ function HeroSection() {
       />
 
       {/* Navigation Arrows */}
-      <button
+      {/* <button
         className="position-absolute start-0 top-50 translate-middle-y btn btn-link text-white p-3"
         onClick={prevSlide}
         style={{
@@ -100,7 +100,7 @@ function HeroSection() {
           height: "60px",
           border: "2px solid rgba(255,255,255,0.3)",
           transition: "all 0.3s ease",
-        }}
+        }} 
         onMouseEnter={(e) => {
           e.target.style.background = "rgba(255,255,255,0.2)"
           e.target.style.transform = "scale(1.1)"
@@ -137,7 +137,7 @@ function HeroSection() {
         }}
       >
         <i className="bi bi-chevron-right"></i>
-      </button>
+      </button> */}
 
       {/* Content */}
       <Container className="position-relative text-center text-white" style={{ zIndex: 3 }}>

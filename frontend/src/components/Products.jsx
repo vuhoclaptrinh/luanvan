@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
 import { Card, Row, Col, Container, Modal, Button, Badge, Spinner } from "react-bootstrap"
+import { addToCart } from './../pages/userCart/Addcart';
 
 const getImageUrl = (path) => {
   if (!path) return "/placeholder.svg?height=300&width=300"
@@ -146,7 +147,9 @@ const ProductList = () => {
                         onClick={(e) => {
                           e.stopPropagation()
                           // Thêm vào giỏ hàng logic ở đây
-                          alert(`Đã thêm ${product.ten_san_pham} vào giỏ hàng!`)
+                          addToCart(product)
+
+                          // alert(`Đã thêm ${product.ten_san_pham} vào giỏ hàng!`)
                         }}
                       >
                         <i className="bi bi-cart-plus"></i>
@@ -159,13 +162,7 @@ const ProductList = () => {
           ))}
         </Row>
 
-        {/* {visibleCount < products.length && (
-          <div className="text-center mt-5">
-            <Button variant="outline-primary" size="lg" onClick={handleShowMore} className="px-4">
-              Xem thêm sản phẩm
-            </Button>
-          </div>
-        )} */}
+        
 
         {/* Modal xem chi tiết sản phẩm */}
         <Modal
@@ -306,7 +303,15 @@ const ProductList = () => {
                       background: "linear-gradient(to right, #e83e8c, #6f42c1)",
                       borderColor: "transparent",
                     }}
+                     onClick={(e) => {
+                    e.stopPropagation()
+                    // Thêm vào giỏ hàng logic ở đây
+                    addToCart(selectedProduct)
+
+                    // alert(`Đã thêm ${selectedProduct.ten_san_pham} vào giỏ hàng!`)
+                  }}
                   >
+                    
                     <i className="bi bi-cart-plus me-2"></i>
                     Thêm vào giỏ hàng
                   </Button>

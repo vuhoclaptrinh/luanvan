@@ -18,7 +18,7 @@ const HomePage = () => {
         <FeaturedCategories />
         <ProductGrid />
         <Newsletter />
-        <BackToTop/>
+       
       </main>
       <Footer />
     </div>
