@@ -350,7 +350,7 @@ const Detailproducts = () => {
                   <div className="payment-info">
                     <div className="payment-method">
                       <div className="payment-label">Phương thức thanh toán</div>
-                      <div className="payment-value">{getPaymentMethodDisplay(donhangInfo.phuong_thuc_thanh_toan)}</div>
+                      <div className="payment-value">{getPaymentMethodDisplay(donhangInfo.paymentMethod)}</div>
                     </div>
 
                     <div className="payment-status">

@@ -108,7 +108,7 @@ const Checkout = () => {
 
             <div className="success-message">
               <p>
-                Cảm ơn bạn đã đặt hàng tại PerfumeShop. Chúng tôi đã gửi email xác nhận đơn hàng đến địa chỉ email của
+                Cảm ơn bạn đã đặt hàng tại PerfumeShop. Chúng tôi đã xác nhận đơn hàng của
                 bạn.
               </p>
               <p>Đơn hàng của bạn sẽ được xử lý và giao đến trong thời gian sớm nhất.</p>
@@ -120,8 +120,8 @@ const Checkout = () => {
                 Tiếp tục mua sắm
               </Button>
 
-              <Button variant="primary" onClick={() => navigate(`/orders/${orderId}`)} className="view-orders">
-                Xem chi tiết đơn hàng
+              <Button variant="primary" onClick={() => navigate(`/orders`)} className="view-orders">
+                Xem đơn hàng
               </Button>
             </div>
           </div>
@@ -199,14 +199,14 @@ const Checkout = () => {
         khach_hang_id: user.id,
         ngay_dat: new Date().toISOString().split("T")[0],
         tong_tien: total,
-        trang_thai: "chưa thanh toán",
+        trang_thai: "chờ xử lý",
         ma_giam_gia_id: ma_giam_gia_id || null,
         ho_ten_nguoi_nhan: formData.ho_ten,
         email_nguoi_nhan: formData.email,
-        so_dien_thoai_nguoi_nhan: formData.so_dien_thoai,
-        dia_chi_giao: fullAddress,
+        so_dien_thoai: formData.so_dien_thoai,
+        dia_chi: fullAddress,
         ghi_chu: formData.notes || "",
-        phuong_thuc_thanh_toan: formData.paymentMethod,
+        paymentMethod: formData.paymentMethod,
       })
 
       const donhang = res.data.data

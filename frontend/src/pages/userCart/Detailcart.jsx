@@ -7,12 +7,18 @@ import { Container, Row, Col, Card, Button, Badge, Alert } from "react-bootstrap
 import { ShoppingBag, Calendar, ArrowRight, Clock, Package } from "lucide-react"
 import Header from "../../components/Header"
 import "./Detailcart.css"
+import { Search, Filter, SortDesc, SortAsc } from "lucide-react"
+import { Form, Dropdown, InputGroup } from "react-bootstrap"
 
 const Detailcart = () => {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const navigate = useNavigate()
+  const [searchTerm, setSearchTerm] = useState("")
+  const [sortOrder, setSortOrder] = useState("newest") 
+  const [statusFilter, setStatusFilter] = useState("all") 
+  const [filteredOrders, setFilteredOrders] = useState([])
 
   useEffect(() => {
     const user = JSON.parse(sessionStorage.getItem("user"))
@@ -39,6 +45,34 @@ const Detailcart = () => {
 
     fetchOrders()
   }, [navigate])
+
+  useEffect(() => {
+    let filtered = [...orders]
+
+    // Search functionality
+    if (searchTerm.trim()) {
+      filtered = filtered.filter(
+        (order) =>
+          order.id.toString().includes(searchTerm.toLowerCase()) ||
+          order.ten_khach_hang?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          order.ho_ten_nguoi_nhan?.toLowerCase().includes(searchTerm.toLowerCase()),
+      )
+    }
+
+    // Status filter
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((order) => order.trang_thai?.toLowerCase() === statusFilter.toLowerCase())
+    }
+
+    // Sort by date
+    filtered.sort((a, b) => {
+      const dateA = new Date(a.ngay_dat)
+      const dateB = new Date(b.ngay_dat)
+      return sortOrder === "newest" ? dateB - dateA : dateA - dateB
+    })
+
+    setFilteredOrders(filtered)
+  }, [orders, searchTerm, sortOrder, statusFilter])
 
   // Format price with VND
   const formatPrice = (price) => {
@@ -108,28 +142,94 @@ const Detailcart = () => {
           </Alert>
         )}
 
-        {orders.length === 0 ? (
+        {filteredOrders.length === 0 ? (
           <div className="empty-orders">
             <div className="empty-orders-content">
               <div className="empty-icon">
                 <ShoppingBag size={60} strokeWidth={1.5} />
               </div>
-              <h2>Bạn chưa có đơn hàng nào</h2>
-              <p>Hãy khám phá các sản phẩm của chúng tôi và đặt hàng ngay!</p>
-              <Button variant="primary" className="shop-now-button" onClick={() => navigate("/products")}>
-                Mua sắm ngay
-              </Button>
+              <h2>{orders.length === 0 ? "Bạn chưa có đơn hàng nào" : "Không tìm thấy đơn hàng nào"}</h2>
+              <p>
+                {orders.length === 0
+                  ? "Hãy khám phá các sản phẩm của chúng tôi và đặt hàng ngay!"
+                  : "Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc"}
+              </p>
+              {orders.length === 0 && (
+                <Button variant="primary" className="shop-now-button" onClick={() => navigate("/products")}>
+                  Mua sắm ngay
+                </Button>
+              )}
             </div>
           </div>
         ) : (
           <>
-            <div className="order-count">
-              <Package size={20} className="me-2" />
-              <span>Tổng cộng: {orders.length} đơn hàng</span>
+            <div className="order-controls">
+              <div className="order-count">
+                <Package size={20} className="me-2" />
+                <span>
+                  {searchTerm || statusFilter !== "all"
+                    ? `Hiển thị ${filteredOrders.length} / ${orders.length} đơn hàng`
+                    : `Tổng cộng: ${orders.length} đơn hàng`}
+                </span>
+              </div>
+
+              <div className="filter-controls">
+                {/* Search Input */}
+                <InputGroup className="search-input">
+                  <InputGroup.Text>
+                    <Search size={16} />
+                  </InputGroup.Text>
+                  <Form.Control
+                    type="text"
+                    placeholder="Tìm kiếm theo mã đơn hàng, tên khách hàng..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </InputGroup>
+
+                {/* Status Filter */}
+                <Dropdown className="status-filter">
+                  <Dropdown.Toggle variant="outline-secondary" className="filter-btn">
+                    <Filter size={16} className="me-1" />
+                    {statusFilter === "all" ? "Tất cả trạng thái" : statusFilter}
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <Dropdown.Item onClick={() => setStatusFilter("all")}>Tất cả trạng thái</Dropdown.Item>
+                    <Dropdown.Divider />
+                    
+                    <Dropdown.Item onClick={() => setStatusFilter("đang xử lý")}>Chờ xử lý</Dropdown.Item>
+                    <Dropdown.Item onClick={() => setStatusFilter("đang giao")}>Đang giao</Dropdown.Item>
+                    <Dropdown.Item onClick={() => setStatusFilter("đã giao")}>Đã giao</Dropdown.Item>
+                    
+                  </Dropdown.Menu>
+                </Dropdown>
+
+                {/* Sort Order */}
+                <Dropdown className="sort-filter">
+                  <Dropdown.Toggle variant="outline-secondary" className="filter-btn">
+                    {sortOrder === "newest" ? (
+                      <SortDesc size={16} className="me-1" />
+                    ) : (
+                      <SortAsc size={16} className="me-1" />
+                    )}
+                    {sortOrder === "newest" ? "Mới nhất" : "Cũ nhất"}
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <Dropdown.Item onClick={() => setSortOrder("newest")}>
+                      <SortDesc size={16} className="me-2" />
+                      Mới nhất
+                    </Dropdown.Item>
+                    <Dropdown.Item onClick={() => setSortOrder("oldest")}>
+                      <SortAsc size={16} className="me-2" />
+                      Cũ nhất
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              </div>
             </div>
 
             <Row>
-              {orders.map((order) => (
+              {filteredOrders.map((order) => (
                 <Col lg={6} key={order.id} className="mb-4">
                   <Card className="order-card">
                     <Card.Body>
@@ -149,11 +249,7 @@ const Detailcart = () => {
                       <div className="order-info">
                         <div className="info-row">
                           <div className="info-label">Người nhận:</div>
-                          <div className="info-value">{order.ten_khach_hang}</div>
-                        </div>
-                        <div className="info-row">
-                          <div className="info-label">Địa chỉ:</div>
-                          <div className="info-value address">{order.dia_chi}</div>
+                          <div className="info-value">{order.ten_khach_hang || order.ho_ten_nguoi_nhan}</div>
                         </div>
                         <div className="info-row">
                           <div className="info-label">Tổng tiền:</div>

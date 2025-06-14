@@ -13,10 +13,13 @@ class Donhang extends Model
     protected $fillable = [
         'id',
         'khach_hang_id',
+        'so_dien_thoai',
+        'dia_chi',
         'ngay_dat',
         'tong_tien',
         'trang_thai',
-        'ma_giam_gia_id'
+        'ma_giam_gia_id',
+        'paymentMethod'
     ];
     // quan he voi khach hang  (fk khach hang lấy id khachhang)
     public function khachhang()

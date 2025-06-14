@@ -36,6 +36,8 @@ class DonhangController extends Controller
                 return [
                     'id' => $item->id,
                     'khach_hang_id' => $item->khach_hang_id,
+                    'so_dien_thoai' => $item->so_dien_thoai,
+                    'dia_chi' => $item->dia_chi,
                     'ten_khach_hang' => optional($item->khachhang)->ho_ten,
                     'ngay_dat' => $item->ngay_dat,
                     'tong_tien' => (float) $tongTiengoc,
@@ -45,6 +47,7 @@ class DonhangController extends Controller
                     'trang_thai' => $item->trang_thai,
                     'ma_giam_gia_id' => $item->ma_giam_gia_id,
                     'ten_ma_giam_gia' => optional($item->magiamgia)->ma,
+                    'paymentMethod' => $item->paymentMethod
                 ];
             });
 
@@ -90,16 +93,19 @@ class DonhangController extends Controller
         $donhangs = [
             'id' => $donhang->id,
             'khach_hang_id' => $donhang->khach_hang_id,
+            'so_dien_thoai' => $donhang->so_dien_thoai,
+            'dia_chi' => $donhang->dia_chi,
             'ten_khach_hang' => optional($donhang->khachhang)->ho_ten,
             'email' => optional($donhang->khachhang)->email,
-            'so_dien_thoai' => optional($donhang->khachhang)->so_dien_thoai,
-            'dia_chi' => optional($donhang->khachhang)->dia_chi,
+            // 'so_dien_thoai' => optional($donhang->khachhang)->so_dien_thoai,
+            // 'dia_chi' => optional($donhang->khachhang)->dia_chi,
             'ngay_dat' => $donhang->ngay_dat,
             'tong_tien' => (float) $tongTien,
             'tong_tien_format_giam' => number_format($tongTien, 0, ',', '.') . ' ₫',
             'trang_thai' => $donhang->trang_thai,
             'ma_giam_gia_id' => $donhang->ma_giam_gia_id,
             'ten_ma_giam_gia' => optional($donhang->magiamgia)->ma,
+            'paymentMethod' => $donhang->paymentMethod
         ];
 
         if (!$donhangs) {
@@ -115,11 +121,16 @@ class DonhangController extends Controller
             $request->validate(
                 [
                     'khach_hang_id' => 'required|exists:khachhang,id',
+                    'so_dien_thoai' => 'required|string|max:255',
+
+                    'dia_chi' => 'required|string|max:255',
+
                     'ngay_dat' => 'required|date',
                     'tong_tien' => 'required|numeric|min:1|max:999999999',
                     'trang_thai' => 'nullable|string',
 
                     'ma_giam_gia_id' => 'nullable|exists:magiamgia,id',
+                    'paymentMethod' => 'nullable|string'
                 ],
                 [
                     'khach_hang_id.required' => 'Khách hàng không được để trống.',
@@ -138,11 +149,13 @@ class DonhangController extends Controller
 
             $donhang = new Donhang();
             $donhang->khach_hang_id = $request->khach_hang_id;
+            $donhang->so_dien_thoai = $request->so_dien_thoai;
+            $donhang->dia_chi = $request->dia_chi;
             $donhang->ngay_dat = $request->ngay_dat;
             $donhang->tong_tien = $request->tong_tien;
             $donhang->trang_thai = $request->trang_thai;
             $donhang->ma_giam_gia_id = $request->ma_giam_gia_id;
-
+            $donhang->paymentMethod = $request->paymentMethod;
             $donhang->save();
 
 
