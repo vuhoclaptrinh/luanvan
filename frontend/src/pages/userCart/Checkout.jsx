@@ -462,8 +462,11 @@ const Checkout = () => {
                     </div>
 
                     <div
-                      className={`payment-method-option ${formData.paymentMethod === "bank-transfer" ? "selected" : ""}`}
-                      onClick={() => setFormData({ ...formData, paymentMethod: "bank-transfer" })}
+                      className={`payment-method-option disabled`}
+                      style={{ opacity: 0.6, cursor: "not-allowed" }}
+                      title="Phương thức chuyển khoản ngân hàng đang được bảo trì"
+                      onClick={() => alert("Phương thức chuyển khoản ngân hàng đang được bảo trì.")}
+                      
                     >
                       <Form.Check
                         type="radio"
@@ -472,8 +475,9 @@ const Checkout = () => {
                         value="bank-transfer"
                         label="Chuyển khoản ngân hàng"
                         checked={formData.paymentMethod === "bank-transfer"}
-                        onChange={handleInputChange}
+                        disabled
                         className="payment-radio"
+                        
                       />
                       <div className="payment-icon bank-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -554,8 +558,10 @@ const Checkout = () => {
                     </div>
 
                     <div
-                      className={`payment-method-option ${formData.paymentMethod === "credit-card" ? "selected" : ""}`}
-                      onClick={() => setFormData({ ...formData, paymentMethod: "credit-card" })}
+                      className={`payment-method-option disabled`}
+                      style={{ opacity: 0.6, cursor: "not-allowed" }}
+                      title="Phương thức thanh toán thẻ tín dụng đang được bảo trì"
+                      onClick={() => alert("Phương thức thanh toán thẻ tín dụng đang được bảo trì.")}
                     >
                       <Form.Check
                         type="radio"
@@ -564,7 +570,7 @@ const Checkout = () => {
                         value="credit-card"
                         label="Thẻ tín dụng/Ghi nợ"
                         checked={formData.paymentMethod === "credit-card"}
-                        onChange={handleInputChange}
+                        disable
                         className="payment-radio"
                       />
                       <div className="payment-icon card-icon">
@@ -704,12 +710,12 @@ const Checkout = () => {
                 </div>
               </Card.Header>
               <Card.Body>
-                <div className="product-list">
+                {/* <div className="product-list">
                   {cart.map((item) => (
                     <div key={item.id} className="product-item">
                       <div className="product-image">
                         <img
-                          src={getImageUrl(item.hinh_anh || item.image)}
+                          src={getImageUrl(item.hinh_anh || item.images)}
                           alt={item.ten_san_pham}
                           width="60"
                           height="60"
@@ -728,7 +734,7 @@ const Checkout = () => {
                       </div>
                     </div>
                   ))}
-                </div>
+                </div> */}
 
                 <div className="price-summary">
                   <div className="price-row">

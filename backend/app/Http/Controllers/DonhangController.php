@@ -6,11 +6,14 @@ use App\Models\Donhang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
+
 class DonhangController extends Controller
 {
+
     public function get()
     {
         try {
+
 
             $donhangs = Donhang::with(['khachhang', 'magiamgia', 'chitietdonhang'])->get()->map(function ($item) {
                 $tongTiengoc = $item->chitietdonhang->sum(function ($ct) {
@@ -39,7 +42,7 @@ class DonhangController extends Controller
                     'so_dien_thoai' => $item->so_dien_thoai,
                     'dia_chi' => $item->dia_chi,
                     'ten_khach_hang' => optional($item->khachhang)->ho_ten,
-                    'ngay_dat' => $item->ngay_dat,
+                    'ngay_dat' => Carbon::parse($item->ngay_dat)->format('Y-m-d'),
                     'tong_tien' => (float) $tongTiengoc,
                     'tong_tien_format' => number_format($tongTiengoc, 0, ',', '.') . ' ₫',
                     'tong_tien_giam' => (float) $tongTienSauGiam,
@@ -47,7 +50,8 @@ class DonhangController extends Controller
                     'trang_thai' => $item->trang_thai,
                     'ma_giam_gia_id' => $item->ma_giam_gia_id,
                     'ten_ma_giam_gia' => optional($item->magiamgia)->ma,
-                    'paymentMethod' => $item->paymentMethod
+                    'paymentMethod' => $item->paymentMethod,
+                    'created_at' => $item->created_at
                 ];
             });
 
@@ -99,13 +103,14 @@ class DonhangController extends Controller
             'email' => optional($donhang->khachhang)->email,
             // 'so_dien_thoai' => optional($donhang->khachhang)->so_dien_thoai,
             // 'dia_chi' => optional($donhang->khachhang)->dia_chi,
-            'ngay_dat' => $donhang->ngay_dat,
+            'ngay_dat' => Carbon::parse($donhang->ngay_dat)->format('Y-m-d'),
             'tong_tien' => (float) $tongTien,
             'tong_tien_format_giam' => number_format($tongTien, 0, ',', '.') . ' ₫',
             'trang_thai' => $donhang->trang_thai,
             'ma_giam_gia_id' => $donhang->ma_giam_gia_id,
             'ten_ma_giam_gia' => optional($donhang->magiamgia)->ma,
-            'paymentMethod' => $donhang->paymentMethod
+            'paymentMethod' => $donhang->paymentMethod,
+            'created_at' => $donhang->created_at
         ];
 
         if (!$donhangs) {
@@ -151,7 +156,7 @@ class DonhangController extends Controller
             $donhang->khach_hang_id = $request->khach_hang_id;
             $donhang->so_dien_thoai = $request->so_dien_thoai;
             $donhang->dia_chi = $request->dia_chi;
-            $donhang->ngay_dat = $request->ngay_dat;
+            $donhang->ngay_dat = $request->ngay_dat ?? Carbon::now('Asia/Ho_Chi_Minh');
             $donhang->tong_tien = $request->tong_tien;
             $donhang->trang_thai = $request->trang_thai;
             $donhang->ma_giam_gia_id = $request->ma_giam_gia_id;

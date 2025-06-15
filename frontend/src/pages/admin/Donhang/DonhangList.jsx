@@ -151,12 +151,9 @@ const columns = [
       case 'chờ xử lý':
         chipColor = 'warning';
         break;
-      case 'chưa thanh toán':
-        chipColor = 'error';
-        break;
-      case 'đã thanh toán':
-        chipColor = 'success';
-        break;
+     
+       
+      
       case 'đang giao':
         chipColor = 'info';
         break;

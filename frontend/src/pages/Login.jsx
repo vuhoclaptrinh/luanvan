@@ -1,475 +1,346 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';  
-import {
-  Container,
-  Box,
-  TextField,
-  Button,
-  Typography,
-  Alert,
-  Tabs,
-  Tab,
-  Paper,
-  InputAdornment,
-  IconButton,
-  Divider,
-  Avatar,
-  Fade,
-} from '@mui/material';
-import {
-  Email as EmailIcon,
-  Lock as LockIcon,
-  Person as PersonIcon,
-  Visibility,
-  VisibilityOff,
-  Store as StoreIcon,
-  Login as LoginIcon,
-  PersonAdd as PersonAddIcon,
-} from '@mui/icons-material';
-import { enqueueSnackbar } from 'notistack';
-import axios from 'axios';
-import Logo from "../assets/img/logo.jpg";
-import { Navbar } from "react-bootstrap";
+"use client"
+
+import { useState } from "react"
+import { useNavigate, useLocation } from "react-router-dom"
+import { Container, Row, Col, Card, Form, Button, Alert, Nav, InputGroup } from "react-bootstrap"
+import { Eye, EyeOff, User, Mail, Lock, LogIn, UserPlus, ArrowLeft } from "lucide-react"
+import { toast } from "react-toastify"
+import axios from "axios"
+import Logo from "../assets/img/logo.jpg"
+import "./Login.css"
 
 const LoginRegister = () => {
-  const [tab, setTab] = useState(0); 
-  const [email, setEmail] = useState('');
-  const [matKhau, setMatKhau] = useState('');
-  const [hoTen, setHoTen] = useState('');
-  const [error, setError] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("login")
+  const [formData, setFormData] = useState({
+    email: "",
+    mat_khau: "",
+    ho_ten: "",
+  })
+  const [error, setError] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [validated, setValidated] = useState(false)
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
+  const location = useLocation()
+  const from = location.state?.from || "/home"
 
-  const handleTabChange = (event, newValue) => {
-    setTab(newValue);
-    setError('');
-    setEmail('');
-    setMatKhau('');
-    setHoTen('');
-    setShowPassword(false);
-  };
+  const handleTabChange = (tab) => {
+    setActiveTab(tab)
+    setError("")
+    setFormData({ email: "", mat_khau: "", ho_ten: "" })
+    setShowPassword(false)
+    setValidated(false)
+  }
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    setError('');
-    try {
-      const response = await axios.post('http://127.0.0.1:8000/api/login', {
-        email,
-        mat_khau: matKhau,
-      });
+    e.preventDefault()
+    const form = e.currentTarget
+    setValidated(true)
 
-      const user = response.data.user;
+    if (form.checkValidity() === false) {
+      e.stopPropagation()
+      return
+    }
+
+    setError("")
+    setLoading(true)
+
+    try {
+      const response = await axios.post("http://127.0.0.1:8000/api/login", {
+        email: formData.email,
+        mat_khau: formData.mat_khau,
+      })
+
+      const user = response.data.user
       if (user) {
-        sessionStorage.setItem('user', JSON.stringify(user));
-        enqueueSnackbar('Đăng nhập thành công!', { variant: 'success' });
-      
+        sessionStorage.setItem("user", JSON.stringify(user))
+        toast.success("Đăng nhập thành công!")
+
         if (user.role === 1) {
-          navigate('/thongke');  // chuyển trang admin
-          enqueueSnackbar('Đăng nhập bằng admin!', { variant: 'info' });
+          navigate("/thongke")
+          toast.info("Chào mừng Admin!")
         } else {
-          navigate('/Home'); // chuyển trang người dùng thường
-          enqueueSnackbar('Đăng nhập bằng người dùng thường!', { variant: 'info' });
+          navigate(from)
+          toast.info("Chào mừng bạn quay trở lại!")
         }
       } else {
-        setError('Đăng nhập thất bại!');
+        setError("Đăng nhập thất bại!")
       }
     } catch (error) {
-      console.error(error);
-      setError('Email hoặc mật khẩu không đúng!');
+      console.error(error)
+      setError("Email hoặc mật khẩu không đúng!")
+    } finally {
+      setLoading(false)
     }
-  };
+  }
 
   const handleRegister = async (e) => {
-  e.preventDefault();
-  setError('');
-  setLoading(true);
+    e.preventDefault()
+    const form = e.currentTarget
+    setValidated(true)
 
-  if (!hoTen.trim() || !email.trim() || !matKhau.trim()) {
-    setError('Vui lòng điền đầy đủ thông tin');
-    setLoading(false);
-    return;
-  }
-
-  try {
-    const response = await axios.post('http://127.0.0.1:8000/api/khachhang/register', {
-      ho_ten: hoTen,
-      email: email,
-      mat_khau: matKhau,
-    });
-
-    enqueueSnackbar('Đăng ký thành công! Vui lòng đăng nhập.', { variant: 'success' });
-    setTab(0); // chuyển về tab đăng nhập
-    setEmail('');
-    setMatKhau('');
-    setHoTen('');
-  } catch (error) {
-    console.error(error);
-    if (error.response?.data?.message) {
-      setError(error.response.data.message);
-    } else {
-      setError('Có lỗi xảy ra khi đăng ký!');
+    if (form.checkValidity() === false) {
+      e.stopPropagation()
+      return
     }
-  } finally {
-    setLoading(false);
-  }
-};
 
+    setError("")
+    setLoading(true)
+
+    try {
+      const response = await axios.post("http://127.0.0.1:8000/api/khachhang/register", {
+        ho_ten: formData.ho_ten,
+        email: formData.email,
+        mat_khau: formData.mat_khau,
+      })
+
+      toast.success("Đăng ký thành công! Vui lòng đăng nhập.")
+      setActiveTab("login")
+      setFormData({ email: formData.email, mat_khau: "", ho_ten: "" })
+      setValidated(false)
+    } catch (error) {
+      console.error(error)
+      if (error.response?.data?.message) {
+        setError(error.response.data.message)
+      } else {
+        setError("Có lỗi xảy ra khi đăng ký!")
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
+    setShowPassword(!showPassword)
+  }
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        p: 2,
-      }}
-    >
-      <Container maxWidth="sm">
-        <Fade in timeout={800}>
-          <Paper
-            elevation={24}
-            sx={{
-              borderRadius: 4,
-              overflow: 'hidden',
-              background: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-            }}
-          >
-            {/* Header */}
-            <Box
-              sx={{
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                color: 'white',
-                p: 4,
-                textAlign: 'center',
-              }}
-            >
-              <Avatar
-              
-                sx={{
-                  width: 80,
-                  height: 80,
-                  bgcolor: 'rgba(255, 255, 255, 0.2)',
-                  mx: 'auto',
-                  mb: 2,
-                  backdropFilter: 'blur(10px)',
-                  
-                }}
-              >
-                <img src={Logo} alt="Logo" width="200" height="200" className="rounded-circle" />
-              </Avatar>
-              <Typography variant="h4" fontWeight="bold" gutterBottom>
-                Perfumer Shop
-              </Typography>
-              
-              <Typography variant="body1" sx={{ opacity: 0.9 }}>
-                Hệ thống nước hoa cao cấp
-              </Typography>
-            </Box>
+    <div className="auth-page">
+      <div className="auth-background">
+        <div className="auth-overlay"></div>
+      </div>
 
-            {/* Content */}
-            <Box sx={{ p: 4 }}>
-              {/* Tabs */}
-              <Tabs
-                value={tab}
-                onChange={handleTabChange}
-                variant="fullWidth"
-                sx={{
-                  mb: 3,
-                  '& .MuiTab-root': {
-                    fontWeight: 'bold',
-                    textTransform: 'none',
-                    fontSize: '1rem',
-                    py: 2,
-                  },
-                  '& .Mui-selected': {
-                    color: '#667eea !important',
-                  },
-                  '& .MuiTabs-indicator': {
-                    background: 'linear-gradient(90deg, #667eea, #764ba2)',
-                    height: 3,
-                    borderRadius: 2,
-                  },
-                }}
-              >
-                <Tab 
-                  icon={<LoginIcon />}
-                  iconPosition="start"
-                  label="Đăng nhập" 
-                />
-                <Tab 
-                  icon={<PersonAddIcon />}
-                  iconPosition="start"
-                  label="Đăng ký" 
-                />
-              </Tabs>
+      <Container className="auth-container">
+        <Row className="justify-content-center align-items-center min-vh-100">
+          <Col lg={5} md={7} sm={9}>
+            <Card className="auth-card">
+              {/* Header */}
+              <div className="auth-header">
+                <div className="auth-logo">
+                  <img src={Logo || "/placeholder.svg"} alt="PerfumeShop Logo" className="logo-image" />
+                </div>
+                <h1 className="auth-title">PerfumeShop</h1>
+                <p className="auth-subtitle">Hệ thống nước hoa cao cấp</p>
+              </div>
 
-              {/* Error Alert */}
-              {error && (
-                <Fade in timeout={300}>
-                  <Alert 
-                    severity="error" 
-                    sx={{ 
-                      mb: 3, 
-                      borderRadius: 2,
-                      '& .MuiAlert-icon': {
-                        fontSize: '1.5rem',
-                      },
-                    }}
-                  >
+              {/* Navigation Tabs */}
+              <div className="auth-tabs">
+                <Nav variant="pills" className="auth-nav">
+                  <Nav.Item>
+                    <Nav.Link
+                      active={activeTab === "login"}
+                      onClick={() => handleTabChange("login")}
+                      className="auth-nav-link"
+                    >
+                      <LogIn size={18} className="me-2" />
+                      Đăng nhập
+                    </Nav.Link>
+                  </Nav.Item>
+                  <Nav.Item>
+                    <Nav.Link
+                      active={activeTab === "register"}
+                      onClick={() => handleTabChange("register")}
+                      className="auth-nav-link"
+                    >
+                      <UserPlus size={18} className="me-2" />
+                      Đăng ký
+                    </Nav.Link>
+                  </Nav.Item>
+                </Nav>
+              </div>
+
+              {/* Content */}
+              <div className="auth-content">
+                {error && (
+                  <Alert variant="danger" className="auth-alert">
                     {error}
                   </Alert>
-                </Fade>
-              )}
+                )}
 
-              {/* Login Form */}
-              {tab === 0 && (
-                <Fade in timeout={500}>
-                  <Box component="form" onSubmit={handleLogin}>
-                    <TextField
-                      label="Email"
-                      type="email"
-                      fullWidth
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      margin="normal"
-                      variant="outlined"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <EmailIcon color="primary" />
-                          </InputAdornment>
-                        ),
-                      }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                          '&:hover fieldset': {
-                            borderColor: '#667eea',
-                          },
-                          '&.Mui-focused fieldset': {
-                            borderColor: '#667eea',
-                          },
-                        },
-                      }}
-                    />
+                {/* Login Form */}
+                {activeTab === "login" && (
+                  <Form noValidate validated={validated} onSubmit={handleLogin} className="auth-form">
+                    <Form.Group className="mb-3">
+                      <Form.Label>Email</Form.Label>
+                      <InputGroup>
+                        <InputGroup.Text>
+                          <Mail size={18} />
+                        </InputGroup.Text>
+                        <Form.Control
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          placeholder="Nhập email của bạn"
+                          required
+                        />
+                        <Form.Control.Feedback type="invalid">Vui lòng nhập email hợp lệ.</Form.Control.Feedback>
+                      </InputGroup>
+                    </Form.Group>
 
-                    <TextField
-                      label="Mật khẩu"
-                      type={showPassword ? 'text' : 'password'}
-                      fullWidth
-                      required
-                      value={matKhau}
-                      onChange={(e) => setMatKhau(e.target.value)}
-                      margin="normal"
-                      variant="outlined"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <LockIcon color="primary" />
-                          </InputAdornment>
-                        ),
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton onClick={togglePasswordVisibility} edge="end">
-                              {showPassword ? <VisibilityOff /> : <Visibility />}
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                          '&:hover fieldset': {
-                            borderColor: '#667eea',
-                          },
-                          '&.Mui-focused fieldset': {
-                            borderColor: '#667eea',
-                          },
-                        },
-                      }}
-                    />
+                    <Form.Group className="mb-4">
+                      <Form.Label>Mật khẩu</Form.Label>
+                      <InputGroup>
+                        <InputGroup.Text>
+                          <Lock size={18} />
+                        </InputGroup.Text>
+                        <Form.Control
+                          type={showPassword ? "text" : "password"}
+                          name="mat_khau"
+                          value={formData.mat_khau}
+                          onChange={handleInputChange}
+                          placeholder="Nhập mật khẩu"
+                          required
+                        />
+                        <Button
+                          variant="outline-secondary"
+                          onClick={togglePasswordVisibility}
+                          className="password-toggle"
+                        >
+                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </Button>
+                        <Form.Control.Feedback type="invalid">Vui lòng nhập mật khẩu.</Form.Control.Feedback>
+                      </InputGroup>
+                    </Form.Group>
 
-                    <Button
-                      type="submit"
-                      fullWidth
-                      variant="contained"
-                      disabled={loading}
-                      sx={{
-                        mt: 3,
-                        py: 1.5,
-                        fontWeight: 'bold',
-                        fontSize: '1.1rem',
-                        borderRadius: 2,
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
-                        textTransform: 'none',
-                        '&:hover': {
-                          background: 'linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)',
-                          boxShadow: '0 6px 20px rgba(102, 126, 234, 0.6)',
-                          transform: 'translateY(-2px)',
-                        },
-                        transition: 'all 0.3s ease',
-                      }}
-                    >
-                      {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+                    <Button type="submit" className="auth-submit-btn" disabled={loading}>
+                      {loading ? (
+                        <>
+                          <div className="spinner-border spinner-border-sm me-2" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                          </div>
+                          Đang đăng nhập...
+                        </>
+                      ) : (
+                        <>
+                          <LogIn size={18} className="me-2" />
+                          Đăng nhập
+                        </>
+                      )}
                     </Button>
-                  </Box>
-                </Fade>
-              )}
+                  </Form>
+                )}
 
-              {/* Register Form */}
-              {tab === 1 && (
-                <Fade in timeout={500}>
-                  <Box component="form" onSubmit={handleRegister}>
-                    <TextField
-                      label="Họ tên"
-                      fullWidth
-                      required
-                      value={hoTen}
-                      onChange={(e) => setHoTen(e.target.value)}
-                      margin="normal"
-                      variant="outlined"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <PersonIcon color="primary" />
-                          </InputAdornment>
-                        ),
-                      }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                          '&:hover fieldset': {
-                            borderColor: '#667eea',
-                          },
-                          '&.Mui-focused fieldset': {
-                            borderColor: '#667eea',
-                          },
-                        },
-                      }}
-                    />
+                {/* Register Form */}
+                {activeTab === "register" && (
+                  <Form noValidate validated={validated} onSubmit={handleRegister} className="auth-form">
+                    <Form.Group className="mb-3">
+                      <Form.Label>Họ tên</Form.Label>
+                      <InputGroup>
+                        <InputGroup.Text>
+                          <User size={18} />
+                        </InputGroup.Text>
+                        <Form.Control
+                          type="text"
+                          name="ho_ten"
+                          value={formData.ho_ten}
+                          onChange={handleInputChange}
+                          placeholder="Nhập họ tên của bạn"
+                          required
+                        />
+                        <Form.Control.Feedback type="invalid">Vui lòng nhập họ tên.</Form.Control.Feedback>
+                      </InputGroup>
+                    </Form.Group>
 
-                    <TextField
-                      label="Email"
-                      type="email"
-                      fullWidth
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      margin="normal"
-                      variant="outlined"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <EmailIcon color="primary" />
-                          </InputAdornment>
-                        ),
-                      }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                          '&:hover fieldset': {
-                            borderColor: '#667eea',
-                          },
-                          '&.Mui-focused fieldset': {
-                            borderColor: '#667eea',
-                          },
-                        },
-                      }}
-                    />
+                    <Form.Group className="mb-3">
+                      <Form.Label>Email</Form.Label>
+                      <InputGroup>
+                        <InputGroup.Text>
+                          <Mail size={18} />
+                        </InputGroup.Text>
+                        <Form.Control
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          placeholder="Nhập email của bạn"
+                          required
+                        />
+                        <Form.Control.Feedback type="invalid">Vui lòng nhập email hợp lệ.</Form.Control.Feedback>
+                      </InputGroup>
+                    </Form.Group>
 
-                    <TextField
-                      label="Mật khẩu"
-                      type={showPassword ? 'text' : 'password'}
-                      fullWidth
-                      required
-                      value={matKhau}
-                      onChange={(e) => setMatKhau(e.target.value)}
-                      margin="normal"
-                      variant="outlined"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <LockIcon color="primary" />
-                          </InputAdornment>
-                        ),
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton onClick={togglePasswordVisibility} edge="end">
-                              {showPassword ? <VisibilityOff /> : <Visibility />}
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                          '&:hover fieldset': {
-                            borderColor: '#667eea',
-                          },
-                          '&.Mui-focused fieldset': {
-                            borderColor: '#667eea',
-                          },
-                        },
-                      }}
-                    />
+                    <Form.Group className="mb-4">
+                      <Form.Label>Mật khẩu</Form.Label>
+                      <InputGroup>
+                        <InputGroup.Text>
+                          <Lock size={18} />
+                        </InputGroup.Text>
+                        <Form.Control
+                          type={showPassword ? "text" : "password"}
+                          name="mat_khau"
+                          value={formData.mat_khau}
+                          onChange={handleInputChange}
+                          placeholder="Nhập mật khẩu"
+                          required
+                          minLength={6}
+                        />
+                        <Button
+                          variant="outline-secondary"
+                          onClick={togglePasswordVisibility}
+                          className="password-toggle"
+                        >
+                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </Button>
+                        <Form.Control.Feedback type="invalid">Mật khẩu phải có ít nhất 6 ký tự.</Form.Control.Feedback>
+                      </InputGroup>
+                    </Form.Group>
 
-                    <Button
-                      type="submit"
-                      fullWidth 
-                      variant="contained"
-                      disabled={loading}
-                      sx={{
-                        mt: 3,
-                        py: 1.5,
-                        fontWeight: 'bold',
-                        fontSize: '1.1rem',
-                        borderRadius: 2,
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
-                        textTransform: 'none',
-                        '&:hover': {
-                          background: 'linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)',
-                          boxShadow: '0 6px 20px rgba(102, 126, 234, 0.6)',
-                          transform: 'translateY(-2px)',
-                        },
-                        transition: 'all 0.3s ease',
-                      }}
-                    >
-                      {loading ? 'Đang đăng ký...' : 'Đăng ký'}
+                    <Button type="submit" className="auth-submit-btn" disabled={loading}>
+                      {loading ? (
+                        <>
+                          <div className="spinner-border spinner-border-sm me-2" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                          </div>
+                          Đang đăng ký...
+                        </>
+                      ) : (
+                        <>
+                          <UserPlus size={18} className="me-2" />
+                          Đăng ký
+                        </>
+                      )}
                     </Button>
-                  </Box>
-                </Fade>
-              )}
+                  </Form>
+                )}
+              </div>
 
               {/* Footer */}
-              <Box sx={{ mt: 4, textAlign: 'center' }}>
-                <Divider sx={{ mb: 2 }}>
-                  <Typography variant="body2" color="textSecondary">
-                    © 2025 Perfumer Shop
-                  </Typography>
-                </Divider>
-                <Typography variant="caption" color="textSecondary">
-                  Hệ thống nước hoa chuyên nghiệp
-                </Typography>
-              </Box>
-            </Box>
-          </Paper>
-        </Fade>
+              <div className="auth-footer">
+                <div className="auth-divider">
+                  <span>© 2025 PerfumeShop</span>
+                </div>
+                <p className="auth-footer-text">Hệ thống nước hoa chuyên nghiệp</p>
+                <Button variant="link" className="back-to-home" onClick={() => navigate("/home")}>
+                  <ArrowLeft size={16} className="me-1" />
+                  Quay về trang chủ
+                </Button>
+              </div>
+            </Card>
+          </Col>
+        </Row>
       </Container>
-    </Box>
-  );
-};
+    </div>
+  )
+}
 
-export default LoginRegister;
+export default LoginRegister

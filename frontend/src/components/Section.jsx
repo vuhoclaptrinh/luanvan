@@ -267,7 +267,7 @@ function HeroSection() {
       </div>
 
       {/* CSS Animations */}
-      <style jsx>{`
+      {/* <style jsx>{`
         @keyframes fadeInUp {
           from {
             opacity: 0;
@@ -281,13 +281,13 @@ function HeroSection() {
 
         .btn:focus {
           box-shadow: none !important;
-        }
+        } */}
 
-        /* Pause animation on hover */
-        section:hover .progress-bar {
+        
+        {/* section:hover .progress-bar {
           animation-play-state: paused;
         }
-      `}</style>
+      `}</style> */}
     </section>
   )
 }

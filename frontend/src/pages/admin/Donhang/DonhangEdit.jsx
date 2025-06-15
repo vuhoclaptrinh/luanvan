@@ -146,11 +146,10 @@ useEffect(() => {
           onChange={handleChange}
         >
           <MenuItem value="chờ xử lý">Chờ xử lý</MenuItem>
-          <MenuItem value="chưa thanh toán">Chưa thanh toán</MenuItem>
-          <MenuItem value="đã thanh toán">Đã thanh toán</MenuItem>
+         
           <MenuItem value="đang giao">Đang giao</MenuItem>
           <MenuItem value="đã giao">Đã giao</MenuItem>
-          <MenuItem value="đã hủy">Đã hủy</MenuItem>
+         
         </Select>
       </FormControl>
         <Stack direction="row" spacing={2}> 

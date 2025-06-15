@@ -111,14 +111,14 @@ const DonhangView = ({ open, onClose, donhangId }) => {
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case 'completed':
-      case 'hoàn thành':
+      case 'đã giao':
         return 'success';
       case 'pending':
       case 'chờ xử lý':
         return 'warning';
       case 'cancelled':
-      case 'đã hủy':
-        return 'error';
+      case 'đang giao':
+        return 'primary';
       default:
         return 'primary';
     }

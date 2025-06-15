@@ -84,18 +84,15 @@ const Detailproducts = () => {
   // Get status badge variant
   const getStatusVariant = (status) => {
     switch (status?.toLowerCase()) {
-      case "chưa thanh toán":
-        return "warning"
-      case "đã thanh toán":
-        return "success"
+     
+     
       case "đang xử lý":
         return "info"
       case "đang giao":
         return "primary"
       case "đã giao":
         return "success"
-      case "đã hủy":
-        return "danger"
+     
       default:
         return "secondary"
     }
@@ -191,7 +188,7 @@ const Detailproducts = () => {
                     </div>
                     <div className="order-date">
                       <Calendar size={16} className="me-2" />
-                      Đặt hàng: {formatDate(donhangInfo.ngay_dat)}
+                      Đặt hàng: {formatDate(donhangInfo.created_at)}
                     </div>
                   </div>
                 </Card.Body>

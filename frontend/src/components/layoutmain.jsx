@@ -67,7 +67,7 @@ const LayoutMain = () => {
     handleAccountMenuClose();
     sessionStorage.removeItem("user");
     sessionStorage.removeItem("token");
-    navigate("/login");
+    navigate("/home");
   };
 
   const menuItems = [

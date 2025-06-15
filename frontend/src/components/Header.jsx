@@ -343,19 +343,9 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
                     onMouseOver={(e) => (e.currentTarget.style.opacity = 1)}
                     onMouseOut={(e) => (e.currentTarget.style.opacity = 0.9)}
                   >
-                    <i className="bi bi-box-seam me-1"></i>
-                    <small className="fw-medium">Theo dõi đơn hàng</small>
+                    
                   </Link>
-                  <Link
-                    to="/stores"
-                    className="text-white text-decoration-none d-flex align-items-center"
-                    style={{ opacity: 0.9, transition: "opacity 0.2s ease" }}
-                    onMouseOver={(e) => (e.currentTarget.style.opacity = 1)}
-                    onMouseOut={(e) => (e.currentTarget.style.opacity = 0.9)}
-                  >
-                    <i className="bi bi-shop me-1"></i>
-                    <small className="fw-medium">Cửa hàng</small>
-                  </Link>
+                  
                 </div>
               </div>
             </Col>
@@ -542,7 +532,7 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
                 ) : (
                   <div className="d-flex">
                     <Link to="/login" className="btn btn-sm btn-outline-primary me-2">
-                      Đăng nhập
+                      Đăng nhập 
                     </Link>
                     <Link to="/login" className="btn btn-sm btn-primary">
                       Đăng ký
@@ -646,13 +636,13 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
 
           {/* Quick Links */}
           <div className="p-3">
-            <h6 className="text-uppercase text-muted mb-3" style={{ fontSize: "0.8rem", letterSpacing: "1px" }}>
+            {/* <h6 className="text-uppercase text-muted mb-3" style={{ fontSize: "0.8rem", letterSpacing: "1px" }}>
               Liên kết nhanh
-            </h6>
+            </h6> */}
             <Nav className="flex-column">
-              <Nav.Link as={Link} to="/track-order" className="px-0 py-2" onClick={() => setShowOffcanvas(false)}>
+              {/* <Nav.Link as={Link} to="/track-order" className="px-0 py-2" onClick={() => setShowOffcanvas(false)}>
                 <i className="bi bi-truck me-2"></i>Theo dõi đơn hàng
-              </Nav.Link>
+              </Nav.Link> */}
               <Nav.Link as={Link} to="/wishlist" className="px-0 py-2" onClick={() => setShowOffcanvas(false)}>
                 <i className="bi bi-heart me-2"></i>Danh sách yêu thích
               </Nav.Link>
@@ -731,7 +721,7 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
       )}
 
       {/* CSS cho header */}
-      <style jsx="true">{`
+      {/* <style jsx="true">{`
         .sticky-header {
           animation: slideDown 0.3s ease-in-out;
         }
@@ -744,7 +734,7 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
             transform: translateY(0);
           }
         }
-      `}</style>
+      `}</style> */}
     </header>
   )
 }
