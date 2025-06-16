@@ -42,7 +42,7 @@ class ChitietdonhangController extends Controller
     public function getByDonhang($don_hang_id)
     {
         try {
-            $chitietdonhang = Chitietdonhang::where('don_hang_id', $don_hang_id)->with('sanpham')->get();
+            $chitietdonhang = Chitietdonhang::where('don_hang_id', $don_hang_id)->with(['sanpham', 'donhang'])->get();
 
             if ($chitietdonhang->isEmpty()) {
                 return response()->json(['message' => 'Không tìm thấy chi tiết đơn hàng'], 404);
@@ -56,6 +56,7 @@ class ChitietdonhangController extends Controller
                     'ten_san_pham' => $item->sanpham->ten_san_pham ?? null,
                     'so_luong' => $item->so_luong,
                     'gia' => $item->gia,
+                    'tien_don_hang' => optional($item->donhang)->tong_tien,
 
                 ];
             });

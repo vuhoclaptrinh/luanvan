@@ -15,27 +15,7 @@ class DonhangController extends Controller
         try {
 
 
-            $donhangs = Donhang::with(['khachhang', 'magiamgia', 'chitietdonhang'])->get()->map(function ($item) {
-                $tongTiengoc = $item->chitietdonhang->sum(function ($ct) {
-                    return $ct->so_luong * $ct->gia;
-                });
-
-                if ($tongTiengoc > 10000000) {
-                    $tongTienduocgiam = $tongTiengoc * 0.4; // Giảm 40%
-                } elseif ($tongTiengoc > 5000000 && $tongTiengoc <= 10000000) {
-                    $tongTienduocgiam = $tongTiengoc * 0.3; // Giảm 30%
-                } elseif ($tongTiengoc > 1000000 && $tongTiengoc <= 5000000) {
-                    $tongTienduocgiam = $tongTiengoc * 0.2; // Giảm 20%
-                } else {
-                    $tongTienduocgiam = 0;
-                }
-                // Đảm bảo không âm
-                $tongTienSauGiam = max(0, $tongTiengoc - $tongTienduocgiam);
-
-
-
-
-
+            $donhangs = Donhang::with(['khachhang', 'magiamgia'])->get()->map(function ($item) {
                 return [
                     'id' => $item->id,
                     'khach_hang_id' => $item->khach_hang_id,
@@ -43,10 +23,16 @@ class DonhangController extends Controller
                     'dia_chi' => $item->dia_chi,
                     'ten_khach_hang' => optional($item->khachhang)->ho_ten,
                     'ngay_dat' => Carbon::parse($item->ngay_dat)->format('Y-m-d'),
-                    'tong_tien' => (float) $tongTiengoc,
-                    'tong_tien_format' => number_format($tongTiengoc, 0, ',', '.') . ' ₫',
-                    'tong_tien_giam' => (float) $tongTienSauGiam,
-                    'tong_tien_format_giam' => number_format($tongTienSauGiam, 0, ',', '.') . ' ₫',
+
+                    'tong_tien_truoc_giam' => $item->tong_tien_truoc_giam,
+                    'tong_tien_truoc_giam_fomat' => number_format($item->tong_tien_truoc_giam, 0, ',', '.') . ' ₫',
+                    'giam_gia_tien' => $item->giam_gia_tien,
+                    'giam_gia_tien_fomat' => number_format($item->giam_gia_tien, 0, ',', '.') . ' ₫',
+                    'phi_van_chuyen' => $item->phi_van_chuyen,
+                    'phi_van_chuyen_fomat' => number_format($item->phi_van_chuyen, 0, ',', '.') . ' ₫',
+                    'tong_tien' => $item->tong_tien,
+                    'tong_tien_format' => number_format($item->tong_tien, 0, ',', '.') . ' ₫',
+
                     'trang_thai' => $item->trang_thai,
                     'ma_giam_gia_id' => $item->ma_giam_gia_id,
                     'ten_ma_giam_gia' => optional($item->magiamgia)->ma,
@@ -71,52 +57,39 @@ class DonhangController extends Controller
     //get one donhang
     public function getOne($id)
     {
-        $donhang = Donhang::with(['khachhang', 'magiamgia', 'chitietdonhang'])->find($id);
-        // Kiểm tra đơn hàng có tồn tại 
+        $donhang = Donhang::with(['khachhang', 'magiamgia'])->find($id);
+
         if (!$donhang) {
             return response()->json(['message' => 'Không tìm thấy đơn hàng'], 404);
         }
-        // Tính tổng tiền từ chi tiết đơn hàng
-        $tongTien = $donhang->chitietdonhang->sum(function ($ct) {
-            return $ct->so_luong * $ct->gia;
-        });
 
-        // Giảm giá theo điều kiện
-        if ($tongTien > 10000000) {
-            $tongTien *= 0.6; // Giảm 40%
-        } elseif ($tongTien > 5000000 && $tongTien <= 10000000) {
-            $tongTien *= 0.7; // Giảm 30%
-        } elseif ($tongTien > 1000000 && $tongTien <= 5000000) {
-            $tongTien *= 0.8; // Giảm 20%
-        }
-
-
-        $tongTien = max(0, $tongTien);
-
-        // dữ liệu 
-        $donhangs = [
+        return response()->json([
             'id' => $donhang->id,
             'khach_hang_id' => $donhang->khach_hang_id,
             'so_dien_thoai' => $donhang->so_dien_thoai,
             'dia_chi' => $donhang->dia_chi,
             'ten_khach_hang' => optional($donhang->khachhang)->ho_ten,
             'email' => optional($donhang->khachhang)->email,
-            // 'so_dien_thoai' => optional($donhang->khachhang)->so_dien_thoai,
-            // 'dia_chi' => optional($donhang->khachhang)->dia_chi,
             'ngay_dat' => Carbon::parse($donhang->ngay_dat)->format('Y-m-d'),
-            'tong_tien' => (float) $tongTien,
-            'tong_tien_format_giam' => number_format($tongTien, 0, ',', '.') . ' ₫',
+
+            'tong_tien_truoc_giam' => $donhang->tong_tien_truoc_giam,
+            'tong_tien_truoc_giam_fomat' => number_format($donhang->tong_tien_truoc_giam, 0, ',', '.') . ' ₫',
+            'giam_gia_tien' => $donhang->giam_gia_tien,
+            'giam_gia_tien_fomat' => number_format($donhang->giam_gia_tien, 0, ',', '.') . ' ₫',
+            'phi_van_chuyen' => $donhang->phi_van_chuyen,
+            'phi_van_chuyen_fomat' => number_format($donhang->phi_van_chuyen, 0, ',', '.') . ' ₫',
+            'tong_tien' => $donhang->tong_tien,
+            'tong_tien_format' => number_format($donhang->tong_tien, 0, ',', '.') . ' ₫',
+
             'trang_thai' => $donhang->trang_thai,
             'ma_giam_gia_id' => $donhang->ma_giam_gia_id,
             'ten_ma_giam_gia' => optional($donhang->magiamgia)->ma,
             'paymentMethod' => $donhang->paymentMethod,
             'created_at' => $donhang->created_at
-        ];
+        ]);
 
-        if (!$donhangs) {
-            return response()->json(['messsage' => 'không tim thay']);
-        }
-        return response()->json($donhangs);
+
+
     }
     // add  
     public function add(Request $request)
@@ -135,7 +108,12 @@ class DonhangController extends Controller
                     'trang_thai' => 'nullable|string',
 
                     'ma_giam_gia_id' => 'nullable|exists:magiamgia,id',
-                    'paymentMethod' => 'nullable|string'
+                    'paymentMethod' => 'nullable|string',
+                    'tong_tien_truoc_giam' => 'required|numeric',
+                    'giam_gia_tien' => 'required|numeric',
+                    'phi_van_chuyen' => 'required|numeric',
+                    'ten_phuong_thuc_van_chuyen' => 'nullable|string|max:255',
+
                 ],
                 [
                     'khach_hang_id.required' => 'Khách hàng không được để trống.',
@@ -158,6 +136,11 @@ class DonhangController extends Controller
             $donhang->dia_chi = $request->dia_chi;
             $donhang->ngay_dat = $request->ngay_dat ?? Carbon::now('Asia/Ho_Chi_Minh');
             $donhang->tong_tien = $request->tong_tien;
+            $donhang->tong_tien = $request->tong_tien;
+            $donhang->tong_tien_truoc_giam = $request->tong_tien_truoc_giam;
+            $donhang->giam_gia_tien = $request->giam_gia_tien;
+            $donhang->phi_van_chuyen = $request->phi_van_chuyen;
+            $donhang->ten_phuong_thuc_van_chuyen = $request->ten_phuong_thuc_van_chuyen;
             $donhang->trang_thai = $request->trang_thai;
             $donhang->ma_giam_gia_id = $request->ma_giam_gia_id;
             $donhang->paymentMethod = $request->paymentMethod;
