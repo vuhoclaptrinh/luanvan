@@ -131,9 +131,9 @@ const Checkout = () => {
   }
 
   // Extract cart data from state
-  const { cart, shipping, discount, coupon, ma_giam_gia_id } = state
+  const { cart, shipping, discount, coupon, couponId ,total,shippingcost } = state
   const subtotal = cart.reduce((total, item) => total + item.gia * item.quantity, 0)
-  const total = subtotal + shipping.price - discount
+  //const total = subtotal + shipping.price - discount
 
   // Format price with VND
   const formatPrice = (price) => {
@@ -147,7 +147,7 @@ const Checkout = () => {
     return `http://127.0.0.1:8000/storage/images/${path.replace(/^images\//, "")}`
   }
 
-  // Handle form input changes
+  // Handle form input changes  
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setFormData({
@@ -199,8 +199,12 @@ const Checkout = () => {
         khach_hang_id: user.id,
         ngay_dat: new Date().toISOString().split("T")[0],
         tong_tien: total,
+        tong_tien_truoc_giam: subtotal,           // ✅ tổng trước giảm
+        giam_gia_tien: discount,                  // ✅ số tiền giảm
+        phi_van_chuyen: shippingcost,             // ✅ phí ship
+        ten_phuong_thuc_van_chuyen: shipping.name,// ✅ tên dịch vụ
         trang_thai: "chờ xử lý",
-        ma_giam_gia_id: ma_giam_gia_id || null,
+        ma_giam_gia_id: couponId || null,
         ho_ten_nguoi_nhan: formData.ho_ten,
         email_nguoi_nhan: formData.email,
         so_dien_thoai: formData.so_dien_thoai,
@@ -710,7 +714,7 @@ const Checkout = () => {
                 </div>
               </Card.Header>
               <Card.Body>
-                {/* <div className="product-list">
+                <div className="product-list">
                   {cart.map((item) => (
                     <div key={item.id} className="product-item">
                       <div className="product-image">
@@ -734,7 +738,7 @@ const Checkout = () => {
                       </div>
                     </div>
                   ))}
-                </div> */}
+                </div>
 
                 <div className="price-summary">
                   <div className="price-row">

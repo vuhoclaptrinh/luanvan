@@ -75,7 +75,7 @@ const Thongke = () => {
         const revenueRaw = revenueRes.data.data || [];
 
         const totalRevenue = orders.reduce(
-          (sum, order) => sum + (order.tong_tien || 0),
+          (sum, order) => sum + Number(order.tong_tien   || 0),
           0
         );
 

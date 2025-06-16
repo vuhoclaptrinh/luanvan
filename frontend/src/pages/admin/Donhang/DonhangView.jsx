@@ -246,7 +246,7 @@ const DonhangView = ({ open, onClose, donhangId }) => {
                           <InfoItem
                             icon={<Receipt fontSize="small" />}
                             label="Tổng tiền"
-                            value={donhangInfo.tong_tien_format_giam}
+                            value={donhangInfo.tong_tien_format}
                             color="error"
                           />
                         </Grid>
@@ -405,9 +405,24 @@ const DonhangView = ({ open, onClose, donhangId }) => {
                             <TableCell colSpan={4} align="right" sx={{ fontWeight: 'bold', border: 0 }}>
                               Mã giảm giá ({donhangInfo.ten_ma_giam_gia}):
                             </TableCell>
-                            <TableCell align="right" sx={{ fontWeight: 'bold', color: 'success.main', border: 0 }}>
+                            <TableCell align="right" sx={{ fontWeight: 'bold', color: 'warning.main', border: 0 }}>
                               - {(
-                                chiTietDonhang.reduce((sum, item) => sum + Number(item.gia) * item.so_luong, 0) - Number(donhangInfo.tong_tien)
+                                 Number(donhangInfo.giam_gia_tien)
+                              ).toLocaleString('vi-VN')} ₫
+                            </TableCell>
+                            
+                          </TableRow>
+                          
+                          
+                        )}
+                        {donhangInfo && chiTietDonhang.length>0 &&(
+                          <TableRow>
+                            <TableCell colSpan={4} align="right" sx={{ fontWeight: 'bold', border: 0 }}>
+                              Phí vận chuyển ({donhangInfo.phi_van_chuyen}):
+                            </TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 'bold', color: 'success.main', border: 0 }}>
+                              + {(
+                                Number(donhangInfo.phi_van_chuyen)
                               ).toLocaleString('vi-VN')} ₫
                             </TableCell>
                           </TableRow>

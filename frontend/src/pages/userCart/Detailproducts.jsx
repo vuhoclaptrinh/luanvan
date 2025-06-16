@@ -319,10 +319,10 @@ const Detailproducts = () => {
                     </div>
                   )}
 
-                  {donhangInfo?.giam_gia && donhangInfo.giam_gia > 0 && (
-                    <div className="summary-row discount">
+                  {donhangInfo?.ten_ma_giam_gia && donhangInfo.ten_ma_giam_gia > 0 && ( 
+                    <div className="summary-row discount">  
                       <span className="summary-label">Giảm giá</span>
-                      <span className="summary-value">-{formatPrice(donhangInfo.giam_gia)}</span>
+                      <span className="summary-value">-{formatPrice(donhangInfo.ten_ma_giam_gia)}</span>
                     </div>
                   )}
 

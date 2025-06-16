@@ -2,12 +2,9 @@
 
 import { useEffect, useState } from "react"
 import { Container, Row, Col } from "react-bootstrap"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { ArrowLeft, Trash2, Plus, Minus, X, ShoppingBag, CreditCard, Gift } from "lucide-react"
-import { useNavigate } from "react-router-dom"
 import "./cart.css"
-
-
 
 const Cart = () => {
   const [cart, setCart] = useState([])
@@ -15,8 +12,9 @@ const Cart = () => {
   const [couponCode, setCouponCode] = useState("")
   const [couponApplied, setCouponApplied] = useState(false)
   const [discountAmount, setDiscountAmount] = useState(0)
-  const navigate = useNavigate()  
-  // Shipping options
+  const [coupons, setCoupons] = useState([])
+  const navigate = useNavigate()
+
   const shippingOptions = [
     { id: 1, name: "Giao hàng tiêu chuẩn", price: 30000, days: "3-5" },
     { id: 2, name: "Giao hàng nhanh", price: 60000, days: "1-2" },
@@ -25,90 +23,126 @@ const Cart = () => {
   const [selectedShipping, setSelectedShipping] = useState(shippingOptions[0])
 
   useEffect(() => {
-    // Simulate loading
     setTimeout(() => {
       const storedCart = JSON.parse(sessionStorage.getItem("cart")) || []
-
-      // Add image URLs and other details if they don't exist
       const enhancedCart = storedCart.map((item) => ({
         ...item,
-        image: item.hinh_anh || `/placeholder.svg?height=100&width=100`,
+        image: item.hinh_anh || "/placeholder.svg?height=100&width=100",
         brand: item.thuong_hieu || "Thương hiệu",
         size: item.dung_tich || "100ml",
       }))
-
       setCart(enhancedCart)
       setLoading(false)
     }, 500)
   }, [])
 
-  //kiẻm tra sô lượng tồn
-    const updateQuantity = (id, newQuantity) => {
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/api/magiamgia")
+      .then((res) => res.json())  
+      .then((data) => {
+        if (data.status) {
+          const mapped = data.data.map((item) => ({
+            id: item.id,
+            ma: item.ma,
+            ty_le: item.phan_tram_giam,
+            mo_ta: item.dieu_kien_ap_dung, 
+            dieu_kien_tien: parseInt(item.dieu_kien_ap_dung.replace(/\D/g, ""))
+          }))
+          setCoupons(mapped)
+        }
+      })
+      .catch((err) => console.error("Lỗi khi tải mã giảm giá:", err))
+  }, [])
+
+  const subtotal = cart.reduce((total, item) => total + item.gia * item.quantity, 0)
+  const shippingCost = selectedShipping.price
+  const total = subtotal + shippingCost - discountAmount
+
+  const updateQuantity = (id, newQuantity) => {
     const updatedCart = cart.map((item) => {
-        if (item.id === id) {
+      if (item.id === id) {
         if (newQuantity > item.so_luong_ton) {
-            alert(`Chỉ còn ${item.so_luong_ton} sản phẩm "${item.ten_san_pham}" trong kho!`)
-            return item
+          alert(`Chỉ còn ${item.so_luong_ton} sản phẩm "${item.ten_san_pham}" trong kho!`)
+          return item
         }
         if (newQuantity < 1) return item
         return { ...item, quantity: newQuantity }
-        }
-        return item
+      }
+      return item
     })
-
     sessionStorage.setItem("cart", JSON.stringify(updatedCart))
     setCart(updatedCart)
-    }
+  }
 
   const removeFromCart = (id) => {
     const updatedCart = cart.filter((item) => item.id !== id)
     sessionStorage.setItem("cart", JSON.stringify(updatedCart))
     setCart(updatedCart)
-  }
+  } 
 
   const clearCart = () => {
     sessionStorage.removeItem("cart")
     setCart([])
   }
 
-  const applyCoupon = () => {
-    // Simple coupon logic - in a real app, this would validate with backend
-    if (couponCode.toLowerCase() === "giamgia10") {
-      setCouponApplied(true)
-      setDiscountAmount(subtotal * 0.1) // 10% discount
-    } else if (couponCode.toLowerCase() === "giamgia20") {
-      setCouponApplied(true)
-      setDiscountAmount(subtotal * 0.2) // 20% discount
-    } else {
-      alert("Mã giảm giá không hợp lệ!")
+ const applyCoupon = () => {
+  const code = couponCode.trim().toUpperCase()
+  const found = coupons.find((c) => c.ma === code)
+
+  if (!found) {
+    alert("Mã giảm giá không hợp lệ!")
+    setCouponApplied(false)
+    setDiscountAmount(0)
+    return
+  }
+  if (subtotal < found.dieu_kien_tien) {
+      alert("Đơn hàng chưa đạt điều kiện áp dụng mã giảm giá!")
       setCouponApplied(false)
       setDiscountAmount(0)
+      return
     }
-  }
 
-  // Calculate totals
-  const subtotal = cart.reduce((total, item) => total + item.gia * item.quantity, 0)
-  const shippingCost = selectedShipping.price
-  const total = subtotal + shippingCost - discountAmount
+  const discount = subtotal * (found.ty_le / 100)
+  setDiscountAmount(discount)
+  setCouponApplied(true)
+}
 
-  // Format price with VND
   const formatPrice = (price) => {
     return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(price)
   }
 
-  // Get image URL
   const getImageUrl = (path) => {
     if (!path) return "/placeholder.svg?height=100&width=100"
     if (path.startsWith("http")) return path
     return `http://127.0.0.1:8000/storage/images/${path.replace(/^images\//, "")}`
   }
 
+  const handleCheckout = () => {
+    const user = JSON.parse(sessionStorage.getItem("user"))
+    if (!user) {
+      alert("Vui lòng đăng nhập để tiếp tục đặt hàng.")
+      navigate("/login")
+      return
+    }
+     const selectedCoupon = coupons.find((c) => c.ma === couponCode.trim().toUpperCase())
+    const couponId = selectedCoupon ? selectedCoupon.id : null // bạn cần lấy id từ API
+    navigate("/checkout", {
+      state: {
+        cart,
+        shipping: selectedShipping,
+        shippingcost: shippingCost,
+        discount: discountAmount,
+        coupon: couponCode,
+        total : total,
+        couponId,
+      },
+    })
+  }
+
   if (loading) {
     return (
       <div className="luxury-loading">
-        <div className="luxury-spinner">
-          <div className="spinner-inner"></div>
-        </div>
+        <div className="luxury-spinner"><div className="spinner-inner"></div></div>
         <p>Đang tải giỏ hàng của bạn...</p>
       </div>
     )
@@ -118,9 +152,7 @@ const Cart = () => {
     return (
       <div className="luxury-empty-cart">
         <div className="empty-cart-content">
-          <div className="empty-icon">
-            <ShoppingBag size={60} strokeWidth={1.5} />
-          </div>
+          <div className="empty-icon"><ShoppingBag size={60} strokeWidth={1.5} /></div>
           <h2>Giỏ hàng của bạn đang trống</h2>
           <p>Khám phá bộ sưu tập nước hoa cao cấp và thêm sản phẩm vào giỏ hàng</p>
           <Link to="/products" className="luxury-button">
@@ -132,29 +164,6 @@ const Cart = () => {
     )
   }
 
-  //chéc out
-  
-
-  const handleCheckout = () => {
-    
-    const user = JSON.parse(sessionStorage.getItem("user"))
-    if (!user) {
-      alert("Vui lòng đăng nhập để tiếp tục đặt hàng.")
-      navigate("/login")
-      return
-    }
-
-    navigate("/checkout", {
-      state: {
-        cart: cart,
-        shipping: selectedShipping,
-        discount: discountAmount,
-        coupon: couponCode    
-      }
-    })
-  }
-  
-
   return (
     <div className="luxury-cart-page">
       <Container>
@@ -162,9 +171,8 @@ const Cart = () => {
           <h1>Giỏ hàng</h1>
           <p>{cart.length} sản phẩm trong giỏ hàng</p>
         </div>
-
         <div className="luxury-cart-content">
-          <Row>
+         <Row>
             <Col lg={8}>
               <div className="luxury-cart-items">
                 <div className="cart-section-header">
@@ -301,18 +309,18 @@ const Cart = () => {
                     </button>
                   </div>
                   {couponApplied && <div className="coupon-success">Mã giảm giá đã được áp dụng thành công!</div>}
-                  <div className="coupon-examples">
-                    <div className="example">
-                      <span className="code">GIAMGIA10</span>
-                      <span className="desc">Giảm 10%</span>
+                  {coupons.length > 0 && (
+                    <div className="coupon-examples">
+                      {coupons.map((c) => (
+                        <div className="example" key={c.ma}>
+                          <span className="code">{c.ma}</span>
+                           <span className="desc">{c.mo_ta}</span>
+                        </div>  
+                      ))}
                     </div>
-                    <div className="example">
-                      <span className="code">GIAMGIA20</span>
-                      <span className="desc">Giảm 20%</span>
-                    </div>
-                  </div>
+                  )}
                 </div>
-              </div>
+              </div>  
             </Col>
           </Row>
         </div>
