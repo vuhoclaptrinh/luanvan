@@ -143,7 +143,7 @@ const SanphamList = () => {
     { field: 'id', headerName: 'ID', width: 70 },
     { field: 'ten_san_pham', headerName: 'Tên sản phẩm', width: 200 },
     { field: 'thuong_hieu', headerName: 'Thương hiệu', width: 150 },
-    { field: 'mo_ta', headerName: 'Mô tả', width: 250 },
+    { field: 'mo_ta', headerName: 'Mô tả', width: 200 },
     { field: 'dung_tich', headerName: 'Dung tích', width: 100 },
     {
       field: 'gia_format',

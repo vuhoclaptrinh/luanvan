@@ -276,7 +276,7 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
     return null
   }
 
-  // Hàm render nav link
+  //Hàm render nav link
   const renderNavLink = ({ href, label }, index) => (
     <Nav.Link
       key={`${href}-${index}`}
@@ -304,6 +304,49 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
       {renderMegaMenu(label)}
     </Nav.Link>
   )
+//   const renderNavLink = ({ href, label }, index) => {
+//   const isDropdown = label === "Danh mục" || label === "Thương hiệu" // kiểm tra có phải là mục đặc biệt có menu phụ không
+
+//   return (
+//     <div
+//       key={`${href}-${index}`}
+//       className="position-relative mx-2"
+//       onMouseEnter={() => setShowMegaMenu(label)} // hiển thị menu khi hover
+//       onMouseLeave={() => setShowMegaMenu(null)}  // ẩn menu khi rời chuột
+//     >
+//       {/* ✅ Nếu có href: tạo Nav.Link để điều hướng */}
+//       {href ? (
+//         <Nav.Link
+//           as={Link}              // sử dụng Link của react-router thay cho thẻ <a>
+//           to={href}              // đường dẫn cần chuyển đến
+//           className={`position-relative ${isActive(href) ? "fw-bold" : ""}`}
+//         >
+//           {label}                
+
+//           {/* Gạch dưới khi đang ở trang hiện tại */}
+//           {isActive(href) && (
+//             <span
+//               className="position-absolute"
+//               style={{
+//                 height: "2px",
+//                 width: "80%",
+//                 backgroundColor: "#e83e8c",
+//                 bottom: "0",
+//                 left: "10%",
+//               }}
+//             ></span>
+//           )}
+//         </Nav.Link>
+//       ) : (
+//         // ❌ KHÔNG dùng <a> nếu không có href —> dùng <span> thay thế
+//         <span className="nav-link text-dark">{label}</span>
+//       )}
+
+//       {/* ✅ menu con hiển thị khi hover (mega menu) */}
+//       {renderMegaMenu(label)}
+//     </div>
+//   )
+// }
 
   return (
     <header>
@@ -321,32 +364,29 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
               <div className="d-flex align-items-center">
                 <div className="d-flex align-items-center me-4" style={{ opacity: 0.9 }}>
                   <LocalShippingIcon fontSize="small" className="me-1" />
-                  <small className="fw-medium">Miễn phí vận chuyển cho đơn hàng từ 5.000.000đ</small>
-                </div>
-                <div className="d-flex align-items-center" style={{ opacity: 0.9 }}>
+                  <small className="fw-medium">Voucher cho đơn hàng từ 500.000đ</small>
+                </div>  
+                <div className="d-flex align-items-center me-4"  style={{ opacity: 0.9 }}>
                   <i className="bi bi-clock me-1"></i>
                   <small className="fw-medium">Giao hàng trong 24h</small>
                 </div>
+                <div className="d-flex align-items-center me-4" style={{ opacity: 0.9 }}>
+                 <i className="bi bi-box me-1"></i>
+                <small>Đổi trả trong 7 ngày</small>
+              </div>
               </div>
             </Col>
             <Col md={6}>
               <div className="d-flex justify-content-end align-items-center">
+                
+               <div className="d-flex align-items-center me-4" style={{ opacity: 0.9 }}>
+                  <i className="bi bi-cash-coin me-1"></i>
+                  <small className="fw-medium">Thanh toán khi nhận hàng</small>
+                </div>
                 <div className="me-4 d-flex align-items-center" style={{ opacity: 0.9 }}>
                   <SupportAgentIcon fontSize="small" className="me-1" />
-                  <small className="fw-medium">Hỗ trợ: 1900 1234</small>
-                </div>
-                <div className="d-flex align-items-center">
-                  <Link
-                    to="/track-order"
-                    className="text-white text-decoration-none me-3 d-flex align-items-center"
-                    style={{ opacity: 0.9, transition: "opacity 0.2s ease" }}
-                    onMouseOver={(e) => (e.currentTarget.style.opacity = 1)}
-                    onMouseOut={(e) => (e.currentTarget.style.opacity = 0.9)}
-                  >
-                    
-                  </Link>
-                  
-                </div>
+                   <small>Hỗ trợ: 0965765861   (7h - 22h)</small> 
+                </div>  
               </div>
             </Col>
           </Row>

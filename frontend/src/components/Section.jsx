@@ -8,7 +8,7 @@ function HeroSection() {
   // Danh sách hình ảnh cho carousel
   const heroImages = [
     {
-      src: "src/assets/img/baner.png",
+      src: "src/assets/img/logost.png",
       title: "Khám phá thế giới",
       subtitle: "Nước hoa cao cấp",
       description:
@@ -16,13 +16,13 @@ function HeroSection() {
     },
     {
       
-      src: "src/assets/img/logo1.png",
+      src: "src/assets/img/logo.png",
       title: "Hương thơm quyến rũ",
       subtitle: "Dành cho phái đẹp",
       description: "Khám phá những mùi hương nữ tính, quyến rũ và đầy mê hoặc từ các thương hiệu danh tiếng.",
     },
     {
-      src: "src/assets/img/logo2.png",
+      src: "src/assets/img/credd.jpg",
       title: "Phong cách nam tính",
       subtitle: "Mạnh mẽ & cuốn hút",
       description: "Bộ sưu tập nước hoa nam với hương thơm mạnh mẽ, nam tính và đầy cuốn hút.",

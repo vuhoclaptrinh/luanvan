@@ -109,12 +109,12 @@ const MagiamgiaList = () => {
     fetchMagiamgia();
   }, []);
     const columns = [
-        { field: 'id', headerName: 'ID', width: 90 },
-        { field: 'ma', headerName: 'Tên mã giảm giá', flex: 1, minWidth: 150 },
-        { field: 'phan_tram_giam', headerName: 'Phần trăm giảm', flex: 1, minWidth: 200 },
-        { field: 'ngay_bat_dau', headerName: 'Ngày bắt đầu', width: 150 },
-        { field: 'ngay_ket_thuc', headerName: 'Ngày kết thúc', width: 150 },
-        { field: 'dieu_kien_ap_dung', headerName: 'Điều kiện áp dụng', width: 150 },
+        { field: 'id', headerName: 'ID',width: 90 },
+        { field: 'ma', headerName: 'Tên mã giảm giá', flex :1, minWidth: 150 },
+        { field: 'phan_tram_giam', headerName: 'Phần trăm giảm', flex :1, minWidth: 200 },
+        // { field: 'ngay_bat_dau', headerName: 'Ngày bắt đầu', width: 150 },
+        // { field: 'ngay_ket_thuc', headerName: 'Ngày kết thúc', width: 150 },
+        { field: 'dieu_kien_ap_dung', headerName: 'Điều kiện áp dụng', flex :1, width: 150 },
         {
         field: 'actions',
         headerName: 'Thao tác',

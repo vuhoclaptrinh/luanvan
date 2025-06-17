@@ -70,6 +70,7 @@ const FilterSidebar = ({
         />
       </Form.Group>
 
+
       <Accordion defaultActiveKey={["0", "1", "2"]} alwaysOpen className="filter-accordion">
         <Accordion.Item eventKey="0">
           <Accordion.Header>Danh mục</Accordion.Header>
@@ -142,11 +143,14 @@ const FilterSidebar = ({
                     {children}
                   </div>
                 )}
-                renderThumb={({ props }) => (
+                renderThumb={({ props }) => {
+                const { key, ...rest } = props
+                return (
                   <div
-                    {...props}
+                    key={key}
+                    {...rest}
                     style={{
-                      ...props.style,
+                      ...rest.style,
                       height: "20px",
                       width: "20px",
                       backgroundColor: "#ffffff",
@@ -155,7 +159,8 @@ const FilterSidebar = ({
                       boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.15)",
                     }}
                   />
-                )}
+                )
+              }}
               />
             </div>
             <div className="d-flex justify-content-between">
