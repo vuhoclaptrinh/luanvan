@@ -7,6 +7,7 @@ use App\Models\Sanpham;
 use Illuminate\Auth\Events\Validated;
 
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class SanphamController extends Controller
 {
@@ -196,6 +197,14 @@ class SanphamController extends Controller
                     ]);
                 }
             }
+            // if ($request->hasFile('images_phu')) {
+            //     foreach ($request->file('images_phu') as $file) {
+            //         $path = $file->storeAs('images', Str::uuid() . '.' . $file->getClientOriginalExtension(), 'public');
+            //         $sanpham->images()->create([
+            //             'image_path' => $path,
+            //         ]);
+            //     }
+            // }
 
             $sanpham->refresh();
 
