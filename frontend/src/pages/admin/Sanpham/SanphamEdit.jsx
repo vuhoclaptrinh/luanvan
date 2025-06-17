@@ -151,7 +151,7 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
 
       // Ảnh phụ mới
       newImagesPhuFiles.forEach((file, ) => { 
-        formPayload.append('images_phu[]', file);
+        formPayload.append('hinh_phu[]', file);
       });
 
       // Danh sách ảnh phụ bị xóa (gửi id về backend để xóa)

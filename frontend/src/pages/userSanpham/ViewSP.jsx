@@ -315,8 +315,11 @@ const ViewSP = () => {
           className="product-detail-modal"
         >
           <Modal.Header closeButton>
-            <Modal.Title className="fs-5">{selectedProduct?.ten_san_pham}</Modal.Title>
-          </Modal.Header>
+           <Modal.Title className="fs-5 text-primary">
+                <i className="bi bi-eye me-2"></i>
+                Chi tiết sản phẩm
+              </Modal.Title>
+          </Modal.Header> 
           <Modal.Body className="p-4">
             <Row>
               <Col md={6}>
@@ -381,9 +384,10 @@ const ViewSP = () => {
                 <div className="mb-4">
                   {selectedProduct?.thuong_hieu && (
                     <div className="mb-2">
-                      <Badge bg="light" text="dark" className="me-2">
-                        {selectedProduct.thuong_hieu}
-                      </Badge>
+                      <Badge bg="light" text="dark" className="me-2 px-3 py-2">
+                          <i className="bi bi-award me-1"></i>
+                          {selectedProduct.thuong_hieu}
+                        </Badge>
                       {selectedProduct?.danh_muc_ten && <Badge bg="primary">{selectedProduct.danh_muc_ten}</Badge>}
                     </div>
                   )}

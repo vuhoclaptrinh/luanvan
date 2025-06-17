@@ -137,14 +137,14 @@ const DonhangList = () => {
 const columns = [
     { field: 'id', headerName: 'ID', width: 70 },
     //{ field: 'khach_hang_id', headerName: 'Mã Khách Hàng', width: 200 },
-    { field: 'ten_khach_hang', headerName: 'Tên Khách Hàng', width: 200 },
+    { field: 'ten_khach_hang', headerName: 'Tên Khách Hàng', width: 150 },
     { field: 'ngay_dat', headerName: 'Ngày Đặt  ', width: 150 },
     { field: 'tong_tien_truoc_giam_fomat', headerName: ' Tiền Gốc  ', width: 150 },
     { field: 'giam_gia_tien_fomat', headerName: 'Tiền Đã Giảm  ', width: 150 }, 
-    { field: 'phi_van_chuyen_fomat', headerName: 'Phí Vận Chuyển', width: 200 },
+    { field: 'phi_van_chuyen_fomat', headerName: 'Phí Vận Chuyển', width: 150 },
     { field: 'tong_tien_format', headerName: 'Tổng tiền (VND)', width: 200 },
     
-    { field: 'trang_thai', headerName: 'Trạng Thái', width: 250,
+    { field: 'trang_thai', headerName: 'Trạng Thái', width: 150,
      renderCell: (params) => {
     const { value } = params;
 

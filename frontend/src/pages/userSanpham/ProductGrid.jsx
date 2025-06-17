@@ -1,7 +1,7 @@
 "use client"
 import { Row, Col, Card, Button, Badge } from "react-bootstrap"
 
-import { addToCart } from "../userCart/Addcart"
+import { addToCart } from "../userCart/addcart"
 
 const ProductGrid = ({
   filteredProducts,

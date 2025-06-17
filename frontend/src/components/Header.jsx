@@ -16,8 +16,8 @@ import axios from "axios"
 const LEFT_NAV_LINKS = [
   { href: "/home", label: "Trang chủ" },
   { href: "/products", label: "Sản phẩm" },
-  { href: "/categories", label: "Danh mục" },
-  { href: "/brands", label: "Thương hiệu" },
+  { label: "Danh mục" },
+  {  label: "Thương hiệu" },
 ]
 
 const RIGHT_NAV_LINKS = [

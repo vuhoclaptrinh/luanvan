@@ -1,7 +1,7 @@
 
 import React from "react";
 import Footer from "../../components/Footer";
-import Header from "../../components/Header";
+import Header from "../../components/header";
 
 import HeroSection from "../../components/Section";
 //import FeaturedCategories from "../components/CategoryList";

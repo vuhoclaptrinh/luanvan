@@ -41,11 +41,11 @@ import Cartuser from "./pages/userCart/Cartuser";
 import Checkout from "./pages/userCart/Checkout";
 import OrderDetails from "./pages/userCart/Detailcart";
 import Detailproducts from "./pages/userCart/Detailproducts";
+import Dannhmuchome from "./pages/userDanhmuc/Danhmuchome";
+import Thuonghieuhome from "./pages/userThuonghieu/ThuonghieuUser";
+
 
 //test cho thai đoi tu thong ke qua
-
-
-
 
 // Protected Route Component
 const PrivateRoute = () => {
@@ -87,6 +87,8 @@ function App() {
                <Route path="/checkout" element={<Checkout/>}/>
                 <Route path="/orders" element={<OrderDetails/>}/>
                  <Route path="/donhang/:id" element={<Detailproducts/>}/>
+                 <Route path="/danhmuc/:id" element={<Dannhmuchome/>}/>
+                 <Route path="/thuonghieu/:brand" element={<Thuonghieuhome/>}/>
             
             {/* Protected Routes */}
             <Route element={<PrivateRoute />}>
