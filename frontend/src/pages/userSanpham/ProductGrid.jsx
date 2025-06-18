@@ -96,7 +96,7 @@ const ProductGrid = ({
                         onClick={(e) => {
                           e.stopPropagation()
                            addToCart(product)
-                          // Thêm vào giỏ hàng logic ở đây
+                          // Thêm vào giỏ hàng logic
                           // alert(`Đã thêm ${product.ten_san_pham} vào giỏ hàng!`)
                         }}
                       >

@@ -18,6 +18,80 @@ const Checkout = () => {
   const [error, setError] = useState("")
   const [orderComplete, setOrderComplete] = useState(false)
   const [orderId, setOrderId] = useState(null)
+//lấy địa chỉ
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [wards, setWards] = useState([]);
+
+  const [selectedProvince, setSelectedProvince] = useState(null);
+  const [selectedDistrict, setSelectedDistrict] = useState(null);
+  const [selectedWard, setSelectedWard] = useState(null);
+
+  // Load tỉnh
+  useEffect(() => {
+    fetch("https://provinces.open-api.vn/api/?depth=1")
+      .then((res) => res.json())
+      .then(setProvinces);
+  }, []);
+  const handleProvinceChange = (e) => {
+  const code = e.target.value;
+
+  setSelectedProvince(code);
+  setFormData((prev) => ({
+    ...prev,
+    city: code,
+    district: "",
+    ward: "",
+  }));
+};
+
+  // Load quận khi chọn tỉnh
+  useEffect(() => {
+    if (selectedProvince) {
+      fetch(`https://provinces.open-api.vn/api/p/${selectedProvince}?depth=2`)
+        .then((res) => res.json())
+        .then((data) => {
+          setDistricts(data.districts);
+          setWards([]);
+          setSelectedDistrict(null);
+          setSelectedWard(null);
+        });
+    }
+  }, [selectedProvince]);
+  const handleDistrictChange = (e) => {
+    const code = e.target.value;
+
+    setSelectedDistrict(code);
+    setFormData((prev) => ({
+      ...prev,
+      district: code,
+      ward: "",
+    }));
+  };
+
+  // Load phường khi chọn quận
+  useEffect(() => {
+    if (selectedDistrict) {
+      fetch(`https://provinces.open-api.vn/api/d/${selectedDistrict}?depth=2`)
+        .then((res) => res.json())
+        .then((data) => {
+          setWards(data.wards);
+          setSelectedWard(null);
+        });
+    }
+  }, [selectedDistrict]);
+  const handleWardChange = (e) => {
+    const code = e.target.value;
+
+    setSelectedWard(code);
+    setFormData((prev) => ({
+      ...prev,
+      ward: code,
+    }));
+  };
+
+  
+
 
   // Form state
   const [formData, setFormData] = useState({
@@ -189,10 +263,24 @@ const Checkout = () => {
     }
 
     setSubmitting(true)
+    //chuyển code địa chỉ sang tên 
+    const getProvinceName = (code) =>
+      provinces.find((p) => p.code === Number(code))?.name || "";
+
+    const getDistrictName = (code) =>
+      districts.find((d) => d.code === Number(code))?.name || "";
+
+    const getWardName = (code) =>
+      wards.find((w) => w.code === Number(code))?.name || "";     
 
     try {
       // Combine address parts
-      const fullAddress = `${formData.dia_chi}, ${formData.ward}, ${formData.district}, ${formData.city}`
+      const fullAddress = [
+        formData.dia_chi, // Số nhà, tên đường
+        getWardName(formData.ward),
+        getDistrictName(formData.district),
+        getProvinceName(formData.city)
+      ].filter(Boolean).join(", ");
 
       // Submit order to API
       const res = await axios.post("http://localhost:8000/api/donhang", {
@@ -383,56 +471,84 @@ const Checkout = () => {
                     <Form.Control.Feedback type="invalid">{errors.dia_chi}</Form.Control.Feedback>
                   </Form.Group>
 
-                  <Row>
-                    <Col md={4}>
-                      <Form.Group className="form-group">
-                        <Form.Label>
-                          Tỉnh/Thành phố <span className="required">*</span>
-                        </Form.Label>
-                        <Form.Control
-                          type="text"
-                          name="city"
-                          value={formData.city}
-                          onChange={handleInputChange}
-                          isInvalid={validated && !!errors.city}
-                          required
-                        />
-                        <Form.Control.Feedback type="invalid">{errors.city}</Form.Control.Feedback>
-                      </Form.Group>
-                    </Col>
-                    <Col md={4}>
-                      <Form.Group className="form-group">
-                        <Form.Label>
-                          Quận/Huyện <span className="required">*</span>
-                        </Form.Label>
-                        <Form.Control
-                          type="text"
-                          name="district"
-                          value={formData.district}
-                          onChange={handleInputChange}
-                          isInvalid={validated && !!errors.district}
-                          required
-                        />
-                        <Form.Control.Feedback type="invalid">{errors.district}</Form.Control.Feedback>
-                      </Form.Group>
-                    </Col>
-                    <Col md={4}>
-                      <Form.Group className="form-group">
-                        <Form.Label>
-                          Phường/Xã <span className="required">*</span>
-                        </Form.Label>
-                        <Form.Control
-                          type="text"
-                          name="ward"
-                          value={formData.ward}
-                          onChange={handleInputChange}
-                          isInvalid={validated && !!errors.ward}
-                          required
-                        />
-                        <Form.Control.Feedback type="invalid">{errors.ward}</Form.Control.Feedback>
-                      </Form.Group>
-                    </Col>
-                  </Row>
+                 <Row>
+  <Col md={4}>
+    <Form.Group className="form-group">
+      <Form.Label>
+        Tỉnh/Thành phố <span className="required">*</span>
+      </Form.Label>
+      <Form.Select
+        name="city"
+        value={formData.city}
+        onChange={handleProvinceChange}
+        isInvalid={validated && !!errors.city}
+        required
+      >
+        <option value="">-- Chọn tỉnh/thành phố --</option>
+        {provinces.map((p) => (
+          <option key={p.code} value={p.code}>
+            {p.name}
+          </option>
+        ))}
+      </Form.Select>
+      <Form.Control.Feedback type="invalid">
+        {errors.city}
+      </Form.Control.Feedback>
+    </Form.Group>
+  </Col>
+
+  <Col md={4}>
+    <Form.Group className="form-group">
+      <Form.Label>
+        Quận/Huyện <span className="required">*</span>
+      </Form.Label>
+      <Form.Select
+        name="district"
+        value={formData.district}
+        onChange={handleDistrictChange}
+        isInvalid={validated && !!errors.district}
+        required
+        disabled={!districts.length}
+      >
+        <option value="">-- Chọn quận/huyện --</option>
+        {districts.map((d) => (
+          <option key={d.code} value={d.code}>
+            {d.name}
+          </option>
+        ))}
+      </Form.Select>
+      <Form.Control.Feedback type="invalid">
+        {errors.district}
+      </Form.Control.Feedback>
+    </Form.Group>
+  </Col>
+
+  <Col md={4}>
+    <Form.Group className="form-group">
+      <Form.Label>
+        Phường/Xã <span className="required">*</span>
+      </Form.Label>
+      <Form.Select
+        name="ward"
+        value={formData.ward}
+        onChange={handleWardChange}
+        isInvalid={validated && !!errors.ward}
+        required
+        disabled={!wards.length}
+      >
+        <option value="">-- Chọn phường/xã --</option>
+        {wards.map((w) => (
+          <option key={w.code} value={w.code}>
+            {w.name}
+          </option>
+        ))}
+      </Form.Select>
+      <Form.Control.Feedback type="invalid">
+        {errors.ward}
+      </Form.Control.Feedback>
+    </Form.Group>
+  </Col>
+</Row>
                 </Card.Body>
               </Card>
 

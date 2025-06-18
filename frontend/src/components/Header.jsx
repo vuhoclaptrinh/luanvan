@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import { Navbar, Nav, Container, Badge, Offcanvas, Dropdown, Row, Col, Button } from "react-bootstrap"
 import { Link, useNavigate, useLocation } from "react-router-dom"
@@ -12,7 +11,7 @@ import SupportAgentIcon from "@mui/icons-material/SupportAgent"
 import Logo from "../assets/img/logo.jpg"
 import axios from "axios"
 
-// Navigation Links chia thành 2 nhóm
+// Navigation 
 const LEFT_NAV_LINKS = [
   { href: "/home", label: "Trang chủ" },
   { href: "/products", label: "Sản phẩm" },
@@ -25,10 +24,10 @@ const RIGHT_NAV_LINKS = [
   { href: "/contact", label: "Liên hệ" },
 ]
 
-// Kết hợp cả hai nhóm cho menu mobile
+// menu mobile
 const ALL_NAV_LINKS = [...LEFT_NAV_LINKS, ...RIGHT_NAV_LINKS]
 
-// Lấy tên đầy đủ từ user object
+
 const getFullName = (user) => {
   if (!user) return ""
 
@@ -39,7 +38,7 @@ const getFullName = (user) => {
   return `${firstName} ${lastName}`.trim()
 }
 
-// Lấy chữ cái đầu cho avatar
+
 const getInitials = (user) => {
   if (!user) return "U"
 
@@ -47,7 +46,6 @@ const getInitials = (user) => {
   return fullName.charAt(0).toUpperCase()
 }
 
-// Màu avatar ngẫu nhiên dựa trên tên
 const getAvatarColor = (user) => {
   if (!user) return "#6f42c1"
 
@@ -80,7 +78,7 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
   const [thuonghieu, setThuonghieu] = useState([])
   const [loadingThuonghieu, setLoadingThuonghieu] = useState(false)
 
-  // Hàm để lấy số lượng sản phẩm trong giỏ hàng
+  //  lấy số lượng sản phẩm trong giỏ hàng
   const getCartItemsCount = () => {
     try {
       const cartItems = JSON.parse(sessionStorage.getItem("cart")) || []
@@ -93,7 +91,7 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
     }
   }
 
-  // Lấy user từ sessionStorage và fetch danh mục
+  // Lấy user sessionStorage 
   useEffect(() => {
     const storedUser = sessionStorage.getItem("user")
     if (storedUser) {
@@ -107,12 +105,12 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
     // Cập nhật số lượng sản phẩm trong giỏ hàng
     setCartItemCount(getCartItemsCount())
 
-    // Theo dõi scroll để thay đổi header style
+    // scroll 
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 100)
     }
 
-    // Lắng nghe sự kiện cập nhật giỏ hàng
+    //  sự kiện cập nhật giỏ hàng
     const handleStorageChange = (e) => {
       if (e.key === "cart") {
         setCartItemCount(getCartItemsCount())
@@ -122,12 +120,12 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
     window.addEventListener("scroll", handleScroll)
     window.addEventListener("storage", handleStorageChange)
 
-    // Fetch danh mục từ API
+    // Fetch danh mục 
     setLoadingCategories(true)
     axios
       .get("http://127.0.0.1:8000/api/danhmuc")
       .then((res) => {
-        // Kiểm tra cấu trúc dữ liệu trả về và xử lý phù hợp
+        
         const categoriesData = res.data.data || res.data
         setCategories(categoriesData)
       })
@@ -144,10 +142,10 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
       .then((res) => {
         const sanphamData = res.data.data || res.data
 
-        // Lọc ra các thương hiệu duy nhất
+        // Lọc thương hiệu 
         const uniqueBrands = [...new Set(sanphamData.map((sp) => sp.thuong_hieu))]
 
-        // Gán vào state
+        
         setThuonghieu(uniqueBrands)
       })
       .catch((err) => {
@@ -164,14 +162,14 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
     }
   }, [])
 
-  // Hàm để cập nhật số lượng sản phẩm
+  // cập nhật số lượng sản phẩm
   useEffect(() => {
     // cập nhật
     const handleCartUpdate = () => {
       setCartItemCount(getCartItemsCount())
     }
 
-    // Đăng ký lắng nghe sự kiện
+    // Đăng ký 
     window.addEventListener("cart-updated", handleCartUpdate)
 
     // Cleanup
@@ -314,7 +312,7 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
 //       onMouseEnter={() => setShowMegaMenu(label)} // hiển thị menu khi hover
 //       onMouseLeave={() => setShowMegaMenu(null)}  // ẩn menu khi rời chuột
 //     >
-//       {/* ✅ Nếu có href: tạo Nav.Link để điều hướng */}
+//       {/*  Nếu có href: tạo Nav.Link để điều hướng */}
 //       {href ? (
 //         <Nav.Link
 //           as={Link}              // sử dụng Link của react-router thay cho thẻ <a>
@@ -338,11 +336,11 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
 //           )}
 //         </Nav.Link>
 //       ) : (
-//         // ❌ KHÔNG dùng <a> nếu không có href —> dùng <span> thay thế
+//         //  KHÔNG dùng <a> nếu không có href —> dùng <span> thay thế
 //         <span className="nav-link text-dark">{label}</span>
 //       )}
 
-//       {/* ✅ menu con hiển thị khi hover (mega menu) */}
+//       {/* menu con hiển thị khi hover (mega menu) */}
 //       {renderMegaMenu(label)}
 //     </div>
 //   )
@@ -385,7 +383,7 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
                 </div>
                 <div className="me-4 d-flex align-items-center" style={{ opacity: 0.9 }}>
                   <SupportAgentIcon fontSize="small" className="me-1" />
-                   <small>Hỗ trợ: 0965765861   (7h - 22h)</small> 
+                   <small>Hỗ trợ: 0965765861   (8h - 22h)</small> 
                 </div>  
               </div>
             </Col>
