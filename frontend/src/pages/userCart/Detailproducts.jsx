@@ -311,18 +311,16 @@ const Detailproducts = () => {
                     <span className="summary-label">Tạm tính</span>
                     <span className="summary-value">{formatPrice(subtotal)}</span>
                   </div>
-
+                  {donhangInfo?.giam_gia_tien  && ( 
+                    <div className="summary-row">
+                      <span className="summary-label">Giảm giá</span>
+                      <span className="summary-value">-   {formatPrice(donhangInfo.giam_gia_tien)}</span>
+                    </div>
+                  )}
                   {donhangInfo?.phi_van_chuyen && (
                     <div className="summary-row">
                       <span className="summary-label">Phí vận chuyển</span>
                       <span className="summary-value">{formatPrice(donhangInfo.phi_van_chuyen)}</span>
-                    </div>
-                  )}
-
-                  {donhangInfo?.ten_ma_giam_gia && donhangInfo.ten_ma_giam_gia > 0 && ( 
-                    <div className="summary-row discount">  
-                      <span className="summary-label">Giảm giá</span>
-                      <span className="summary-value">-{formatPrice(donhangInfo.ten_ma_giam_gia)}</span>
                     </div>
                   )}
 

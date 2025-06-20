@@ -79,34 +79,41 @@ class KhachhangController extends Controller
         try {
             $request->validate([
                 'ho_ten' => 'required|string|max:255',
-                'email' => 'required|string|max:255',
-                'mat_khau' => 'required|string|max:255',
+                'email' => 'required|email|max:255',
                 'so_dien_thoai' => 'required|string|max:255',
-
-                'dia_chi' => 'required|string|max:255'
+                'dia_chi' => 'required|string|max:255',
+                'mat_khau' => 'nullable|string|min:6',
             ]);
-            // tim
+
             $khachhang = Khachhang::find($id);
 
-            $khachhang->update($request->only([
+            if (!$khachhang) {
+                return response()->json(['message' => 'Không tìm thấy khách hàng'], 404);
+            }
+
+            $data = $request->only([
                 'ho_ten',
                 'email',
-                'mat_khau',
                 'so_dien_thoai',
-                'dia_chi'
-            ]));
-            return response()->json(
-                [
-                    'message' => 'cậpp nhật khách hàng thành công ',
-                    'data' => $khachhang
-                ],
-                200
-            );
+                'dia_chi',
+            ]);
+
+            // Nếu có gửi mật khẩu mới thì mã hóa rồi lưu
+            if ($request->filled('mat_khau')) {
+                $data['mat_khau'] = bcrypt($request->mat_khau);
+            }
+
+            $khachhang->update($data);
+
+            return response()->json([
+                'message' => 'Cập nhật khách hàng thành công',
+                'data' => $khachhang,
+            ], 200);
 
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Đã xảy ra lỗi',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

@@ -544,7 +544,7 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
                         </div>
                       </div>
 
-                      <Dropdown.Item as={Link} to="/profile" className="rounded-2 mb-1">
+                      <Dropdown.Item as={Link} to="/profilehome" className="rounded-2 mb-1">
                         <i className="bi bi-person me-2"></i>Hồ sơ cá nhân
                       </Dropdown.Item>
 
@@ -556,9 +556,9 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
                         <i className="bi bi-heart me-2"></i>Danh sách yêu thích
                       </Dropdown.Item>
 
-                      <Dropdown.Item as={Link} to="/addresses" className="rounded-2 mb-1">
+                      {/* <Dropdown.Item as={Link} to="/addresses" className="rounded-2 mb-1">
                         <i className="bi bi-geo-alt me-2"></i>Địa chỉ giao hàng
-                      </Dropdown.Item>
+                      </Dropdown.Item> */}
 
                       <Dropdown.Divider />
 

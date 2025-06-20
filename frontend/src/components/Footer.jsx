@@ -58,12 +58,12 @@ function Footer() {
                 </a>
               </li>
               <li className="mb-2">
-                <a href="/brands" className="text-decoration-none text-muted">
+                <a  className="text-decoration-none text-muted">
                   Thương hiệu
                 </a>
               </li>
               <li className="mb-2">
-                <a href="/blog" className="text-decoration-none text-muted">
+                <a  className="text-decoration-none text-muted">
                   Blog
                 </a>
               </li>

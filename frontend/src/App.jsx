@@ -18,6 +18,9 @@ import theme from "./theme";
 // Import components
 import Layoutmain from "./components/layoutmain";
 import NotFound from "./components/Notfound";
+import AboutPage from "./components/About";
+import ContactPage from "./components/Contact";
+import ProfilePage from "./components/ProfileHome";
 
 // Import pages
 import Login from "./pages/Login";
@@ -84,12 +87,16 @@ function App() {
              <Route path="/login" element={<Login />} />
               <Route path="/products" element={<SanphamUser />} />
               <Route path="/cart" element={<Cartuser/>}/>
-               <Route path="/checkout" element={<Checkout/>}/>
-                <Route path="/orders" element={<OrderDetails/>}/>
-                 <Route path="/donhang/:id" element={<Detailproducts/>}/>
-                 <Route path="/danhmuc/:id" element={<Dannhmuchome/>}/>
-                 <Route path="/thuonghieu/:brand" element={<Thuonghieuhome/>}/>
-            
+              <Route path="/checkout" element={<Checkout/>}/>
+              <Route path="/orders" element={<OrderDetails/>}/>
+              <Route path="/donhang/:id" element={<Detailproducts/>}/>
+              <Route path="/danhmuc/:id" element={<Dannhmuchome/>}/>
+              <Route path="/thuonghieu/:brand" element={<Thuonghieuhome/>}/>
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/profilehome" element={<ProfilePage />} />
+
+
             {/* Protected Routes */}
             <Route element={<PrivateRoute />}>
               {/* Admin Dashboard Routes */}
