@@ -10,6 +10,7 @@ import FilterSidebar from "../userSanpham/FilterSidebar"
 import "./styles.css"
 import { addToCart } from "../userCart/addcart"
 import { useParams } from "react-router-dom"
+import { addtowwishlist } from "../userWishlist/Addwishlist"
 
 const getImageUrl = (path) => {
   if (!path) return "/placeholder.svg?height=300&width=300"
@@ -647,7 +648,10 @@ const ViewDM = () => {
                       <i className="bi bi-cart-plus me-2"></i>
                       {selectedProduct?.so_luong_ton === 0 ? "Hết hàng" : "Thêm vào giỏ hàng"}
                     </Button>
-                    <Button variant="outline-secondary" size="lg">
+                    <Button variant="outline-secondary" size="lg" onClick={(e) => {
+                      e.stopPropagation()
+                      addtowwishlist(selectedProduct)
+                    }}>
                       <i className="bi bi-heart me-2"></i>
                       Thêm vào yêu thích
                     </Button>

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import axios from "axios"
 import { Card, Row, Col, Container, Modal, Button, Badge, Spinner } from "react-bootstrap"
 import { addToCart } from './../pages/userCart/Addcart';
+import { addtowwishlist } from "../pages/userWishlist/Addwishlist";
 
 const getImageUrl = (path) => {
   if (!path) return "/placeholder.svg?height=300&width=300"
@@ -315,7 +316,10 @@ const ProductList = () => {
                     <i className="bi bi-cart-plus me-2"></i>
                     Thêm vào giỏ hàng
                   </Button>
-                  <Button variant="outline-secondary">
+                  <Button variant="outline-secondary" onClick={(e) => {
+                    e.stopPropagation()
+                    addtowwishlist(selectedProduct)
+                  }}>
                     <i className="bi bi-heart me-2"></i>
                     Thêm vào yêu thích
                   </Button>

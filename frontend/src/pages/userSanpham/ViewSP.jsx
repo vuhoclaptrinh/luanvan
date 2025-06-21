@@ -8,6 +8,7 @@ import ProductGrid from "./ProductGrid"
 import FilterSidebar from "./FilterSidebar"
 import "./styles.css"
 import { addToCart } from "../userCart/addcart"
+import { addtowwishlist } from "../userWishlist/Addwishlist"
 
 const getImageUrl = (path) => {
   if (!path) return "/placeholder.svg?height=300&width=300"
@@ -461,7 +462,13 @@ const ViewSP = () => {
                     <i className="bi bi-cart-plus me-2"></i>
                     Thêm vào giỏ hàng
                   </Button>
-                  <Button variant="outline-secondary">
+                  <Button variant="outline-secondary"  onClick={(e) => {
+                    e.stopPropagation()
+                    // Thêm vào giỏ hàng logic ở đây
+                    addtowwishlist(selectedProduct)
+
+                    // alert(`Đã thêm ${selectedProduct.ten_san_pham} vào wishlist!`)
+                  }}>
                     <i className="bi bi-heart me-2"></i>
                     Thêm vào yêu thích
                   </Button>

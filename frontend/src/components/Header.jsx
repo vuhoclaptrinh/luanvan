@@ -62,7 +62,7 @@ const getAvatarColor = (user) => {
   return colors[index]
 }
 
-function Header({ cartCount = 0, wishlistCount = 0 }) {
+function Header({ cartCount = 0}) {
   const [showOffcanvas, setShowOffcanvas] = useState(false)
   const [user, setUser] = useState(null)
   const [showMegaMenu, setShowMegaMenu] = useState(null)
@@ -78,6 +78,8 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
   const [thuonghieu, setThuonghieu] = useState([])
   const [loadingThuonghieu, setLoadingThuonghieu] = useState(false)
 
+
+
   //  lấy số lượng sản phẩm trong giỏ hàng
   const getCartItemsCount = () => {
     try {
@@ -90,6 +92,30 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
       return 0
     }
   }
+  //wishlist
+  const getWishlistCount = () => {
+  try {
+    const wishlist = JSON.parse(sessionStorage.getItem("wishlist")) || []
+    return wishlist.length
+  } catch (err) {
+    console.error("Lỗi khi đọc wishlist:", err)
+    return 0
+  }
+}
+  const [wishlistCount, setWishlistCount] = useState(getWishlistCount())
+useEffect(() => {
+  const updateWishlistCount = () => {
+    setWishlistCount(getWishlistCount())
+  }
+
+  // Khi sự kiện "wishlist-updated" được gọi
+  window.addEventListener("wishlist-updated", updateWishlistCount)
+
+  // Cleanup
+  return () => {
+    window.removeEventListener("wishlist-updated", updateWishlistCount)
+  }
+}, [])
 
   // Lấy user sessionStorage 
   useEffect(() => {
@@ -465,7 +491,7 @@ function Header({ cartCount = 0, wishlistCount = 0 }) {
                     {wishlistCount > 0 && (
                       <Badge
                         pill
-                        bg="danger"
+                        bg="primary"
                         className="position-absolute top-0 start-100 translate-middle"
                         style={{ fontSize: "0.6rem" }}
                       >

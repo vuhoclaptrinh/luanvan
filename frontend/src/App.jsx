@@ -11,6 +11,8 @@ import {
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material";
 import { SnackbarProvider } from "notistack";
+import { Bounce, ToastContainer } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
 
 // Import theme
 import theme from "./theme";
@@ -21,12 +23,13 @@ import NotFound from "./components/Notfound";
 import AboutPage from "./components/About";
 import ContactPage from "./components/Contact";
 import ProfilePage from "./components/ProfileHome";
+import BackToTop from "./components/Backtotop";
 
 // Import pages
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Thongke from "./pages/Thongke";
-import BackToTop from "./components/Backtotop";
+
 
 // Import admin pages
 import SanphamList from "./pages/admin/Sanpham/SanphamList";
@@ -46,6 +49,8 @@ import OrderDetails from "./pages/userCart/Detailcart";
 import Detailproducts from "./pages/userCart/Detailproducts";
 import Dannhmuchome from "./pages/userDanhmuc/Danhmuchome";
 import Thuonghieuhome from "./pages/userThuonghieu/ThuonghieuUser";
+import Wishlist from "./pages/userWishlist/Wishlist";
+import WishlistUser from "./pages/userWishlist/WishlistUser";
 
 
 //test cho thai đoi tu thong ke qua
@@ -75,10 +80,21 @@ function App() {
         autoHideDuration={3000}
         anchorOrigin={{
           vertical: 'top',
-          horizontal: 'right',
+          horizontal: 'center',
         }}
         
       >
+         <ToastContainer position="top-center"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick={false}
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+          transition={Bounce} />
         <BackToTop/>  
         <Router>
           <Routes>
@@ -95,6 +111,7 @@ function App() {
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/profilehome" element={<ProfilePage />} />
+              <Route path="/wishlist" element={<WishlistUser />} />
 
 
             {/* Protected Routes */}

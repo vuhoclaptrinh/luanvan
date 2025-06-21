@@ -169,7 +169,7 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
       );
 
       if (response.status === 200) {
-        enqueueSnackbar('Cập nhật sản phẩm thành công!', { variant: 'success' });
+        enqueueSnackbar('Cập nhật sản phẩm thành công!', { variant: 'success',position:"top-center" });
         onUpdate();
         onClose();
       } else {
