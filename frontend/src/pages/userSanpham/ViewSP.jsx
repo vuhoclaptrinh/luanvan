@@ -39,6 +39,11 @@ const ViewSP = () => {
   const [searchQuery, setSearchQuery] = useState("")
   const [inStockOnly, setInStockOnly] = useState(false)
 
+  // Review states
+  const [showReviewModal, setShowReviewModal] = useState(false)
+  const [reviews, setReviews] = useState([])
+  const [loadingReviews, setLoadingReviews] = useState(false)
+
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true)
@@ -178,6 +183,20 @@ const ViewSP = () => {
 
   const toggleMobileFilters = () => {
     setMobileFiltersVisible(!mobileFiltersVisible)
+  }
+
+  const handleShowReviews = async () => {
+    if (!selectedProduct) return
+    setShowReviewModal(true)
+    setLoadingReviews(true)
+    try {
+      const res = await axios.get(`http://127.0.0.1:8000/api/danhgia/sanpham/${selectedProduct.id}`)
+      setReviews(res.data.data || [])
+    } catch (err) {
+      setReviews([])
+    } finally {
+      setLoadingReviews(false)
+    }
   }
 
   if (loading) {
@@ -472,11 +491,72 @@ const ViewSP = () => {
                     <i className="bi bi-heart me-2"></i>
                     Thêm vào yêu thích
                   </Button>
+                  <Button variant="outline-info" onClick={handleShowReviews}>
+                    <i className="bi bi-chat-left-text me-2"></i>
+                    Xem đánh giá
+                  </Button>
                 </div>
               </Col>
             </Row>
           </Modal.Body>
         </Modal>
+
+        {/* Modal hiển thị đánh giá */}
+        <Modal show={showReviewModal} onHide={() => setShowReviewModal(false)} centered className="review-modal">
+          <Modal.Header closeButton>
+            <Modal.Title>Đánh giá sản phẩm</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {loadingReviews ? (
+              <div className="text-center py-4">
+                <Spinner animation="border" />
+              </div>
+            ) : reviews.length === 0 ? (
+              <div className="text-center text-muted py-4">
+                Chưa có đánh giá nào cho sản phẩm này.
+              </div>
+            ) : (
+              <div style={{ maxHeight: 350, overflowY: 'auto' }}>
+                {reviews.map((rv, idx) => (
+                  <div
+                    key={idx}
+                    className="mb-3 p-3"
+                    style={{
+                      backgroundColor: '#f8f9fa',
+                      border: '1px solid #dee2e6',
+                      borderRadius: '12px',
+                      transition: 'box-shadow 0.3s',
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)')
+                    }
+                    onMouseLeave={(e) => (e.currentTarget.style.boxShadow = 'none')}
+                  >
+                    <div className="d-flex align-items-center mb-2">
+                      <span className="fw-semibold me-2" style={{ color: '#343a40' }}>
+                        {rv.ten_khach_hang || 'Ẩn danh'}
+                      </span>
+                      <span className="text-warning">
+                        {Array.from({ length: 5 }, (_, i) => (
+                          <i
+                            key={i}
+                            className={`bi ${i < rv.so_sao ? 'bi-star-fill' : 'bi-star'}`}
+                            style={{ marginRight: '2px' }}
+                          ></i>
+                        ))}
+                      </span>
+                      <span className="ms-auto text-muted small">{rv.ngay_danh_gia}</span>
+                    </div>
+                    <div className="text-muted" style={{ lineHeight: 1.5 }}>
+                      {rv.noi_dung}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Modal.Body>
+        </Modal>
+
       </Container>
     </section>
   )

@@ -83,3 +83,78 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+
+
+import React, { useEffect, useState } from 'react'
+import { Container, Row, Col, Card, Button } from "react-bootstrap"
+
+const getWishlist = () => {
+        return JSON.parse(sessionStorage.getItem('wishlist')) || [];
+    }
+const removeFromWishlist = (productId) => {
+  const wishlist = JSON.parse(sessionStorage.getItem("wishlist")) || []
+  const updatedWishlist = wishlist.filter((item) => item.id !== productId)
+  sessionStorage.setItem("wishlist", JSON.stringify(updatedWishlist))
+  window.dispatchEvent(new Event("wishlist-updated"))
+}
+const Wishlist = () => {
+    const [wishlist, setWishlist] = useState([])
+
+    useEffect(() => {
+    setWishlist(getWishlist())
+
+    const handleUpdate = () => setWishlist(getWishlist())
+    window.addEventListener("wishlist-updated", handleUpdate)
+
+    return () => {
+      window.removeEventListener("wishlist-updated", handleUpdate)
+    }
+  }, [])
+   const getImageUrl = (path) => {
+    if (!path) return "/placeholder.svg?height=100&width=100"
+    if (path.startsWith("http")) return path
+    return `http://127.0.0.1:8000/storage/images/${path.replace(/^images\//, "")}`
+  }
+
+  if (wishlist.length === 0) {
+    return (
+      <Container className="mt-4">
+        <h3>Danh sách yêu thích trống</h3>
+      </Container>
+    )
+  }
+  return (
+   <Container className="mt-4">
+      <h3 className="mb-4">Danh sách yêu thích</h3>
+      <Row>
+        {wishlist.map((product) => (
+          <Col key={product.id} md={4} sm={6} className="mb-4">
+            <Card className="h-100 shadow-sm">
+              <Card.Img
+                variant="top"
+                src={product.hinh_anh || "/placeholder.jpg"}
+                style={{ height: "200px", objectFit: "cover" }}
+              />
+              <Card.Body>
+                <Card.Title>{product.ten_san_pham}</Card.Title>
+                <Card.Text>{product.mo_ta?.substring(0, 100)}...</Card.Text>
+                <Button
+                  variant="danger"
+                  onClick={() => {
+                    removeFromWishlist(product.id)
+                    setWishlist(getWishlist())
+                  }}
+                >
+                  Xoá khỏi yêu thích
+                </Button>
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+    </Container>
+  )
+}
+
+export default Wishlist

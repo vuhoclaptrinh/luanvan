@@ -95,7 +95,9 @@ Route::delete('/danhgia/{id}', [DanhgiaController::class, 'delete']);
 Route::get('/danhgia/sanpham/{id}', [DanhgiaController::class, 'getBySanPham']);
 //getby kahch hàng
 Route::get('/danhgia/khachhang/{id}', [DanhgiaController::class, 'getByKhachHang']);
-
+Route::get('/danhgia/trungbinh/{sanPhamId}', [DanhGiaController::class, 'getTrungBinhSoSao']);
+Route::get('/danhgia/kiemtra-da-mua/{khachHangId}/{sanPhamId}', [DanhGiaController::class, 'checkDaMua']);
+Route::get('/danhgia/da-danh-gia/{khachHangId}/{sanPhamId}', [DanhGiaController::class, 'daDanhGia']);
 //DON HÀNG
 //GET
 Route::get('/donhang', [DonhangController::class, 'get']);

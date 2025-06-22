@@ -343,4 +343,26 @@ class DonhangController extends Controller
             ], 500);
         }
     }
+    //check xem khách hàng đã mua sản phẩm này chưa
+    public function checkDaMua($khachHangId, $sanPhamId)
+    {
+        try {
+            $daMua = Donhang::where('khach_hang_id', $khachHangId)
+                ->whereHas('chiTietDonHang', function ($query) use ($sanPhamId) {
+                    $query->where('san_pham_id', $sanPhamId);
+                })
+                ->exists();
+
+            return response()->json([
+                'status' => true,
+                'message' => $daMua ? 'Khách hàng đã mua sản phẩm này' : 'Chưa mua',
+                'da_mua' => $daMua
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Có lỗi xảy ra: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

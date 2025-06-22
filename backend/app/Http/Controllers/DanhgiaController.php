@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Danhgia;
+use App\Models\Donhang;
 use App\Models\Khachhang;
+use Illuminate\Container\Attributes\DB;
 use Illuminate\Http\Request;
 
 class DanhgiaController extends Controller
@@ -223,6 +225,57 @@ class DanhgiaController extends Controller
                 'message' => 'Có lỗi xảy ra: ' . $e->getMessage()
             ], 500);
         }
+    }
+    //số sao trung bình
+    public function getTrungBinhSoSao($sanPhamId)
+    {
+        try {
+            $trungBinh = Danhgia::where('san_pham_id', $sanPhamId)->avg('so_sao');
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Lấy trung bình số sao thành công',
+                'trung_binh' => round($trungBinh, 1)
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Có lỗi xảy ra: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    // Kiểm tra khách hàng đã mua sản phẩm chưa
+    public function checkDaMua($khachHangId, $sanPhamId)
+    {
+        try {
+            $daMua = Donhang::where('khach_hang_id', $khachHangId)
+                ->whereHas('chiTietDonHang', function ($query) use ($sanPhamId) {
+                    $query->where('san_pham_id', $sanPhamId);
+                })
+                ->exists();
+
+            return response()->json([
+                'status' => true,
+                'message' => $daMua ? 'Khách hàng đã mua sản phẩm này' : 'Chưa mua',
+                'da_mua' => $daMua
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Có lỗi xảy ra: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    //da đánh giá 
+    public function daDanhGia($khachHangId, $sanPhamId)
+    {
+        $tonTai = Danhgia::where('khach_hang_id', $khachHangId)
+            ->where('san_pham_id', $sanPhamId)
+            ->exists();
+
+        return response()->json([
+            'da_danh_gia' => $tonTai
+        ]);
     }
 
 }

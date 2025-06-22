@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect } from "react"
 import axios from "axios"
 import { Card, Row, Col, Container, Modal, Button, Badge, Spinner } from "react-bootstrap"
@@ -24,8 +22,26 @@ const ProductList = () => {
     setLoading(true)
     axios
       .get("http://127.0.0.1:8000/api/sanpham")
-      .then((response) => {
-        setProducts(response.data.data)
+      .then(async (response) => {
+        const allProducts = response.data.data
+        // Lấy đánh giá cho từng sản phẩm
+        const productsWithAvgStar = await Promise.all(
+          allProducts.map(async (product) => {
+            try {
+              const res = await axios.get(`http://127.0.0.1:8000/api/danhgia/sanpham/${product.id}`)
+              const reviews = res.data.data || []
+              if (reviews.length === 0) return null
+              const totalStars = reviews.reduce((sum, rv) => sum + (rv.so_sao || 0), 0)
+              const avgStar = totalStars / reviews.length
+              return avgStar > 0 ? { ...product, avgStar, reviewCount: reviews.length } : null
+            } catch {
+              return null
+            }
+          })
+        )
+        // Lọc và sắp xếp sản phẩm có đánh giá, ưu tiên nhiều sao hơn
+        const filtered = productsWithAvgStar.filter(Boolean).sort((a, b) => b.avgStar - a.avgStar)
+        setProducts(filtered)
         setLoading(false)
       })
       .catch(() => {
@@ -135,6 +151,15 @@ const ProductList = () => {
                   <div className="mb-2">
                     {product.thuong_hieu && <small className="text-muted d-block mb-1">{product.thuong_hieu}</small>}
                     <Card.Title className="fs-5 text-truncate">{product.ten_san_pham}</Card.Title>
+                    {/* Hiển thị số sao trung bình và số lượt đánh giá */}
+                    <div className="d-flex align-items-center mt-1 mb-2">
+                      <span className="text-warning me-1">
+                        {Array.from({ length: 5 }, (_, i) => (
+                          <i key={i} className={`bi ${i < Math.round(product.avgStar) ? 'bi-star-fill' : 'bi-star'}`}></i>
+                        ))}
+                      </span>
+                      <span className="small text-muted">{product.avgStar.toFixed(1)}/5 ({product.reviewCount} đánh giá)</span>
+                    </div>
                   </div>
                   <div className="mt-auto">
                     {product.dung_tich && (

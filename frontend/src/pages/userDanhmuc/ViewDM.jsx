@@ -33,6 +33,9 @@ const ViewDM = () => {
   const [viewMode, setViewMode] = useState("grid")
   const [sortOption, setSortOption] = useState("default")
   const [mobileFiltersVisible, setMobileFiltersVisible] = useState(false)
+  const [showReviewModal, setShowReviewModal] = useState(false)
+  const [reviews, setReviews] = useState([])
+  const [loadingReviews, setLoadingReviews] = useState(false)
 
   // Filter states
   const [selectedCategories, setSelectedCategories] = useState([])
@@ -243,6 +246,20 @@ const ViewDM = () => {
 
   const toggleMobileFilters = () => {
     setMobileFiltersVisible(!mobileFiltersVisible)
+  }
+
+  const handleShowReviews = async () => {
+    if (!selectedProduct) return
+    setShowReviewModal(true)
+    setLoadingReviews(true)
+    try {
+      const res = await axios.get(`http://127.0.0.1:8000/api/danhgia/sanpham/${selectedProduct.id}`)
+      setReviews(res.data.data || [])
+    } catch (err) {
+      setReviews([])
+    } finally {
+      setLoadingReviews(false)
+    }
   }
 
   if (loading) {
@@ -655,11 +672,48 @@ const ViewDM = () => {
                       <i className="bi bi-heart me-2"></i>
                       Thêm vào yêu thích
                     </Button>
+                    <Button variant="outline-info" size="lg" onClick={handleShowReviews}>
+                      <i className="bi bi-chat-dots me-2"></i>
+                      Xem đánh giá
+                    </Button>
                   </div>
                 </Col>
               </Row>
             </Modal.Body>
           </Modal>
+          {/* Modal xem đánh giá sản phẩm */}
+          <Modal show={showReviewModal} onHide={() => setShowReviewModal(false)} centered>
+            <Modal.Header closeButton>
+              <Modal.Title>Đánh giá sản phẩm</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              {loadingReviews ? (
+                <div className="text-center py-4">
+                  <Spinner animation="border" />
+                </div>
+              ) : reviews.length === 0 ? (
+                <div className="text-center text-muted py-4">Chưa có đánh giá nào cho sản phẩm này.</div>
+              ) : (
+                <div style={{ maxHeight: 350, overflowY: 'auto' }}>
+                  {reviews.map((rv, idx) => (
+                    <div key={idx} className="mb-3 p-2 border rounded bg-light">
+                      <div className="d-flex align-items-center mb-1">
+                        <span className="fw-bold me-2">{rv.ten_khach_hang || 'Ẩn danh'}</span>
+                        <span className="text-warning">
+                          {Array.from({ length: 5 }, (_, i) => (
+                            <i key={i} className={`bi ${i < rv.so_sao ? 'bi-star-fill' : 'bi-star'}`}></i>
+                          ))}
+                        </span>
+                        <span className="ms-auto text-muted small">{rv.ngay_danh_gia}</span>
+                      </div>
+                      <div className="text-muted">{rv.noi_dung}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Modal.Body>
+          </Modal>
+          
         </Container>
       </section>
     </>
