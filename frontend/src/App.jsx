@@ -56,6 +56,7 @@ import WishlistUser from "./pages/userWishlist/WishlistUser";
 
 
 
+
 //test cho thai đoi tu thong ke qua
 
 // Protected Route Component
@@ -115,6 +116,7 @@ function App() {
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/profilehome" element={<ProfilePage />} />
               <Route path="/wishlist" element={<WishlistUser />} />
+              {/* <Route path="/sanpham/:id" element={<Chitietsanpham />} /> */}
 
 
             {/* Protected Routes */}

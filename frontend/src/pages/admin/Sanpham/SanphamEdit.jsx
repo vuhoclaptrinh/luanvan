@@ -286,12 +286,16 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
             rows={3}
           />
          {/* Biến thể sản phẩm */}
-          {variants.length > 0 && (
-            <Box>
-              <Typography variant="subtitle1" mt={2} mb={1}>Biến thể sản phẩm</Typography>
+          <Box mt={2}>
+            <Typography variant="subtitle1" mb={1}>Biến thể sản phẩm</Typography>
+            {variants.length === 0 ? (
+              <Button variant="outlined" onClick={() => setVariants([{ dung_tich: '', gia: '', so_luong_ton: '' }])}>
+                Thêm biến thể đầu tiên
+              </Button>
+            ) : (
               <Stack spacing={2}>
                 {variants.map((variant, idx) => (
-                  <Box key={variant.id || idx} p={2} border={1} borderColor="#eee" borderRadius={2}>
+                  <Box key={variant.id || idx} p={2} border={1} borderColor="#eee" borderRadius={2} position="relative">
                     <Stack direction="row" spacing={2} alignItems="center">
                       <TextField
                         label="Dung tích (ml)"
@@ -314,13 +318,20 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
                         onChange={e => handleVariantChange(idx, 'so_luong_ton', e.target.value)}
                         size="small"
                       />
+                      {variants.length > 1 && (
+                        <IconButton color="error" onClick={() => setVariants(vs => vs.filter((_, i) => i !== idx))}>
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      )}
                     </Stack>
                   </Box>
                 ))}
+                <Button variant="outlined" onClick={() => setVariants(vs => [...vs, { dung_tich: '', gia: '', so_luong_ton: '' }])}>
+                  Thêm biến thể
+                </Button>
               </Stack>
-            </Box>
-            
-          )}
+            )}
+          </Box>
 
           <FormControl fullWidth>
             <InputLabel id="danhmuc-label">Danh mục</InputLabel>

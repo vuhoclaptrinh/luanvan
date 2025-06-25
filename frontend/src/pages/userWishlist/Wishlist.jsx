@@ -120,7 +120,12 @@ const Wishlist = () => {
                             <span className="brand">{product.thuong_hieu || "Thương hiệu"}</span>
                             <span className="size">{product.dung_tich || "100ml"}</span>
 
-                            <span className="size">{product.mo_ta || "..."}</span>
+                            <span className="size">{product.xuat_xu || "..."}</span>
+                             <span className="size">{product.phong_cach || "..."}</span>
+                              <span className="size">{product.nma_phat_hanh || "..."}</span>
+                               <span className="size">{product.do_luu_huong || "..."}</span>
+                               <span className="size">{product.do_toa_huong || "..."}</span>
+
                           </div>
                         </div>
                         <div className="item-actions">
@@ -180,16 +185,38 @@ const Wishlist = () => {
                 <Col md={6}>
                 <h4>{selectedProduct.ten_san_pham}</h4>
                 <p className="text-muted">{selectedProduct.mo_ta}</p>
-                <p><strong>Giá:</strong> {selectedProduct.gia?.toLocaleString()}₫</p>
+                {/* <p><strong>Giá:</strong> {selectedProduct.gia?.toLocaleString()}₫</p> */}
                 <p><strong>Thương hiệu:</strong> {selectedProduct.thuong_hieu}</p>
-                <p><strong>Dung tích:</strong> {selectedProduct.dung_tich}</p>
+                {/* <p><strong>Dung tích:</strong> {selectedProduct.dung_tich}</p> */}
+                <p><strong>Xuất xứ:</strong> {selectedProduct.xuat_xu}</p>
+                <p><strong>Phong cách:</strong> {selectedProduct.phong_cach}</p>
+                <p><strong>Năm phát hành:</strong> {selectedProduct.nam_phat_hanh}</p>
+                <p><strong>Độ lưu hương:</strong> {selectedProduct.do_luu_huong}</p>
+                <p><strong>Độ toả hương:</strong> {selectedProduct.do_toa_huong}</p>
                 <p>
                     <strong>Tình trạng:</strong>{" "}
-                    {selectedProduct.so_luong_ton > 0 ? (
-                    <span className="text-success">Còn hàng</span>
-                    ) : (
-                    <span className="text-danger">Hết hàng</span>
-                    )}
+                    <td>
+                          {(() => {
+                            let total = 0;
+                            if (Array.isArray(selectedProduct.variants) && selectedProduct.variants.length > 0) {
+                              total = selectedProduct.variants.reduce((sum, v) => sum + (Number(v.so_luong_ton) || 0), 0);
+                            } else {
+                              total = Number(selectedProduct.so_luong_ton) || 0;
+                            }
+                            return total > 0 ? (
+                              <span className="text-success">
+                                <i className="bi bi-check-circle me-1"></i>
+                                Còn hàng ({total})
+                              </span>
+                            ) : (
+                              <span className="text-danger">
+                                <i className="bi bi-x-circle me-1"></i>
+                                Hết hàng
+                              </span>
+                            );
+                          })()}
+                        </td>
+                   
                 </p>
                 <div className="d-grid gap-2 mt-3">
                     <Button

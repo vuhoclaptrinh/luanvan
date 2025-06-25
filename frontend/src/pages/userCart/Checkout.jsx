@@ -690,8 +690,9 @@ const Checkout = () => {
                         value="credit-card"
                         label="Thẻ tín dụng/Ghi nợ"
                         checked={formData.paymentMethod === "credit-card"}
-                        disable
+                        disabled
                         className="payment-radio"
+                        readOnly
                       />
                       <div className="payment-icon card-icon">
                         <CreditCard size={20} />
@@ -832,7 +833,7 @@ const Checkout = () => {
               <Card.Body>
                 <div className="product-list">
                   {cart.map((item) => (
-                    <div key={item.id} className="product-item">
+                    <div key={item.variant_id ? `${item.id}_${item.variant_id}` : item.id} className="product-item">
                       <div className="product-image">
                         <img
                           src={getImageUrl(item.hinh_anh || item.images)}

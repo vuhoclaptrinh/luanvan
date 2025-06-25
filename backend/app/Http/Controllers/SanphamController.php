@@ -32,6 +32,7 @@ class SanphamController extends Controller
                     'danh_muc_ten' => $item->danhMuc?->ten_danh_muc,
                     'variants' => $item->variants->map(function ($v) {
                         return [
+                            'id' => $v->id,
                             'dung_tich' => $v->dung_tich,
                             'gia' => (float) $v->gia,
                             'gia_format' => number_format($v->gia, 0, ',', '.') . ' ₫',

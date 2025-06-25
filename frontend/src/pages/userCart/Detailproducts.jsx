@@ -227,7 +227,9 @@ const Detailproducts = () => {
                             <h5 className="product-name">{product.ten_san_pham || "Sản phẩm không tìm thấy"}</h5>
                             <div className="product-meta">
                               {product.thuong_hieu && <span className="product-brand">{product.thuong_hieu}</span>}
-                              {product.dung_tich && <span className="product-size">{product.dung_tich}</span>}
+                              {(item.dung_tich || product.dung_tich) && (
+                                <span className="product-size">{item.dung_tich || product.dung_tich}</span>
+                              )}
                             </div>
                             <div className="product-pricing">
                               <div className="product-quantity">Số lượng: {item.so_luong}</div>

@@ -58,9 +58,10 @@ const Cart = () => {
   const shippingCost = selectedShipping.price
   const total = subtotal + shippingCost - discountAmount
 
-  const updateQuantity = (id, newQuantity) => {
+  const updateQuantity = (id, newQuantity, variant_id = null) => {
     const updatedCart = cart.map((item) => {
-      if (item.id === id) {
+      const isMatch = variant_id ? (item.id === id && item.variant_id === variant_id) : (item.id === id && !item.variant_id);
+      if (isMatch) {
         if (newQuantity > item.so_luong_ton) {
           alert(`Chỉ còn ${item.so_luong_ton} sản phẩm "${item.ten_san_pham}" trong kho!`)
           return item
@@ -74,8 +75,11 @@ const Cart = () => {
     setCart(updatedCart)
   }
 
-  const removeFromCart = (id) => {
-    const updatedCart = cart.filter((item) => item.id !== id)
+  const removeFromCart = (id, variant_id = null) => {
+    const updatedCart = cart.filter((item) => {
+      if (variant_id) return !(item.id === id && item.variant_id === variant_id)
+      return !(item.id === id && !item.variant_id)
+    })
     sessionStorage.setItem("cart", JSON.stringify(updatedCart))
     setCart(updatedCart)
   } 
@@ -185,7 +189,8 @@ const Cart = () => {
 
                 <div className="luxury-items-list">
                   {cart.map((item) => (
-                    <div key={item.id} className="luxury-item">
+                    <div key={`sp-${item.id}-v-${item.variant_id}`} className="luxury-item">
+                    {/* <div key={item.variant_id ? `${item.id}_${item.variant_id}` : `${item.id}_${item.dung_tich || ''}`} className="luxury-item"> */}
                       <div className="item-image">
                         <img src={getImageUrl(item.image) || "/placeholder.svg"} alt={item.ten_san_pham} />
                       </div>
@@ -202,7 +207,7 @@ const Cart = () => {
                          <div className="luxury-quantity">
                         <button
                             className="qty-btn"
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            onClick={() => updateQuantity(item.id, item.quantity - 1, item.variant_id)}
                             disabled={item.quantity <= 1}
                         >
                             <Minus size={14} />
@@ -210,7 +215,7 @@ const Cart = () => {
                         <span>{item.quantity}</span>
                         <button
                             className="qty-btn"
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            onClick={() => updateQuantity(item.id, item.quantity + 1, item.variant_id)}
                             disabled={item.quantity >= item.so_luong_ton}
                         >
                             <Plus size={14} />
@@ -220,7 +225,7 @@ const Cart = () => {
                             <div className="price-total">{formatPrice(item.gia * item.quantity)}</div>
                             <div className="price-unit">{formatPrice(item.gia)} / sản phẩm</div>
                           </div>
-                          <button className="remove-item" onClick={() => removeFromCart(item.id)}>
+                          <button className="remove-item" onClick={() => removeFromCart(item.id, item.variant_id)}>
                             <X size={18} />
                           </button>
                         </div>

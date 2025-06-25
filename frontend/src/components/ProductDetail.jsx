@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Modal, Button, Col, Row, Badge, Spinner } from "react-bootstrap";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const getImageUrl = (path) => {
   if (!path) return "/placeholder.svg?height=300&width=300";
@@ -9,16 +10,23 @@ const getImageUrl = (path) => {
 };
 
 const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist }) => {
+  // Đảm bảo không có bất kỳ hook hoặc logic nào phía trên dòng này
+  if (!product) return null;
+
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showReviewPanel, setShowReviewPanel] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(false);
+  const [selectedVariantId, setSelectedVariantId] = useState(null);
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     if (product && show) {
       setCurrentImageIndex(0);
       setShowReviewPanel(false);
       setReviews([]);
+      setSelectedVariantId(null); // Reset biến thể khi đổi sản phẩm
+      setQuantity(1);
     }
   }, [product, show]);
 
@@ -39,7 +47,14 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
     }
   }, [showReviewPanel, product?.id]);
 
-  if (!product) return null;
+  // Lấy biến thể đã chọn
+  const selectedVariant = Array.isArray(product.variants) && product.variants.length > 0
+    ? product.variants.find(v => v.id === selectedVariantId)
+    : null;
+
+  // Giá và tồn kho hiển thị
+  const displayPrice = selectedVariant ? (Number(selectedVariant.gia).toLocaleString('vi-VN') + ' ₫') : (product.gia_format || '');
+  const displayStock = selectedVariant ? selectedVariant.so_luong_ton : product.so_luong_ton;
 
   return (
     <Modal show={show} onHide={onHide} size="xl" centered className="product-detail-modal">
@@ -131,34 +146,135 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
                     </div>
                   )}
                   <h3 className="fs-4 mb-3">{product.ten_san_pham}</h3>
-                  <div className="fs-3 fw-bold text-primary mb-3">{product.gia_format}</div>
+                  {/* Chọn biến thể nếu có */}
+                  {Array.isArray(product.variants) && product.variants.length > 0 && (
+                    <div className="mb-3">
+                      <label className="form-label fw-semibold">Dung tích:</label>
+                      <div className="d-flex gap-2 flex-wrap">
+                        {product.variants.map(v => {
+                          const isActive = selectedVariantId === v.id;
+                          const isOut = Number(v.so_luong_ton) <= 0;
+                          return (
+                            <button
+                              key={v.id}
+                              type="button"
+                              className={
+                                `btn btn-outline-primary px-3 py-2${isActive ? ' active border-2 fw-bold' : ''}${isOut ? ' text-decoration-line-through' : ''}`
+                              }
+                              style={{
+                                minWidth: 90,
+                                opacity: isOut ? 0.5 : 1,
+                                pointerEvents: isOut ? "none" : "auto",
+                                borderColor: isActive ? "#0d6efd" : undefined,
+                                background: isActive ? "#e7f1ff" : undefined,
+                              }}
+                              disabled={isOut}
+                              onClick={() => {
+                                setSelectedVariantId(v.id);
+                                setQuantity(1);
+                              }}
+                            >
+                              <div>{v.dung_tich}</div>
+                              <div className="small text-muted">{Number(v.gia).toLocaleString('vi-VN')} ₫</div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                  {/* Hiển thị giá và số lượng tồn theo biến thể đã chọn */}
+                  <div className="fs-3 fw-bold text-primary mb-3">{displayPrice}</div>
+                  {/* Chọn số lượng */}
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold">Số lượng:</label>
+                    <input
+                      type="number"
+                      className="form-control"
+                      min={1}
+                      max={displayStock || 1}
+                      value={quantity}
+                      onChange={e => {
+                        let val = Number(e.target.value);
+                        if (val < 1) val = 1;
+                        if (val > (displayStock || 1)) val = displayStock || 1;
+                        setQuantity(val);
+                      }}
+                      disabled={displayStock <= 0}
+                      style={{ width: 120 }}
+                    />
+                    {displayStock <= 0 && <div className="text-danger small mt-1">Hết hàng</div>}
+                  </div>
                 </div>
 
                 <div className="mb-4">
+                 
                   <table className="table table-borderless">
                     <tbody>
-                      {product.dung_tich && (
+                      {product.thuong_hieu && (
                         <tr>
-                          <td className="text-muted ps-0" style={{ width: "40%" }}>
-                            Dung tích:
-                          </td>
+                          <td className="text-muted ps-0" style={{ width: "40%" }}>Thương hiệu:</td>
+                          <td>{product.thuong_hieu}</td>
+                        </tr>
+                      )}
+                      {product.xuat_xu && (
+                        <tr>
+                          <td className="text-muted ps-0">Xuất xứ:</td>
+                          <td>{product.xuat_xu}</td>
+                        </tr>
+                      )}
+                      {product.phong_cach && (
+                        <tr>
+                          <td className="text-muted ps-0">Phong cách:</td>
+                          <td>{product.phong_cach}</td>
+                        </tr>
+                      )}
+                      {product.nam_phat_hanh && (
+                        <tr>
+                          <td className="text-muted ps-0">Năm phát hành:</td>
+                          <td>{product.nam_phat_hanh}</td>
+                        </tr>
+                      )}
+                      {product.do_luu_huong && (
+                        <tr>
+                          <td className="text-muted ps-0">Độ lưu hương:</td>
+                          <td>{product.do_luu_huong}</td>
+                        </tr>
+                      )}
+                      {product.do_toa_huong && (
+                        <tr>
+                          <td className="text-muted ps-0">Độ tỏa hương:</td>
+                          <td>{product.do_toa_huong}</td>
+                        </tr>
+                      )}
+                      {product.dung_tich && !product.variants?.length && (
+                        <tr>
+                          <td className="text-muted ps-0">Dung tích:</td>
                           <td>{product.dung_tich}</td>
                         </tr>
                       )}
+                      {/* Tình trạng: tổng hợp cho cả variants và không variants */}
                       <tr>
                         <td className="text-muted ps-0">Tình trạng:</td>
                         <td>
-                          {product.so_luong_ton > 0 ? (
-                            <span className="text-success">
-                              <i className="bi bi-check-circle me-1"></i>
-                              Còn hàng ({product.so_luong_ton})
-                            </span>
-                          ) : (
-                            <span className="text-danger">
-                              <i className="bi bi-x-circle me-1"></i>
-                              Hết hàng
-                            </span>
-                          )}
+                          {(() => {
+                            let total = 0;
+                            if (Array.isArray(product.variants) && product.variants.length > 0) {
+                              total = product.variants.reduce((sum, v) => sum + (Number(v.so_luong_ton) || 0), 0);
+                            } else {
+                              total = Number(product.so_luong_ton) || 0;
+                            }
+                            return total > 0 ? (
+                              <span className="text-success">
+                                <i className="bi bi-check-circle me-1"></i>
+                                Còn hàng ({total})
+                              </span>
+                            ) : (
+                              <span className="text-danger">
+                                <i className="bi bi-x-circle me-1"></i>
+                                Hết hàng
+                              </span>
+                            );
+                          })()}
                         </td>
                       </tr>
                       {product.danh_muc_ten && (
@@ -179,7 +295,30 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
                 )}
 
                 <div className="d-grid gap-2">
-                  <Button variant="primary" size="lg" onClick={() => addToCart(product)}>
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    onClick={() => {
+                      if (Array.isArray(product.variants) && product.variants.length > 0) {
+                        if (!selectedVariantId) {
+                          toast.warning('Vui lòng chọn loại/dung tích trước khi thêm vào giỏ hàng!');
+                          return;
+                        }
+                        addToCart({
+                          ...product,
+                          variant_id: selectedVariantId,
+                          variants: product.variants,
+                          so_luong_ton: selectedVariant ? selectedVariant.so_luong_ton : 0,
+                          gia: selectedVariant ? selectedVariant.gia : 0,
+                          dung_tich: selectedVariant ? selectedVariant.dung_tich : '',
+                          quantity: quantity
+                        });
+                      } else {
+                        addToCart({ ...product, quantity: quantity });
+                      }
+                    }}
+                    disabled={displayStock <= 0}
+                  >
                     <i className="bi bi-cart-plus me-2"></i>
                     Thêm vào giỏ hàng
                   </Button>
