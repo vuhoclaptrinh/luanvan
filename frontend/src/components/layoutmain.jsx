@@ -89,6 +89,12 @@ const LayoutMain = () => {
       path: "/sanpham",
       description: "Quản lý sản phẩm"
     },
+    // { 
+    //   text: "Quản Lý Biến Thể", 
+    //   icon: <InventoryIcon />, 
+    //   path: "/bienthe",
+    //   description: "Quản lý Biến Thể"
+    // },
     { 
       text: "Quản Lý Đơn Hàng", 
       icon: <ShoppingCartIcon />, 

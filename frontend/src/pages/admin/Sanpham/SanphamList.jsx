@@ -54,6 +54,7 @@ const SanphamList = () => {
     try {
       const res = await axios.get(`${API_BASE}sanpham`);
       if (res.data?.data && Array.isArray(res.data.data)) {
+        console.log("Sanpham data:", res.data.data);
         setSanpham(res.data.data);
       } else {
         console.error('Dữ liệu sản phẩm không đúng định dạng:', res.data);
@@ -144,13 +145,24 @@ const SanphamList = () => {
     { field: 'ten_san_pham', headerName: 'Tên sản phẩm', width: 200 },
     { field: 'thuong_hieu', headerName: 'Thương hiệu', width: 150 },
     { field: 'mo_ta', headerName: 'Mô tả', width: 200 },
-    { field: 'dung_tich', headerName: 'Dung tích', width: 100 },
     {
-      field: 'gia_format',
-      headerName: 'Giá (VND)',
-      width: 150,
+       field: 'dung_tich',
+      headerName: 'Dung tích / Giá / SL tồn',
+      width: 260,
+      renderCell: (params) => {
+        if (!params.row.variants || params.row.variants.length === 0) return 'Không có biến thể';
+        return (
+          <Box>
+            {params.row.variants.map((v, idx) => (
+              <Typography key={idx} variant="body2">  
+                {v.dung_tich}: {parseInt(v.gia).toLocaleString('vi-VN')} ₫ — SL: {v.so_luong_ton}
+              </Typography>
+            ))}
+          </Box>
+        );
+      }
     },
-    { field: 'so_luong_ton', headerName: 'Số lượng', width: 100 },
+
     {
       field: 'hinh_anh',
       headerName: 'Hình ảnh',

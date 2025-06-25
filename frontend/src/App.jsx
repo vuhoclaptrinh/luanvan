@@ -40,6 +40,8 @@ import NguoidungList from "./pages/admin/Nguoidung/NguoidungList";
 import NguoidungView from "./pages/admin/Nguoidung/NguoidungView";
 import Profile from "./pages/Profile";
 import DanhgiaList from "./pages/admin/Danhgia/DanhgiaList";
+import BientheList from "./pages/admin/Bienthe/BientheList";
+
 
 
 import SanphamUser from "./pages/userSanpham/SanphamUser";
@@ -51,6 +53,7 @@ import Dannhmuchome from "./pages/userDanhmuc/Danhmuchome";
 import Thuonghieuhome from "./pages/userThuonghieu/ThuonghieuUser";
 import Wishlist from "./pages/userWishlist/Wishlist";
 import WishlistUser from "./pages/userWishlist/WishlistUser";
+
 
 
 //test cho thai đoi tu thong ke qua
@@ -120,6 +123,8 @@ function App() {
               <Route path="/" element={<Layoutmain />}>
                 <Route index element={<Dashboard />} />
                 <Route path="sanpham" element={<SanphamList />} />
+                <Route path="bienthe" element={<BientheList />} />
+
                 <Route path="danhmuc" element={<DanhmucList />} />
                 <Route path="magiamgia" element={<MagiamgiaList />} />
                 <Route path="donhang" element={<DonhangList />} />

@@ -137,11 +137,14 @@ const SanphamView = ({ open, onClose, sanphamId }) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          py: 1.5
+          py: 2,
+          px: 3,
+          borderTopLeftRadius: 12,
+          borderTopRightRadius: 12,
         }}
       >
         <Box display="flex" alignItems="center">
-          <ShoppingBag sx={{ mr: 1.5 }} />
+          <ShoppingBag sx={{ mr: 2, fontSize: 32 }} />
           <Typography variant="h5" fontWeight="bold">
             Chi tiết sản phẩm
           </Typography>
@@ -152,14 +155,15 @@ const SanphamView = ({ open, onClose, sanphamId }) => {
             color: 'inherit',
             minWidth: 'auto',
             p: 1,
-            borderRadius: 2
+            borderRadius: 2,
+            '&:hover': { bgcolor: 'primary.dark', color: 'white' }
           }}
         >
           <Close />
         </Button>
       </DialogTitle>
 
-      <DialogContent sx={{ p: 0 }}>
+      <DialogContent sx={{ p: 0, bgcolor: 'grey.50' }}>
         {loading ? (
           <Box display="flex" justifyContent="center" alignItems="center" minHeight={400}>
             <Box textAlign="center">
@@ -168,21 +172,40 @@ const SanphamView = ({ open, onClose, sanphamId }) => {
             </Box>
           </Box>
         ) : sanpham ? (
-          <Card sx={{ m: 3, borderRadius: 3, boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
-            <CardContent sx={{ p: 3 }}>
-              <Grid container spacing={4}>
-                {/* Phần hình ảnh */}
+          <Card sx={{ m: 0, borderRadius: 3, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', bgcolor: 'transparent' }}>
+            <CardContent sx={{ p: { xs: 2, md: 3 }, pb: 2 }}>
+              <Grid container spacing={3} alignItems="stretch">
+                {/* Cột trái: Hình ảnh */}
                 <Grid item xs={12} md={5}>
                   <Paper 
-                    elevation={2} 
+                    elevation={1} 
                     sx={{ 
                       p: 2, 
                       borderRadius: 3,
-                      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'
+                      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+                      minHeight: 420,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      height: '100%',
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
                     }}
                   >
                     {/* Ảnh chính */}
-                    <Box sx={{ textAlign: 'center', mb: 2 }}>
+                    <Box sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: 220,
+                      height: 220,
+                      mb: 2,
+                      borderRadius: 2,
+                      bgcolor: 'white',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                      border: '1.5px solid #e0e0e0',
+                      overflow: 'hidden',
+                    }}>
                       {selectedImage ? (
                         <Box
                           component="img"
@@ -190,61 +213,48 @@ const SanphamView = ({ open, onClose, sanphamId }) => {
                           alt={sanpham.ten_san_pham}
                           sx={{
                             width: '100%',
-                            height: 300,
-                            borderRadius: 2,
+                            height: '100%',
                             objectFit: 'contain',
-                            bgcolor: 'white',
-                            boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-                            transition: 'transform 0.3s ease',
-                            '&:hover': {
-                              transform: 'scale(1.02)'
-                            }
+                            transition: 'transform 0.3s',
+                            '&:hover': { transform: 'scale(1.04)' }
                           }}
                         />
                       ) : (
                         <Box 
                           sx={{ 
                             width: '100%', 
-                            height: 300, 
+                            height: '100%', 
                             bgcolor: 'grey.100',
-                            borderRadius: 2,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             flexDirection: 'column'
                           }}
                         >
-                          <Image sx={{ fontSize: 64, color: 'text.disabled', mb: 1 }} />
+                          <Image sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
                           <Typography color="textSecondary">Không có hình ảnh</Typography>
                         </Box>
                       )}
-                      
                     </Box>
-                    
-
                     {/* Ảnh phụ */}
                     {sanpham.images && sanpham.images.length > 0 && (
                       <>
-                        <Divider sx={{ mb: 2 }}>
+                        <Divider sx={{ mb: 1, width: '100%' }}>
                           <Chip label="Ảnh khác" size="small" />
                         </Divider>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
+                        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center', width: '100%' }}>
                           {/* Ảnh chính trong thumbnails */}
                           {sanpham.hinh_anh && (
                             <Avatar
                               src={getImageUrl(sanpham.hinh_anh)}
                               sx={{
-                                width: 60,
-                                
-                                height: 60, 
+                                width: 44,
+                                height: 44, 
                                 cursor: 'pointer',
-                                border: selectedImage === getImageUrl(sanpham.hinh_anh) ? '3px solid' : '3px solid',
+                                border: selectedImage === getImageUrl(sanpham.hinh_anh) ? '2px solid' : '2px solid',
                                 borderColor: selectedImage === getImageUrl(sanpham.hinh_anh) ? 'primary.main' : 'grey.300',
-                                transition: 'all 0.2s ease',
-                                '&:hover': {
-                                  transform: 'scale(1.1)',
-                                  borderColor: 'primary.main'
-                                }
+                                transition: 'all 0.2s',
+                                '&:hover': { transform: 'scale(1.08)', borderColor: 'primary.main' }
                               }}
                               onClick={() => setSelectedImage(getImageUrl(sanpham.hinh_anh))}
                             />
@@ -255,16 +265,13 @@ const SanphamView = ({ open, onClose, sanphamId }) => {
                               key={idx}
                               src={getImageUrl(imgObj.image_path)}
                               sx={{
-                                width: 60,
-                                height: 60,
+                                width: 44,
+                                height: 44,
                                 cursor: 'pointer',
-                                border: selectedImage === getImageUrl(imgObj.image_path) ? '3px solid' : '3px solid',
+                                border: selectedImage === getImageUrl(imgObj.image_path) ? '2px solid' : '2px solid',
                                 borderColor: selectedImage === getImageUrl(imgObj.image_path) ? 'primary.main' : 'grey.300',
-                                transition: 'all 0.2s ease',
-                                '&:hover': {
-                                  transform: 'scale(1.1)',
-                                  borderColor: 'primary.main'
-                                }
+                                transition: 'all 0.2s',
+                                '&:hover': { transform: 'scale(1.08)', borderColor: 'primary.main' }
                               }}
                               onClick={() => setSelectedImage(getImageUrl(imgObj.image_path))}
                             />
@@ -274,126 +281,211 @@ const SanphamView = ({ open, onClose, sanphamId }) => {
                     )}
                   </Paper>
                 </Grid>
-
-                {/* Phần thông tin */}
+                {/* Cột phải: Thông tin sản phẩm */}
                 <Grid item xs={12} md={7}>
-                  <Box mb={3}>
-                    <Typography variant="h4" fontWeight="bold" color="primary.main" gutterBottom>
-                      {sanpham.ten_san_pham}
-                    </Typography>
-                    <Box display="flex" gap={1} flexWrap="wrap">
-                      <Chip 
-                        label={`ID: ${sanpham.id}`} 
-                        size="small" 
-                        variant="outlined" 
-                      />
-                      {sanpham.so_luong_ton !== undefined && (
+                  <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: 3, bgcolor: 'white', height: '100%' }}>
+                    <Box mb={2}>
+                      <Typography variant="h4" fontWeight="bold" color="primary.main" sx={{ mb: 1, lineHeight: 1.2 }}>
+                        {sanpham.ten_san_pham}
+                      </Typography>
+                      <Box display="flex" gap={1} flexWrap="wrap" alignItems="center" mb={1}>
                         <Chip 
-                          label={getStockStatus(sanpham.so_luong_ton).label}
-                          color={getStockStatus(sanpham.so_luong_ton).color}
-                          size="small"
+                          label={`ID: ${sanpham.id}`} 
+                          size="small" 
+                          variant="outlined" 
                         />
-                      )}
-                    </Box>
-                  </Box>
-
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} sm={6}>
-                      <InfoItem
-                        icon={<MonetizationOn fontSize="small" />}
-                        label="Giá bán"
-                        value={`${new Intl.NumberFormat('vi-VN').format(sanpham.gia || 0)} ₫`}
-                        color="error"
-                        valueColor="error.main"
-                      />
-                      <InfoItem
-                        icon={<Inventory fontSize="small" />}
-                        label="Số lượng tồn"
-                        value={sanpham.so_luong_ton ?? 0}
-                        color="success"
-                      />
-                      <InfoItem
-                        icon={<Business fontSize="small" />}
-                        label="Thương hiệu"
-                        value={sanpham.thuong_hieu || 'Chưa cập nhật'}
-                        color="info"
-                      />
-                    </Grid>
-
-                    <Grid item xs={12} sm={6}>
-                      <InfoItem
-                        icon={<AspectRatio fontSize="small" />}
-                        label="Dung tích"
-                        value={sanpham.dung_tich || 'Chưa cập nhật'}
-                        color="secondary"
-                      />
-                      <InfoItem
-                        icon={<Category fontSize="small" />}
-                        label="Danh mục"
-                        value={danhMucMap[sanpham.danh_muc_id] || 'Chưa phân loại'}
-                        color="warning"
-                      />
-                      <InfoItem
-                        icon={<LocalOffer fontSize="small" />}
-                        label="Mã danh mục"
-                        value={sanpham.danh_muc_id || 'N/A'}
-                        color="primary"
-                      />
-                    </Grid>
-                  </Grid>
-
-                  <Divider sx={{ my: 3 }} />
-
-                  <Box>
-                    <Box display="flex" alignItems="center" mb={2}>
-                      <Box 
-                        sx={{ 
-                          mr: 2, 
-                          p: 1, 
-                          borderRadius: 2, 
-                          bgcolor: 'primary.light',
-                          color: 'primary.contrastText',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          minWidth: 40,
-                          height: 40
-                        }}
-                      >
-                        <Description fontSize="small" />
-                      </Box>
-                      <Typography variant="h6" fontWeight="bold" color="primary.main">
-                        Mô tả sản phẩm
-                      </Typography>
-                    </Box>
-                    <Paper 
-                      variant="outlined" 
-                      sx={{ 
-                        p: 2, 
-                        borderRadius: 2, 
-                        bgcolor: 'grey.50',
-                        maxHeight: 200,
-                        overflow: 'auto'
-                      }}
-                    >
-                      <Typography 
-                        variant="body1" 
-                        sx={{ 
-                          whiteSpace: 'pre-line',
-                          lineHeight: 1.7
-                        }}
-                      >
-                        {sanpham.mo_ta || (
-                          <Box display="flex" alignItems="center" color="text.disabled">
-                            <Description sx={{ mr: 1, fontSize: 20 }} />
-                            Chưa có mô tả cho sản phẩm này
-                          </Box>
+                        {sanpham.so_luong_ton !== undefined && (
+                          <Chip 
+                            label={getStockStatus(sanpham.so_luong_ton).label}
+                            color={getStockStatus(sanpham.so_luong_ton).color}
+                            size="small"
+                          />
                         )}
-                      </Typography>
-                    </Paper>
-                  </Box>
+                      </Box>
+                    </Box>
+                    {/* Biến thể sản phẩm */}
+                    {sanpham.variants && sanpham.variants.length > 0 && (
+                      <>
+                        <Divider sx={{ my: 2 }} />
+                        <Box>
+                          <Box display="flex" alignItems="center" mb={2}>
+                            <Box 
+                              sx={{ 
+                                mr: 2, 
+                                p: 1, 
+                                borderRadius: 2, 
+                                bgcolor: 'success.light',
+                                color: 'success.contrastText',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                minWidth: 40,
+                                height: 40
+                              }}
+                            >
+                              <AspectRatio fontSize="small" />
+                            </Box>
+                            <Typography variant="h6" fontWeight="bold" color="success.main">
+                              Biến thể sản phẩm
+                            </Typography>
+                          </Box>
+                          <Grid container spacing={2}>
+                            {sanpham.variants.map((variant, idx) => (
+                              <Grid item xs={12} sm={6} key={idx}>
+                                <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, mb: 1 }}>
+                                  <InfoItem
+                                    icon={<AspectRatio fontSize="small" />}
+                                    label="Dung tích"
+                                    value={variant.dung_tich ? `${variant.dung_tich} ` : 'Chưa cập nhật'}
+                                    color="secondary"
+                                  />
+                                  <InfoItem
+                                    icon={<MonetizationOn fontSize="small" />}
+                                    label="Giá"
+                                    value={variant.gia ? `${parseInt(variant.gia).toLocaleString('vi-VN')} ₫` : 'Chưa cập nhật'}
+                                    color="success"
+                                  />
+                                  <InfoItem
+                                    icon={<Inventory fontSize="small" />}
+                                    label="Số lượng tồn"
+                                    value={variant.so_luong_ton !== undefined ? variant.so_luong_ton : 'Chưa cập nhật'}
+                                    color="info"
+                                  />
+                                </Paper>
+                              </Grid>
+                            ))}
+                          </Grid>
+                        </Box>
+                      </>
+                    )}
+                    <Divider sx={{ my: 2 }} />
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6} md={4}>
+                        <InfoItem
+                          icon={<Business fontSize="small" />}
+                          label="Thương hiệu"
+                          value={sanpham.thuong_hieu || 'Chưa cập nhật'}
+                          color="info"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={4}>
+                        <InfoItem
+                          icon={<Category fontSize="small" />}
+                          label="Danh mục"
+                          value={danhMucMap[sanpham.danh_muc_id] || 'Chưa phân loại'}
+                          color="warning"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={4}>
+                        <InfoItem
+                          icon={<LocalOffer fontSize="small" />}
+                          label="Mã danh mục"
+                          value={sanpham.danh_muc_id || 'N/A'}
+                          color="primary"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={4}>
+                        <InfoItem
+                          icon={<Inventory fontSize="small" />}
+                          label="Tình trạng kho"
+                          value={getStockStatus(sanpham.so_luong_ton).label}
+                          color={getStockStatus(sanpham.so_luong_ton).color}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={4}>
+                        <InfoItem
+                          icon={<Category fontSize="small" />}
+                          label="Xuất xứ"
+                          value={sanpham.xuat_xu || 'Chưa cập nhật'}
+                          color="secondary"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={4}>
+                        <InfoItem
+                          icon={<Category fontSize="small" />}
+                          label="Phong cách"
+                          value={sanpham.phong_cach || 'Chưa cập nhật'}
+                          color="secondary"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={4}>
+                        <InfoItem
+                          icon={<Category fontSize="small" />}
+                          label="Năm phát hành"
+                          value={sanpham.nam_phat_hanh || 'Chưa cập nhật'}
+                          color="secondary"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={4}>
+                        <InfoItem
+                          icon={<Category fontSize="small" />}
+                          label="Độ lưu hương"
+                          value={sanpham.do_luu_huong || 'Chưa cập nhật'}
+                          color="secondary"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={4}>
+                        <InfoItem
+                          icon={<Category fontSize="small" />}
+                          label="Độ tỏa hương"
+                          value={sanpham.do_toa_huong || 'Chưa cập nhật'}
+                          color="secondary"
+                        />
+                      </Grid>
+                    </Grid>  
+                  </Paper>
                 </Grid>
               </Grid>
+              {/* Mô tả sản phẩm - section riêng hoàn toàn dưới cùng */}
+              <Divider sx={{ my: 3 }} />
+              <Box>
+                <Box display="flex" alignItems="center" mb={2}>
+                  <Box 
+                    sx={{ 
+                      mr: 2, 
+                      p: 1, 
+                      borderRadius: 2, 
+                      bgcolor: 'primary.light',
+                      color: 'primary.contrastText',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minWidth: 40,
+                      height: 40
+                    }}
+                  >
+                    <Description fontSize="small" />
+                  </Box>
+                  <Typography variant="h6" fontWeight="bold" color="primary.main">
+                    Mô tả sản phẩm
+                  </Typography>
+                </Box>
+                <Paper 
+                  variant="outlined" 
+                  sx={{ 
+                    p: 2, 
+                    borderRadius: 2, 
+                    bgcolor: 'grey.50',
+                    maxHeight: 200,
+                    overflow: 'auto'
+                  }}
+                >
+                  <Typography 
+                    variant="body1" 
+                    sx={{ 
+                      whiteSpace: 'pre-line',
+                      lineHeight: 1.7
+                    }}
+                  >
+                    {sanpham.mo_ta || (
+                      <Box display="flex" alignItems="center" color="text.disabled">
+                        <Description sx={{ mr: 1, fontSize: 20 }} />
+                        Chưa có mô tả cho sản phẩm này
+                      </Box>
+                    )}
+                  </Typography>
+                </Paper>
+              </Box>
             </CardContent>
           </Card>
         ) : (
@@ -409,7 +501,7 @@ const SanphamView = ({ open, onClose, sanphamId }) => {
         )}
       </DialogContent>
 
-      <DialogActions sx={{ p: 3, bgcolor: 'grey.50' }}>
+      <DialogActions sx={{ p: 3, bgcolor: 'grey.50', borderBottomLeftRadius: 12, borderBottomRightRadius: 12 }}>
         <Button 
           onClick={onClose} 
           variant="contained"

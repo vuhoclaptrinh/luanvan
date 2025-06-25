@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BienTheController;
 use App\Http\Controllers\ChitietdonhangController;
 use App\Http\Controllers\DanhgiaController;
 use App\Http\Controllers\KhoaController;
@@ -136,3 +137,16 @@ Route::delete('/chitietdonhang/{id}', [ChitietdonhangController::class, 'delete'
 Route::get('/chitietdonhang/donhang/{id}', [ChitietdonhangController::class, 'getByDonhang']);
 //getby khach hang
 //Route::get('/chitietdonhang/khachhang/{id}', [ChitietdonhangController::class, 'getByKhachHang']);
+
+// API lấy biến thể theo sản phẩm
+Route::get('/bienthe', [BienTheController::class, 'getall']);
+Route::get('/sanpham/{id}/bienthe', [BienTheController::class, 'get']);
+
+// Thêm mới biến thể
+Route::post('/bienthe', [BienTheController::class, 'add']);
+
+// Cập nhật biến thể
+Route::put('/bienthe/{id}', [BienTheController::class, 'update']);
+
+// Xóa biến thể
+Route::delete('/bienthe/{id}', [BienTheController::class, 'delete']);

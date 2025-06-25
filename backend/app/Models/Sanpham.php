@@ -20,7 +20,12 @@ class Sanpham extends Model
         'gia',
         'so_luong_ton',
         'hinh_anh',
-        'danh_muc_id'
+        'danh_muc_id',
+        'xuat_xu',
+        'phong_cach',
+        'nam_phat_hanh',
+        'do_luu_huong',
+        'do_toa_huong',
         // Thêm các cột khác trong bảng
     ];
 
@@ -45,6 +50,11 @@ class Sanpham extends Model
     public function images()
     {
         return $this->hasMany(SanphamImage::class, 'sanpham_id');
+    }
+
+    public function variants()
+    {
+        return $this->hasMany(BienThe::class, 'san_pham_id');
     }
     protected $primaryKey = 'id';
 }

@@ -14,17 +14,16 @@ const SanphamAdd = ({ open, onClose, onUpdate }) => {
   const [formdata, setFormdata] = useState({
     ten_san_pham: '',
     thuong_hieu: '',
+    xuat_xu: '',
+    phong_cach: '',
+    nam_phat_hanh: '',
+    do_luu_huong: '',
+    do_toa_huong: '',
     mo_ta: '',
-    dung_tich: '',
-    gia: '',
-    so_luong_ton: '',
     danh_muc_id: '',
   });
 
-  // 2 state riêng để xử lý nhập và hiển thị giá tiền có định dạng
-  const [ giaRaw, setGiaRaw] = useState('');
-  const [ giaHienThi, setGiaHienThi] = useState('');
-
+  const [variants, setVariants] = useState([{ dung_tich: '', gia: '', so_luong_ton: '' }]);
   const [fileAnh, setFileAnh] = useState(null);
   const [anhPhu, setAnhPhu] = useState([]);
   const [danhMucList, setDanhMucList] = useState([]);
@@ -37,27 +36,24 @@ const SanphamAdd = ({ open, onClose, onUpdate }) => {
       .catch(console.error);
   }, []);
 
-  // Hàm định dạng số thành tiền VND dạng chuỗi
-  const formatVND = (value) => {
-    if (!value) return '';
-    // Loại bỏ tất cả ký tự không phải số rồi parse
-    const number = parseInt(value.replace(/\D/g, ''), 10);
-    if (isNaN(number)) return '';
-    return number.toLocaleString('vi-VN') ;
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Xử lý riêng cho trường 'gia' (giá)
-    if (name === 'gia') {
-      // Lấy chỉ số nguyên từ chuỗi nhập vào
-      const rawValue = value.replace(/\D/g, '');
-      setGiaRaw(rawValue);
-      setGiaHienThi(formatVND(rawValue));
-      setFormdata(prev => ({ ...prev, gia: rawValue }));
-    } else {
-      setFormdata(prev => ({ ...prev, [name]: value }));
-    }
+    setFormdata(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleVariantChange = (index, field, value) => {
+    const newVariants = [...variants];
+    newVariants[index][field] = value;
+    setVariants(newVariants);
+  };
+
+  const addVariant = () => {
+    setVariants([...variants, { dung_tich: '', gia: '', so_luong_ton: '' }]);
+  };
+
+  const removeVariant = (index) => {
+    const newVariants = variants.filter((_, i) => i !== index);
+    setVariants(newVariants);
   };
 
   const handleFileChange = (e) => {
@@ -74,22 +70,24 @@ const SanphamAdd = ({ open, onClose, onUpdate }) => {
     try {
       const data = new FormData();
 
-      // Thêm dữ liệu từ form
       for (const key in formdata) {
         data.append(key, formdata[key]);
       }
 
-      // Ảnh chính
+      variants.forEach((v, index) => {
+        data.append(`variants[${index}][dung_tich]`, v.dung_tich);
+        data.append(`variants[${index}][gia]`, v.gia);
+        data.append(`variants[${index}][so_luong_ton]`, v.so_luong_ton);
+      });
+
       if (fileAnh) {
         data.append('hinh_anh', fileAnh);
       }
 
-      // Ảnh phụ
       anhPhu.forEach(file => {
         data.append('hinh_phu[]', file);
       });
 
-      // Gửi lên API
       await axios.post(API, data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
@@ -98,18 +96,11 @@ const SanphamAdd = ({ open, onClose, onUpdate }) => {
       onUpdate();
       onClose();
 
-      // Reset
       setFormdata({
-        ten_san_pham: '',
-        thuong_hieu: '',
-        mo_ta: '',
-        dung_tich: '',
-        gia: '',
-        so_luong_ton: '',
-        danh_muc_id: '',
+        ten_san_pham: '', thuong_hieu: '', xuat_xu: '', phong_cach: '', nam_phat_hanh: '',
+        do_luu_huong: '', do_toa_huong: '', mo_ta: '', danh_muc_id: ''
       });
-      setGiaRaw('');
-      setGiaHienThi('');
+      setVariants([{ dung_tich: '', gia: '', so_luong_ton: '' }]);
       setFileAnh(null);
       setAnhPhu([]);
 
@@ -124,104 +115,47 @@ const SanphamAdd = ({ open, onClose, onUpdate }) => {
       <DialogTitle>Thêm sản phẩm</DialogTitle>
       <DialogContent>
         <Stack spacing={2} mt={1}>
-          <TextField
-            label="Tên sản phẩm"
-            name="ten_san_pham"
-            value={formdata.ten_san_pham}
-            onChange={handleChange}
-            fullWidth
-          />
-          <TextField
-            label="Thương hiệu"
-            name="thuong_hieu"
-            value={formdata.thuong_hieu}
-            onChange={handleChange}
-            fullWidth
-          />
-          <TextField
-            label="Mô tả"
-            name="mo_ta"
-            value={formdata.mo_ta}
-            onChange={handleChange}
-            fullWidth
-            multiline
-            rows={3}
-          />
-          <TextField
-            label="Dung tích"
-            name="dung_tich"
-            value={formdata.dung_tich}
-            onChange={handleChange}
-            fullWidth
-          />
+          <TextField label="Tên sản phẩm" name="ten_san_pham" value={formdata.ten_san_pham} onChange={handleChange} fullWidth />
+          <TextField label="Thương hiệu" name="thuong_hieu" value={formdata.thuong_hieu} onChange={handleChange} fullWidth />
+          <TextField label="Xuất xứ" name="xuat_xu" value={formdata.xuat_xu} onChange={handleChange} fullWidth />
+          <TextField label="Phong cách" name="phong_cach" value={formdata.phong_cach} onChange={handleChange} fullWidth />
+          <TextField label="Năm phát hành" name="nam_phat_hanh" value={formdata.nam_phat_hanh} onChange={handleChange} fullWidth />
+          <TextField label="Độ lưu hương" name="do_luu_huong" value={formdata.do_luu_huong} onChange={handleChange} fullWidth />
+          <TextField label="Độ tỏa hương" name="do_toa_huong" value={formdata.do_toa_huong} onChange={handleChange} fullWidth />
+          <TextField label="Mô tả" name="mo_ta" value={formdata.mo_ta} onChange={handleChange} fullWidth multiline rows={3} />
 
-          {/* Trường giá dùng nhập kiểu text để dễ định dạng */}
-          <TextField
-            label="Giá"
-            name="gia"
-            value={giaHienThi}
-            onChange={handleChange}
-            fullWidth
-            inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
-            placeholder="Nhập giá sản phẩm"
-          />
+          {variants.map((variant, index) => (
+            <Box key={index} display="flex" gap={2}>
+              <TextField label="Dung tích" value={variant.dung_tich} onChange={(e) => handleVariantChange(index, 'dung_tich', e.target.value)} fullWidth />
+              <TextField label="Giá" value={variant.gia} onChange={(e) => handleVariantChange(index, 'gia', e.target.value)} fullWidth />
+              <TextField label="Số lượng" value={variant.so_luong_ton} onChange={(e) => handleVariantChange(index, 'so_luong_ton', e.target.value)} fullWidth />
+              {index > 0 && <Button onClick={() => removeVariant(index)}>-</Button>}
+            </Box>
+          ))}
+          <Button onClick={addVariant}>Thêm biến thể</Button>
 
-          <TextField
-            label="Số lượng"
-            name="so_luong_ton"
-            type="number"
-            value={formdata.so_luong_ton}
-            onChange={handleChange}
-            fullWidth
-          />
-
-          {/* Chọn ảnh chính */}
-          <Button variant="contained" component="label">
-            Chọn ảnh chính
-            <input type="file" hidden accept="image/*" onChange={handleFileChange} />
-          </Button>
+          <Button variant="contained" component="label">Chọn ảnh chính<input type="file" hidden accept="image/*" onChange={handleFileChange} /></Button>
           {fileAnh && (
             <Box mt={1} textAlign="center">
               <div>Đã chọn: {fileAnh.name}</div>
-              <img
-                src={URL.createObjectURL(fileAnh)}
-                alt="Ảnh chính"
-                style={{ maxHeight: 200, objectFit: 'contain' }}
-              />
+              <img src={URL.createObjectURL(fileAnh)} alt="Ảnh chính" style={{ maxHeight: 200, objectFit: 'contain' }} />
             </Box>
           )}
 
-          {/* Chọn nhiều ảnh phụ */}
-          <Button variant="contained" component="label" color="secondary">
-            Chọn ảnh phụ
-            <input type="file" hidden multiple accept="image/*" onChange={handleMultiFileChange} />
-          </Button>
+          <Button variant="contained" component="label" color="secondary">Chọn ảnh phụ<input type="file" hidden multiple accept="image/*" onChange={handleMultiFileChange} /></Button>
           {anhPhu.length > 0 && (
             <Box mt={1} display="flex" gap={2} flexWrap="wrap">
               {anhPhu.map((file, idx) => (
-                <img
-                  key={idx}
-                  src={URL.createObjectURL(file)}
-                  alt={`Ảnh phụ ${idx}`}
-                  style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 8 }}
-                />
+                <img key={idx} src={URL.createObjectURL(file)} alt={`Ảnh phụ ${idx}`} style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 8 }} />
               ))}
             </Box>
           )}
 
-          {/* Danh mục */}
           <FormControl fullWidth>
             <InputLabel>Danh mục</InputLabel>
-            <Select
-              name="danh_muc_id"
-              value={formdata.danh_muc_id}
-              onChange={handleChange}
-              label="Danh mục"
-            >
+            <Select name="danh_muc_id" value={formdata.danh_muc_id} onChange={handleChange} label="Danh mục">
               {danhMucList.map(dm => (
-                <MenuItem key={dm.id} value={dm.id}>
-                  {dm.ten_danh_muc}
-                </MenuItem>
+                <MenuItem key={dm.id} value={dm.id}>{dm.ten_danh_muc}</MenuItem>
               ))}
             </Select>
           </FormControl>
