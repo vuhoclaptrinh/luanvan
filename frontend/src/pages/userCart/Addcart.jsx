@@ -14,7 +14,7 @@ export const addToCart = (product) => {
     } else {
       toast.warning(`Bạn đã thêm tối đa ${maxQuantity} sản phẩm "${product.ten_san_pham}" (số lượng còn lại trong kho).`)
       
-      toast.error(`"${product.ten_san_pham}" hiện đã hết hàng và không thể thêm vào giỏ.`)
+      // toast.error(`"${product.ten_san_pham}" hiện đã hết hàng và không thể thêm vào giỏ.`)
       return
     }
   } else {

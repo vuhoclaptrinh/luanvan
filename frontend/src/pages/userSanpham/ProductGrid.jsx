@@ -267,8 +267,8 @@ useEffect(() => {
                 </>
               )}
               {khachHangId && reviewedMap[product.id] && (
-  <div className="text-success small">Bạn đã đánh giá sản phẩm này.</div>
-)}
+                <div className="text-success small">Bạn đã đánh giá sản phẩm này.</div>
+              )}
 
                     {viewMode === "list" && product.mo_ta && (
                       <p className="text-muted small mb-2 text-truncate">{product.mo_ta}</p>

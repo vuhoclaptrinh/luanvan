@@ -11,6 +11,7 @@ import "./styles.css"
 import { addToCart } from "../userCart/addcart"
 import { useParams } from "react-router-dom"
 import { addtowwishlist } from "../userWishlist/Addwishlist"
+import ProductDetailModal from "../../components/ProductDetail"
 
 const getImageUrl = (path) => {
   if (!path) return "/placeholder.svg?height=300&width=300"
@@ -33,9 +34,7 @@ const ViewDM = () => {
   const [viewMode, setViewMode] = useState("grid")
   const [sortOption, setSortOption] = useState("default")
   const [mobileFiltersVisible, setMobileFiltersVisible] = useState(false)
-  const [showReviewModal, setShowReviewModal] = useState(false)
-  const [reviews, setReviews] = useState([])
-  const [loadingReviews, setLoadingReviews] = useState(false)
+  
 
   // Filter states
   const [selectedCategories, setSelectedCategories] = useState([])
@@ -213,22 +212,7 @@ const ViewDM = () => {
     setCurrentImageIndex(0)
   }
 
-  const handleCloseModal = () => {
-    setSelectedProduct(null)
-    setCurrentImageIndex(0)
-  }
-
-  const handleNextImage = () => {
-    if (selectedProduct?.images?.length > 0) {
-      setCurrentImageIndex((currentImageIndex + 1) % selectedProduct.images.length)
-    }
-  }
-
-  const handlePrevImage = () => {
-    if (selectedProduct?.images?.length > 0) {
-      setCurrentImageIndex(currentImageIndex === 0 ? selectedProduct.images.length - 1 : currentImageIndex - 1)
-    }
-  }
+  
 
   const handleShowMore = () => {
     setVisibleCount((prevCount) => Math.min(prevCount + 9, filteredProducts.length))
@@ -248,19 +232,7 @@ const ViewDM = () => {
     setMobileFiltersVisible(!mobileFiltersVisible)
   }
 
-  const handleShowReviews = async () => {
-    if (!selectedProduct) return
-    setShowReviewModal(true)
-    setLoadingReviews(true)
-    try {
-      const res = await axios.get(`http://127.0.0.1:8000/api/danhgia/sanpham/${selectedProduct.id}`)
-      setReviews(res.data.data || [])
-    } catch (err) {
-      setReviews([])
-    } finally {
-      setLoadingReviews(false)
-    }
-  }
+  
 
   if (loading) {
     return (
@@ -490,230 +462,11 @@ const ViewDM = () => {
             </Col>
           </Row>
 
-          {/* Product Detail Modal */}
-          <Modal
+          <ProductDetailModal product={selectedProduct}
             show={selectedProduct !== null}
-            onHide={handleCloseModal}
-            size="lg"
-            centered
-            className="product-detail-modal"
-          >
-            <Modal.Header closeButton className="border-0 pb-0">
-              <Modal.Title className="fs-5 text-primary">
-                <i className="bi bi-eye me-2"></i>
-                Chi tiết sản phẩm
-              </Modal.Title>
-            </Modal.Header>
-            <Modal.Body className="p-4">
-              <Row>
-                <Col md={6}>
-                  <div className="position-relative mb-3">
-                    <img
-                      src={getImageUrl(selectedProduct?.images?.[currentImageIndex] || selectedProduct?.hinh_anh)}
-                      alt={selectedProduct?.ten_san_pham}
-                      className="img-fluid rounded shadow-sm"
-                      style={{ width: "100%", height: "350px", objectFit: "cover" }}
-                    />
-
-                    {selectedProduct?.images?.length > 1 && (
-                      <>
-                        <Button
-                          variant="light"
-                          size="sm"
-                          className="position-absolute top-50 start-0 translate-middle-y rounded-circle p-2 shadow"
-                          onClick={handlePrevImage}
-                        >
-                          <i className="bi bi-chevron-left"></i>
-                        </Button>
-                        <Button
-                          variant="light"
-                          size="sm"
-                          className="position-absolute top-50 end-0 translate-middle-y rounded-circle p-2 shadow"
-                          onClick={handleNextImage}
-                        >
-                          <i className="bi bi-chevron-right"></i>
-                        </Button>
-                        <div className="text-center mt-2">
-                          <Badge bg="dark" className="opacity-75">
-                            {currentImageIndex + 1} / {selectedProduct.images.length}
-                          </Badge>
-                        </div>
-                      </>
-                    )}
-                  </div>
-
-                  {/* Thumbnail gallery */}
-                  {selectedProduct?.images?.length > 1 && (
-                    <Row className="g-2 mt-2">
-                      {selectedProduct.images.map((img, index) => (
-                        <Col key={index} xs={3}>
-                          <img
-                            src={getImageUrl(img) || "/placeholder.svg"}
-                            alt={`Thumbnail ${index + 1}`}
-                            className={`img-thumbnail cursor-pointer ${index === currentImageIndex ? "border-primary border-2" : ""}`}
-                            style={{
-                              height: "60px",
-                              objectFit: "cover",
-                              cursor: "pointer",
-                              opacity: index === currentImageIndex ? 1 : 0.7,
-                            }}
-                            onClick={() => setCurrentImageIndex(index)}
-                          />
-                        </Col>
-                      ))}
-                    </Row>
-                  )}
-                </Col>
-
-                <Col md={6}>
-                  <div className="mb-4">
-                    {selectedProduct?.thuong_hieu && (
-                      <div className="mb-3">
-                        <Badge bg="light" text="dark" className="me-2 px-3 py-2">
-                          <i className="bi bi-award me-1"></i>
-                          {selectedProduct.thuong_hieu}
-                        </Badge>
-                        {selectedProduct?.danh_muc_ten && (
-                          <Badge bg="primary" className="px-3 py-2">
-                            <i className="bi bi-tag me-1"></i>
-                            {selectedProduct.danh_muc_ten}
-                          </Badge>
-                        )}
-                      </div>
-                    )}
-                    <h3 className="fs-4 mb-3 text-dark">{selectedProduct?.ten_san_pham}</h3>
-                    <div className="fs-2 fw-bold text-primary mb-3">
-                      <i className=" me-1"></i>
-                      {selectedProduct?.gia_format}
-                    </div>
-                  </div>
-
-                  <div className="mb-4">
-                    <div className="table-responsive">
-                      <table className="table table-borderless">
-                        <tbody>
-                          {selectedProduct?.dung_tich && (
-                            <tr>
-                              <td className="text-muted ps-0 fw-medium" style={{ width: "40%" }}>
-                                <i className="bi bi-droplet me-2"></i>
-                                Dung tích:
-                              </td>
-                              <td className="fw-medium">{selectedProduct.dung_tich}</td>
-                            </tr>
-                          )}
-                          {selectedProduct?.so_luong_ton !== undefined && (
-                            <tr>
-                              <td className="text-muted ps-0 fw-medium">
-                                <i className="bi bi-box-seam me-2"></i>
-                                Tình trạng:
-                              </td>
-                              <td>
-                                {selectedProduct.so_luong_ton > 0 ? (
-                                  <Badge bg="success" className="px-3 py-2">
-                                    <i className="bi bi-check-circle me-1"></i>
-                                    Còn hàng ({selectedProduct.so_luong_ton})
-                                  </Badge>
-                                ) : (
-                                  <Badge bg="danger" className="px-3 py-2">
-                                    <i className="bi bi-x-circle me-1"></i>
-                                    Hết hàng
-                                  </Badge>
-                                )}
-                              </td>
-                            </tr>
-                          )}
-                          {selectedProduct?.danh_muc_ten && (
-                            <tr>
-                              <td className="text-muted ps-0 fw-medium">
-                                <i className="bi bi-collection me-2"></i>
-                                Danh mục:
-                              </td>
-                              <td className="fw-medium">{selectedProduct.danh_muc_ten}</td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-
-                  {selectedProduct?.mo_ta && (
-                    <div className="mb-4">
-                      <h5 className="fs-6 fw-bold mb-2 text-primary">
-                        <i className="bi bi-info-circle me-2"></i>
-                        Mô tả sản phẩm:
-                      </h5>
-                      <p className="text-muted lh-lg">{selectedProduct.mo_ta}</p>
-                    </div>
-                  )}
-
-                  <div className="d-grid gap-2">
-                    <Button
-                      variant="primary"
-                      size="lg"
-                      className="fw-bold"
-                      style={{
-                        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                        borderColor: "transparent",
-                        padding: "12px 24px",
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        addToCart(selectedProduct)
-                      }}
-                      disabled={selectedProduct?.so_luong_ton === 0}
-                    >
-                      <i className="bi bi-cart-plus me-2"></i>
-                      {selectedProduct?.so_luong_ton === 0 ? "Hết hàng" : "Thêm vào giỏ hàng"}
-                    </Button>
-                    <Button variant="outline-secondary" size="lg" onClick={(e) => {
-                      e.stopPropagation()
-                      addtowwishlist(selectedProduct)
-                    }}>
-                      <i className="bi bi-heart me-2"></i>
-                      Thêm vào yêu thích
-                    </Button>
-                    <Button variant="outline-info" size="lg" onClick={handleShowReviews}>
-                      <i className="bi bi-chat-dots me-2"></i>
-                      Xem đánh giá
-                    </Button>
-                  </div>
-                </Col>
-              </Row>
-            </Modal.Body>
-          </Modal>
-          {/* Modal xem đánh giá sản phẩm */}
-          <Modal show={showReviewModal} onHide={() => setShowReviewModal(false)} centered>
-            <Modal.Header closeButton>
-              <Modal.Title>Đánh giá sản phẩm</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              {loadingReviews ? (
-                <div className="text-center py-4">
-                  <Spinner animation="border" />
-                </div>
-              ) : reviews.length === 0 ? (
-                <div className="text-center text-muted py-4">Chưa có đánh giá nào cho sản phẩm này.</div>
-              ) : (
-                <div style={{ maxHeight: 350, overflowY: 'auto' }}>
-                  {reviews.map((rv, idx) => (
-                    <div key={idx} className="mb-3 p-2 border rounded bg-light">
-                      <div className="d-flex align-items-center mb-1">
-                        <span className="fw-bold me-2">{rv.ten_khach_hang || 'Ẩn danh'}</span>
-                        <span className="text-warning">
-                          {Array.from({ length: 5 }, (_, i) => (
-                            <i key={i} className={`bi ${i < rv.so_sao ? 'bi-star-fill' : 'bi-star'}`}></i>
-                          ))}
-                        </span>
-                        <span className="ms-auto text-muted small">{rv.ngay_danh_gia}</span>
-                      </div>
-                      <div className="text-muted">{rv.noi_dung}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </Modal.Body>
-          </Modal>
-          
+            onHide={() => setSelectedProduct(null)}
+            addToCart={addToCart}
+            addToWishlist={addtowwishlist}/>
         </Container>
       </section>
     </>

@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from "react"
 import axios from "axios"
-import { Row, Col, Container, Modal, Button, Badge, Spinner, Form } from "react-bootstrap"
+import { Row, Col, Container, Modal, Button, Badge, Spinner, Form , Offcanvas } from "react-bootstrap"
 import { FilterAlt, GridView, ViewList } from "@mui/icons-material"
 import ProductGrid from "./ProductGrid"
 import FilterSidebar from "./FilterSidebar"
 import "./styles.css"
 import { addToCart } from "../userCart/addcart"
 import { addtowwishlist } from "../userWishlist/Addwishlist"
+import ProductDetailModal from "../../components/ProductDetail"
 
 const getImageUrl = (path) => {
   if (!path) return "/placeholder.svg?height=300&width=300"
@@ -39,11 +40,7 @@ const ViewSP = () => {
   const [searchQuery, setSearchQuery] = useState("")
   const [inStockOnly, setInStockOnly] = useState(false)
 
-  // Review states
-  const [showReviewModal, setShowReviewModal] = useState(false)
-  const [reviews, setReviews] = useState([])
-  const [loadingReviews, setLoadingReviews] = useState(false)
-
+ 
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true)
@@ -151,23 +148,6 @@ const ViewSP = () => {
     setCurrentImageIndex(0)
   }
 
-  const handleCloseModal = () => {
-    setSelectedProduct(null)
-    setCurrentImageIndex(0)
-  }
-
-  const handleNextImage = () => {
-    if (selectedProduct?.images?.length > 0) {
-      setCurrentImageIndex((currentImageIndex + 1) % selectedProduct.images.length)
-    }
-  }
-
-  const handlePrevImage = () => {
-    if (selectedProduct?.images?.length > 0) {
-      setCurrentImageIndex(currentImageIndex === 0 ? selectedProduct.images.length - 1 : currentImageIndex - 1)
-    }
-  }
-
   const handleShowMore = () => {
     setVisibleCount((prevCount) => Math.min(prevCount + 9, filteredProducts.length))
   }
@@ -185,19 +165,7 @@ const ViewSP = () => {
     setMobileFiltersVisible(!mobileFiltersVisible)
   }
 
-  const handleShowReviews = async () => {
-    if (!selectedProduct) return
-    setShowReviewModal(true)
-    setLoadingReviews(true)
-    try {
-      const res = await axios.get(`http://127.0.0.1:8000/api/danhgia/sanpham/${selectedProduct.id}`)
-      setReviews(res.data.data || [])
-    } catch (err) {
-      setReviews([])
-    } finally {
-      setLoadingReviews(false)
-    }
-  }
+  
 
   if (loading) {
     return (
@@ -326,237 +294,13 @@ const ViewSP = () => {
           </Col>
         </Row>
 
-        {/* Modal xem chi tiết sản phẩm */}
-        <Modal
-          show={selectedProduct !== null}
-          onHide={handleCloseModal}
-          size="lg"
-          centered
-          className="product-detail-modal"
-        >
-          <Modal.Header closeButton>
-           <Modal.Title className="fs-5 text-primary">
-                <i className="bi bi-eye me-2"></i>
-                Chi tiết sản phẩm
-              </Modal.Title>
-          </Modal.Header> 
-          <Modal.Body className="p-4">
-            <Row>
-              <Col md={6}>
-                <div className="position-relative mb-3">
-                  <img
-                    src={getImageUrl(selectedProduct?.images?.[currentImageIndex] || selectedProduct?.hinh_anh)}
-                    alt={selectedProduct?.ten_san_pham}
-                    className="img-fluid rounded"
-                    style={{ width: "100%", height: "350px", objectFit: "cover" }}
-                  />
-
-                  {selectedProduct?.images?.length > 1 && (
-                    <>
-                      <Button
-                        variant="light"
-                        size="sm"
-                        className="position-absolute top-50 start-0 translate-middle-y rounded-circle p-2 shadow-sm"
-                        onClick={handlePrevImage}
-                      >
-                        <i className="bi bi-chevron-left"></i>
-                      </Button>
-                      <Button
-                        variant="light"
-                        size="sm"
-                        className="position-absolute top-50 end-0 translate-middle-y rounded-circle p-2 shadow-sm"
-                        onClick={handleNextImage}
-                      >
-                        <i className="bi bi-chevron-right"></i>
-                      </Button>
-                      <div className="text-center mt-2 text-muted small">
-                        <i className="bi bi-info-circle me-1"></i>
-                        Ảnh {currentImageIndex + 1} / {selectedProduct.images.length}
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                {/* Thumbnail gallery */}
-                {selectedProduct?.images?.length > 1 && (
-                  <Row className="g-2 mt-2">
-                    {selectedProduct.images.map((img, index) => (
-                      <Col key={index} xs={3}>
-                        <img
-                          src={getImageUrl(img) || "/placeholder.svg"}
-                          alt={`Thumbnail ${index + 1}`}
-                          className={`img-thumbnail cursor-pointer ${index === currentImageIndex ? "border-primary" : ""}`}
-                          style={{
-                            height: "60px",
-                            objectFit: "cover",
-                            cursor: "pointer",
-                            opacity: index === currentImageIndex ? 1 : 0.6,
-                          }}
-                          onClick={() => setCurrentImageIndex(index)}
-                        />
-                      </Col>
-                    ))}
-                  </Row>
-                )}
-              </Col>
-
-              <Col md={6}>
-                <div className="mb-4">
-                  {selectedProduct?.thuong_hieu && (
-                    <div className="mb-2">
-                      <Badge bg="light" text="dark" className="me-2 px-3 py-2">
-                          <i className="bi bi-award me-1"></i>
-                          {selectedProduct.thuong_hieu}
-                        </Badge>
-                      {selectedProduct?.danh_muc_ten && <Badge bg="primary">{selectedProduct.danh_muc_ten}</Badge>}
-                    </div>
-                  )}
-                  <h3 className="fs-4 mb-3">{selectedProduct?.ten_san_pham}</h3>
-                  <div className="fs-3 fw-bold text-primary mb-3">{selectedProduct?.gia_format}</div>
-                </div>
-
-                <div className="mb-4">
-                  <table className="table table-borderless">
-                    <tbody>
-                      {selectedProduct?.dung_tich && (
-                        <tr>
-                          <td className="text-muted ps-0" style={{ width: "40%" }}>
-                            Dung tích:
-                          </td>
-                          <td>{selectedProduct.dung_tich}</td>
-                        </tr>
-                      )}
-                      {selectedProduct?.so_luong_ton !== undefined && (
-                        <tr>
-                          <td className="text-muted ps-0">Tình trạng:</td>
-                          <td>
-                            {selectedProduct.so_luong_ton > 0 ? (
-                              <span className="text-success">
-                                <i className="bi bi-check-circle me-1"></i>
-                                Còn hàng ({selectedProduct.so_luong_ton})
-                              </span>
-                            ) : (
-                              <span className="text-danger">
-                                <i className="bi bi-x-circle me-1"></i>
-                                Hết hàng
-                              </span>
-                            )}
-                          </td>
-                        </tr>
-                      )}
-                      {selectedProduct?.danh_muc_ten && (
-                        <tr>
-                          <td className="text-muted ps-0">Danh mục:</td>
-                          <td>{selectedProduct.danh_muc_ten}</td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-
-                {selectedProduct?.mo_ta && (
-                  <div className="mb-4">
-                    <h5 className="fs-6 fw-bold mb-2">Mô tả sản phẩm:</h5>
-                    <p className="text-muted">{selectedProduct.mo_ta}</p>
-                  </div>
-                )}
-
-                <div className="d-grid gap-2">
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    style={{
-                      background: "linear-gradient(to right, #e83e8c, #6f42c1)",
-                      borderColor: "transparent",
-                    }}
-                     onClick={(e) => {
-                    e.stopPropagation()
-                    // Thêm vào giỏ hàng logic ở đây
-                    addToCart(selectedProduct)
-
-                    // alert(`Đã thêm ${selectedProduct.ten_san_pham} vào giỏ hàng!`)
-                  }}
-                  >
-                    
-                    <i className="bi bi-cart-plus me-2"></i>
-                    Thêm vào giỏ hàng
-                  </Button>
-                  <Button variant="outline-secondary"  onClick={(e) => {
-                    e.stopPropagation()
-                    // Thêm vào giỏ hàng logic ở đây
-                    addtowwishlist(selectedProduct)
-
-                    // alert(`Đã thêm ${selectedProduct.ten_san_pham} vào wishlist!`)
-                  }}>
-                    <i className="bi bi-heart me-2"></i>
-                    Thêm vào yêu thích
-                  </Button>
-                  <Button variant="outline-info" onClick={handleShowReviews}>
-                    <i className="bi bi-chat-left-text me-2"></i>
-                    Xem đánh giá
-                  </Button>
-                </div>
-              </Col>
-            </Row>
-          </Modal.Body>
-        </Modal>
-
-        {/* Modal hiển thị đánh giá */}
-        <Modal show={showReviewModal} onHide={() => setShowReviewModal(false)} centered className="review-modal">
-          <Modal.Header closeButton>
-            <Modal.Title>Đánh giá sản phẩm</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            {loadingReviews ? (
-              <div className="text-center py-4">
-                <Spinner animation="border" />
-              </div>
-            ) : reviews.length === 0 ? (
-              <div className="text-center text-muted py-4">
-                Chưa có đánh giá nào cho sản phẩm này.
-              </div>
-            ) : (
-              <div style={{ maxHeight: 350, overflowY: 'auto' }}>
-                {reviews.map((rv, idx) => (
-                  <div
-                    key={idx}
-                    className="mb-3 p-3"
-                    style={{
-                      backgroundColor: '#f8f9fa',
-                      border: '1px solid #dee2e6',
-                      borderRadius: '12px',
-                      transition: 'box-shadow 0.3s',
-                    }}
-                    onMouseEnter={(e) =>
-                      (e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)')
-                    }
-                    onMouseLeave={(e) => (e.currentTarget.style.boxShadow = 'none')}
-                  >
-                    <div className="d-flex align-items-center mb-2">
-                      <span className="fw-semibold me-2" style={{ color: '#343a40' }}>
-                        {rv.ten_khach_hang || 'Ẩn danh'}
-                      </span>
-                      <span className="text-warning">
-                        {Array.from({ length: 5 }, (_, i) => (
-                          <i
-                            key={i}
-                            className={`bi ${i < rv.so_sao ? 'bi-star-fill' : 'bi-star'}`}
-                            style={{ marginRight: '2px' }}
-                          ></i>
-                        ))}
-                      </span>
-                      <span className="ms-auto text-muted small">{rv.ngay_danh_gia}</span>
-                    </div>
-                    <div className="text-muted" style={{ lineHeight: 1.5 }}>
-                      {rv.noi_dung}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </Modal.Body>
-        </Modal>
-
+        <ProductDetailModal
+            product={selectedProduct}
+            show={selectedProduct !== null}
+            onHide={() => setSelectedProduct(null)}
+            addToCart={addToCart}
+            addToWishlist={addtowwishlist}
+          />
       </Container>
     </section>
   )
