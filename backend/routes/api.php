@@ -34,6 +34,8 @@ Route::put('/sanpham/{id}', [SanphamController::class, 'update']);
 Route::delete('/sanpham/{id}', [SanphamController::class, 'delete']);
 //getby Danh mục
 Route::get('/sanpham/danhmuc/{id}', [SanphamController::class, 'getByDanhmuc']);
+//geth thuong hiue
+Route::get('/sanpham/thuonghieu', [SanphamController::class, 'getByThuongHieu']);
 
 
 //khoa

@@ -289,5 +289,32 @@ class SanphamController extends Controller
         ], 200);
     }
 
+    public function getByThuongHieu(Request $request)
+    {
+        $thuongHieu = $request->query('thuong_hieu');
+        $excludeId = $request->query('exclude_id');
+
+        if (!$thuongHieu) {
+            return response()->json([
+                'message' => 'Thiếu tham số thương hiệu.'
+            ], 400);
+        }
+
+        $query = \App\Models\Sanpham::where('thuong_hieu', $thuongHieu);
+
+        if ($excludeId) {
+            $query->where('id', '!=', $excludeId);
+        }
+
+        $sanPhams = $query->with('variants') // nếu bạn dùng quan hệ biến thể
+            ->orderBy('id', 'desc')
+            ->limit(10)
+            ->get();
+
+        return response()->json([
+            'data' => $sanPhams
+        ]);
+    }
+
 
 }
