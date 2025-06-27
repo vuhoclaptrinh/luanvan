@@ -11,7 +11,7 @@ const getImageUrl = (path) => {
 };
 
 const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist }) => {
-  // Đảm bảo không có bất kỳ hook hoặc logic nào phía trên dòng này
+  
 
   const navigate = useNavigate();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -173,6 +173,7 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
                                 pointerEvents: isOut ? "none" : "auto",
                                 borderColor: isActive ? "#0d6efd" : undefined,
                                 background: isActive ? "#e7f1ff" : undefined,
+                                color: isActive ? "red" : "#0d6efd",
                               }}
                               disabled={isOut}
                               onClick={() => {
@@ -180,8 +181,8 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
                                 setQuantity(1);
                               }}
                             >
-                              <div>{v.dung_tich}</div>
-                              <div className="small text-muted">{Number(v.gia).toLocaleString('vi-VN')} ₫</div>
+                              <div>{v.dung_tich}ml</div>
+                              {/* <div className="small text-muted">{Number(v.gia).toLocaleString('vi-VN')} ₫</div> */}
                             </button>
                           );
                         })}
@@ -304,7 +305,10 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
                   <Button
                     variant="dark"
                     className="mt-3 w-100"
-                    onClick={handleViewDetail}
+                    onClick={() => {
+                      handleViewDetail();
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
                   >
                     Xem chi tiết sản phẩm
                   </Button>
@@ -335,10 +339,11 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
                     <i className="bi bi-cart-plus me-2"></i>
                     Thêm vào giỏ hàng
                   </Button>
-                  <Button variant="danger" onClick={() => addToWishlist(product)}>
+                  <Button variant="outline-danger" className="w-100" onClick={() => addToWishlist(product)}>
                     <i className="bi bi-heart me-2"></i>
                     Thêm vào yêu thích
                   </Button>
+                  
                   <Button
                     variant={showReviewPanel ? "outline-danger" : "outline-info"}
                     onClick={() => setShowReviewPanel(!showReviewPanel)}

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { Container, Row, Col, Button, Card, Badge, Tabs, Tab, Table, Spinner } from "react-bootstrap"
+import { Container, Row, Col, Button, Card, Badge, Tabs, Tab, Table, Spinner, Alert } from "react-bootstrap"
 import {
   Star,
   Heart,
@@ -15,27 +15,25 @@ import {
   Plus,
   Minus,
   ArrowLeft,
+  ZoomIn,
 } from "lucide-react"
-import { toast } from "react-toastify"
-import axios from "axios"
-import Lightbox from "yet-another-react-lightbox";
-import Zoom from "yet-another-react-lightbox/plugins/zoom";
-import "yet-another-react-lightbox/styles.css";
-import { addToWishlist } from "../userWishlist/Addwishlist"
+import { toast } from "react-hot-toast"
 import { addToCart } from "../userCart/Addcart"
+import { addToWishlist } from "../userWishlist/Addwishlist"
 
 // Utility function for image URLs
 const getImageUrl = (path) => {
   if (typeof path !== "string" || path.trim() === "") {
-    return "/placeholder.svg?height=300&width=300";
+    return "/placeholder.svg?height=300&width=300"
   }
-  if (path.startsWith("http")) return path;
-  return `http://127.0.0.1:8000/storage/images/${path.replace(/^images\//, "")}`;
-};
+  if (path.startsWith("http")) return path
+  return `http://127.0.0.1:8000/storage/images/${path.replace(/^images\//, "")}`
+}
 
-export default function DetailSanpham() {
+export default function ProductDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
+
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
@@ -43,15 +41,19 @@ export default function DetailSanpham() {
   const [quantity, setQuantity] = useState(1)
   const [reviews, setReviews] = useState([])
   const [loadingReviews, setLoadingReviews] = useState(false)
-  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [relatedProducts, setRelatedProducts] = useState([])
+  const [loadingRelated, setLoadingRelated] = useState(false)
 
   // Fetch product data from API
   useEffect(() => {
     const fetchProduct = async () => {
+      if (!id) return
+
       setLoading(true)
       try {
-        const res = await axios.get(`http://127.0.0.1:8000/api/sanpham/${id}`)
-        setProduct(res.data.data)
+        const res = await fetch(`http://127.0.0.1:8000/api/sanpham/${id}`)
+        const data = await res.json()
+        setProduct(data.data)
       } catch (err) {
         console.error("Không thể tải sản phẩm:", err)
         toast.error("Không thể tải sản phẩm")
@@ -60,18 +62,53 @@ export default function DetailSanpham() {
       }
     }
 
-    if (id) {
-      fetchProduct()
-    }
+    fetchProduct()
   }, [id])
 
+  // Fetch related products
+  useEffect(() => {
+    const fetchRelatedProducts = async () => {
+      if (!product?.thuong_hieu) return
+
+      setLoadingRelated(true)
+      try {
+        const res = await fetch(`http://127.0.0.1:8000/api/sanpham`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+        const data = await res.json()
+
+        // Filter products by brand and exclude current product
+        const filtered = (data.data || [])
+          .filter((item) => item.thuong_hieu === product.thuong_hieu && item.id !== product.id)
+          .slice(0, 6) // Limit to 6 products
+
+        setRelatedProducts(filtered)
+      } catch (error) {
+        console.error("Lỗi khi lấy sản phẩm liên quan:", error)
+        setRelatedProducts([])
+      } finally {
+        setLoadingRelated(false)
+      }
+    }
+
+    if (product) {
+      fetchRelatedProducts()
+    }
+  }, [product])
+
+  // Fetch reviews
   useEffect(() => {
     const fetchReviews = async () => {
       if (!product?.id) return
+
       setLoadingReviews(true)
       try {
-        const res = await axios.get(`http://127.0.0.1:8000/api/danhgia/sanpham/${product.id}`)
-        setReviews(res.data.data || [])
+        const res = await fetch(`http://127.0.0.1:8000/api/danhgia/sanpham/${product.id}`)
+        const data = await res.json()
+        setReviews(data.data || [])
       } catch (error) {
         console.error("Error fetching reviews:", error)
         setReviews([])
@@ -94,20 +131,23 @@ export default function DetailSanpham() {
   }
 
   const handleAddToCart = () => {
-  addToCart(product, selectedVariantId, quantity, selectedVariant)
-  
-};
+      addToCart(product, selectedVariantId, quantity, selectedVariant)
+  }
 
   const handleAddToWishlist = () => {
-   addToWishlist(product)
- }
+     addToWishlist(product)
+  }
 
   const handleGoBack = () => {
-    navigate(-1) // Go back to previous page
+    navigate(-1)
   }
 
   const handleGoHome = () => {
-    navigate("/") // Go to home page
+    navigate("/")
+  }
+
+  const handleRelatedProductClick = (productId) => {
+    navigate(`/sanpham/${productId}`)
   }
 
   if (loading) {
@@ -143,7 +183,6 @@ export default function DetailSanpham() {
   const totalStock = product.variants?.length
     ? product.variants.reduce((sum, v) => sum + (v.so_luong_ton || 0), 0)
     : product.so_luong_ton || 0
-    
 
   return (
     <div className="min-vh-100 bg-light">
@@ -171,210 +210,187 @@ export default function DetailSanpham() {
 
         <Row className="mb-5">
           {/* Product Images */}
-          <Col md={6} className="bg-light p-3 rounded shadow-sm">
-              <div className="position-relative text-center mb-3">
-                {(() => {
-                  const currentImage = product.images?.[currentImageIndex];
-                  const currentImagePath =
-                    typeof currentImage === "string"
-                      ? currentImage
-                      : currentImage?.image_path ?? product.hinh_anh;
+          <Col md={6}>
+            <Card className="shadow-sm">
+              <Card.Body className="p-4">
+                <div className="position-relative text-center mb-3">
+                  {(() => {
+                    const currentImage = product.images?.[currentImageIndex]
+                    const currentImagePath =
+                      typeof currentImage === "string" ? currentImage : (currentImage?.image_path ?? product.hinh_anh)
 
-                  return (
-                    <img
-                      src={getImageUrl(currentImagePath)}
-                      alt={product.ten_san_pham}
-                      className="rounded border d-block mx-auto"
-                      onClick={() => setLightboxOpen(true)}
-                      style={{
-                        maxWidth: "100%",
-                        maxHeight: "350px",
-                        objectFit: "contain",
-                        backgroundColor: "#ffffff",
-                        padding: "10px",
-                        cursor: "zoom-in",
-                      }}
-                    />
-                  );
-                })()}
+                    return (
+                      <div className="position-relative">
+                        <img
+                          src={getImageUrl(currentImagePath) || "/placeholder.svg"}
+                          alt={product.ten_san_pham}
+                          className="img-fluid rounded border"
+                          style={{
+                            maxHeight: "400px",
+                            objectFit: "contain",
+                            backgroundColor: "#ffffff",
+                            padding: "10px",
+                            cursor: "zoom-in",
+                            width: "100%",
+                          }}
+                        />
+                        <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center opacity-0 hover-opacity-100 transition-opacity">
+                          <ZoomIn className="text-white" size={32} />
+                        </div>
+                      </div>
+                    )
+                  })()}
+
+                  {product.images?.length > 1 && (
+                    <>
+                      <Button
+                        variant="light"
+                        size="sm"
+                        className="position-absolute top-50 start-0 translate-middle-y rounded-circle p-2 shadow-sm"
+                        onClick={() =>
+                          setCurrentImageIndex(
+                            currentImageIndex === 0 ? product.images.length - 1 : currentImageIndex - 1,
+                          )
+                        }
+                      >
+                        <ChevronLeft size={16} />
+                      </Button>
+                      <Button
+                        variant="light"
+                        size="sm"
+                        className="position-absolute top-50 end-0 translate-middle-y rounded-circle p-2 shadow-sm"
+                        onClick={() => setCurrentImageIndex((currentImageIndex + 1) % product.images.length)}
+                      >
+                        <ChevronRight size={16} />
+                      </Button>
+                      <div className="text-center mt-2 text-muted small">
+                        Ảnh {currentImageIndex + 1} / {product.images.length}
+                      </div>
+                    </>
+                  )}
+                </div>
 
                 {product.images?.length > 1 && (
-                  <>
-                    <Button
-                      variant="light"
-                      size="sm"
-                      className="position-absolute top-50 start-0 translate-middle-y rounded-circle p-2 shadow-sm"
-                      onClick={() =>
-                        setCurrentImageIndex(
-                          currentImageIndex === 0
-                            ? product.images.length - 1
-                            : currentImageIndex - 1
-                        )
-                      }
-                    >
-                      <i className="bi bi-chevron-left"></i>
-                    </Button>
-                    <Button
-                      variant="light"
-                      size="sm"
-                      className="position-absolute top-50 end-0 translate-middle-y rounded-circle p-2 shadow-sm"
-                      onClick={() =>
-                        setCurrentImageIndex((currentImageIndex + 1) % product.images.length)
-                      }
-                    >
-                      <i className="bi bi-chevron-right"></i>
-                    </Button>
-                    <div className="text-center mt-2 text-muted small">
-                      <i className="bi bi-info-circle me-1"></i>
-                      Ảnh {currentImageIndex + 1} / {product.images.length}
-                    </div>
-                  </>
+                  <Row className="g-2 justify-content-center">
+                    {product.images.map((img, index) => (
+                      <Col key={index} xs={3}>
+                        <img
+                          src={getImageUrl(img.image_path) || "/placeholder.svg"}
+                          alt={`Thumbnail ${index + 1}`}
+                          className={`img-thumbnail rounded shadow-sm w-100 ${
+                            index === currentImageIndex ? "border-primary border-2" : "border"
+                          }`}
+                          style={{
+                            height: "60px",
+                            objectFit: "cover",
+                            backgroundColor: "#fff",
+                            cursor: "pointer",
+                            opacity: index === currentImageIndex ? 1 : 0.6,
+                            transition: "opacity 0.3s",
+                          }}
+                          onClick={() => setCurrentImageIndex(index)}
+                        />
+                      </Col>
+                    ))}
+                  </Row>
                 )}
-              </div>
-
-              {product.images?.length > 1 && (
-                <Row className="g-3 mt-2 justify-content-center">
-                  {product.images.map((img, index) => (
-                    <Col key={index} xs={3}>
-                      <img
-                        src={getImageUrl(img.image_path)}
-                        alt={`Thumbnail ${index + 1}`}
-                        className={`img-thumbnail rounded-2 shadow-sm ${
-                          index === currentImageIndex ? "border-primary border-2" : "border"
-                        }`}
-                        style={{
-                          height: "60px",
-                          width: "100%",
-                          objectFit: "cover",
-                          backgroundColor: "#fff",
-                          cursor: "pointer",
-                          opacity: index === currentImageIndex ? 1 : 0.6,
-                          transition: "opacity 0.3s",
-                        }}
-                        onClick={() => setCurrentImageIndex(index)}
-                      />
-                    </Col>
-                  ))}
-                </Row>
-              )}
-
-              {lightboxOpen && (
-                <Lightbox
-                  open={lightboxOpen}
-                  close={() => setLightboxOpen(false)}
-                  index={currentImageIndex}
-                  slides={product.images.map((img) => ({
-                    src: getImageUrl(img.image_path),
-                  }))}
-                  plugins={[Zoom]}
-                />
-              )}
-            </Col>
-
-
+              </Card.Body>
+            </Card>
+          </Col>
 
           {/* Product Info */}
-          <Col lg={6}>
-            <div  className="bg-light p-3 rounded shadow-sm">
-              <div className="d-flex align-items-center gap-2 mb-3 ">
-                <Badge bg="secondary" className="d-flex align-items-center gap-1">
-                  <Award size={12} />
-                  {product.thuong_hieu}
-                </Badge>
-                {product.danh_muc_ten &&
-                 <Badge>{product.danh_muc_ten}</Badge>}
-              </div>
+          <Col md={6}>
+            <Card className="shadow-sm">
+              <Card.Body className="p-4">
+                <div className="d-flex align-items-center gap-2 mb-3">
+                  <Badge bg="secondary" className="d-flex align-items-center gap-1">
+                    <Award size={12} />
+                    {product.thuong_hieu}
+                  </Badge>
+                  {product.danh_muc_ten && <Badge>{product.danh_muc_ten}</Badge>}
+                </div>
 
-              <h1 className="h3 mb-4">{product.ten_san_pham}</h1>
+                <h1 className="h3 mb-4">{product.ten_san_pham}</h1>
 
-              {/* Variants Selection */}
-              {product.variants && product.variants.length > 0 && (
-                <div className="mb-4">
-                  <label className="form-label fw-semibold">Dung tích:</label>
-                  <div className="d-flex flex-wrap gap-2 justify-content-center">
-                    {product.variants.map((variant) => {
-                      const isSelected = selectedVariantId === variant.id
-                      const isOutOfStock = variant.so_luong_ton <= 0
+                {/* Variants Selection */}
+                {product.variants && product.variants.length > 0 && (
+                  <div className="mb-4">
+                    <label className="form-label fw-semibold">Dung tích:</label>
+                    <div className="d-flex flex-wrap justify-content-center gap-2">
+                      {product.variants.map((variant) => {
+                        const isSelected = selectedVariantId === variant.id
+                        const isOutOfStock = variant.so_luong_ton <= 0
 
-                      return (
-                        <Button
-                          key={variant.id}
-                          variant={isSelected ? "primary" : "outline-primary"}
-                          size="sm"
-                          disabled={isOutOfStock}
-                          onClick={() => {
-                            setSelectedVariantId(variant.id)
-                            setQuantity(1)
-                          }}
-                          className={`d-flex flex-column p-2 ${isOutOfStock ? "text-decoration-line-through" : ""}`}
-                          style={{ minWidth: "80px", opacity: isOutOfStock ? 0.5 : 1 }}
-                        >
-                          <span>{variant.dung_tich}</span>
-                          {/* <small>{Number(variant.gia).toLocaleString("vi-VN")} ₫</small> */}
-                        </Button>
-                      )
-                    })}
+                        return (
+                          <Button
+                            key={variant.id}
+                            variant={isSelected ? "primary" : "outline-primary"}
+                            size="sm"
+                            disabled={isOutOfStock}
+                            onClick={() => {
+                              setSelectedVariantId(variant.id)
+                              setQuantity(1)
+                            }}
+                            className={`${isOutOfStock ? "text-decoration-line-through" : ""}`}
+                            style={{ opacity: isOutOfStock ? 0.5 : 1 }}
+                          >
+                            {variant.dung_tich} ml
+                          </Button>
+                        )
+                      })}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* Price */}
-              <div className="h2 text-danger fw-bold mb-4">{displayPrice}</div>
+                {/* Price */}
+                <div className="h2 text-danger fw-bold mb-4">{displayPrice}</div>
 
-              {/* Quantity Selection */}
-              <div className="mb-4">
-                <label className="form-label fw-semibold">Số lượng:</label>
-                <div className="d-flex align-items-center gap-2 justify-content-center">
-                  <Button
-                    variant="outline-secondary"
-                    size="sm"
-                    onClick={() => handleQuantityChange(-1)}
-                    disabled={quantity <= 1}
-                  >
-                    <Minus size={16} />
-                  </Button>
-                  <span className="px-3 py-2 border rounded text-center" style={{ minWidth: "60px" }}>
-                    {quantity}
-                  </span>
-                  <Button
-                    variant="outline-secondary"
-                    size="sm"
-                    onClick={() => handleQuantityChange(1)}
-                    disabled={quantity >= displayStock}
-                  >
-                    <Plus size={16} />
-                  </Button>
-                </div>
-                {displayStock <= 0 && <small className="text-danger">Chọn dung tích</small>}
-              </div>
-
-              {/* Action Buttons */}
-              <div className="d-grid gap-2">
-                <Button variant="primary" size="lg" onClick={handleAddToCart} disabled={displayStock <= 0}>
-                  <ShoppingCart className="me-2" size={20} />
-                  Thêm vào giỏ hàng
-                </Button>
-
-                <Row className="g-2">
-                  <Col>
-                    <Button variant="danger" className="w-100" onClick={handleAddToWishlist}>
-                      <Heart className="me-2" size={16} />
-                      Yêu thích
+                {/* Quantity Selection */}
+                <div className="mb-4">
+                  <label className="form-label fw-semibold">Số lượng:</label>
+                  <div className="d-flex align-items-center justify-content-center gap-2">
+                    <Button
+                      variant="outline-secondary"
+                      size="sm"
+                      onClick={() => handleQuantityChange(-1)}
+                      disabled={quantity <= 1}
+                    >
+                      <Minus size={16} />
                     </Button>
-                  </Col>
-                  {/* <Col>
-                    <Button variant="outline-primary" className="w-100">
-                      Mua ngay
+                    <span className="px-3 py-2 border rounded text-center" style={{ minWidth: "60px" }}>
+                      {quantity}
+                    </span>
+                    <Button
+                      variant="outline-secondary"
+                      size="sm"
+                      onClick={() => handleQuantityChange(1)}
+                      disabled={quantity >= displayStock}
+                    >
+                      <Plus size={16} />
                     </Button>
-                  </Col> */}
-                </Row>
-              </div>
-            </div>
+                  </div>
+                  {displayStock <= 0 && <small className="text-danger">Chọn dung tích</small>}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="d-grid gap-2">
+                  <Button variant="primary" size="lg" onClick={handleAddToCart} disabled={displayStock <= 0}>
+                    <ShoppingCart className="me-2" size={20} />
+                    Thêm vào giỏ hàng
+                  </Button>
+
+                  <Button variant="outline-danger" className="w-100" onClick={handleAddToWishlist}>
+                    <Heart className="me-2" size={16} />
+                    Yêu thích
+                  </Button>
+                </div>
+              </Card.Body>
+            </Card>
           </Col>
         </Row>
 
         {/* Product Details */}
-        <Card className="mb-4">
+        <Card className="mb-4 shadow-sm">
           <Card.Body>
             <Tabs defaultActiveKey="specifications" id="product-tabs" className="mb-3">
               <Tab eventKey="specifications" title="Thông Tin Sản Phẩm">
@@ -500,6 +516,142 @@ export default function DetailSanpham() {
             </Tabs>
           </Card.Body>
         </Card>
+
+        {/* Related Products */}
+        {relatedProducts.length > 0 && (
+          <Card className="shadow-sm">
+            <Card.Header>
+              <Card.Title className="d-flex align-items-center gap-2 text-primary mb-0">
+                <Award size={20} />
+                Sản phẩm cùng thương hiệu
+              </Card.Title>
+            </Card.Header>
+            <Card.Body>
+              {loadingRelated ? (
+                <div className="text-center py-5">
+                  <Spinner animation="border" />
+                  <p className="mt-2 text-muted">Đang tải sản phẩm liên quan...</p>
+                </div>
+              ) : (
+                <div className="position-relative">
+                  <div
+                    className="d-flex gap-3 overflow-auto pb-2"
+                    style={{
+                      scrollBehavior: "smooth",
+                      msOverflowStyle: "none",
+                      scrollbarWidth: "none",
+                      WebkitScrollbar: { display: "none" },
+                    }}
+                    id="related-products-scroll"
+                  >
+                    {relatedProducts.map((item) => (
+                      <div key={item.id} className="flex-shrink-0" style={{ width: "250px" }}>
+                        <Card
+                          className="h-100 shadow-sm border-0 hover-shadow"
+                          style={{
+                            cursor: "pointer",
+                            transition: "transform 0.2s, box-shadow 0.2s",
+                          }}
+                          onClick={() => {
+                            handleRelatedProductClick(item.id);
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = "translateY(-2px)"
+                            e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)"
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = "translateY(0)"
+                            e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.12)"
+                          }}
+                        >
+                          <div className="position-relative overflow-hidden">
+                            <img
+                              src={getImageUrl(item.hinh_anh) || "/placeholder.svg"}
+                              alt={item.ten_san_pham}
+                              className="card-img-top"
+                              style={{
+                                height: "180px",
+                                objectFit: "cover",
+                                transition: "transform 0.3s",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.target.style.transform = "scale(1.05)"
+                              }}
+                              onMouseLeave={(e) => {
+                                e.target.style.transform = "scale(1)"
+                              }}
+                            />
+                          </div>
+                          <Card.Body className="p-3">
+                            <h6
+                              className="card-title mb-2"
+                              style={{
+                                fontSize: "0.9rem",
+                                display: "-webkit-box",
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: "vertical",
+                                overflow: "hidden",
+                                lineHeight: "1.3",
+                                height: "2.6em",
+                              }}
+                            >
+                              {item.ten_san_pham}
+                            </h6>
+                            
+                            {item.thuong_hieu && <small className="text-muted d-block">{item.thuong_hieu}</small>}
+                          </Card.Body>
+                        </Card>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Scroll Buttons */}
+                  <Button
+                    variant="light"
+                    className="position-absolute top-50 start-0 translate-middle-y rounded-circle shadow-sm d-none d-md-block"
+                    style={{
+                      zIndex: 10,
+                      width: "40px",
+                      height: "40px",
+                      marginLeft: "-20px",
+                    }}
+                    onClick={() => {
+                      const container = document.getElementById("related-products-scroll")
+                      container.scrollBy({ left: -250, behavior: "smooth" })
+                    }}
+                  >
+                    <ChevronLeft size={20} />
+                  </Button>
+
+                  <Button
+                    variant="light"
+                    className="position-absolute top-50 end-0 translate-middle-y rounded-circle shadow-sm d-none d-md-block"
+                    style={{
+                      zIndex: 10,
+                      width: "40px",
+                      height: "40px",
+                      marginRight: "-20px",
+                    }}
+                    onClick={() => {
+                      const container = document.getElementById("related-products-scroll")
+                      container.scrollBy({ left: 250, behavior: "smooth" })
+                    }}
+                  >
+                    <ChevronRight size={20} />
+                  </Button>
+                </div>
+              )}
+
+              {relatedProducts.length === 0 && !loadingRelated && (
+                <Alert variant="info" className="text-center">
+                  <Award className="me-2" size={16} />
+                  Không có sản phẩm liên quan nào được tìm thấy.
+                </Alert>
+              )}
+            </Card.Body>
+          </Card>
+        )}
       </Container>
     </div>
   )
