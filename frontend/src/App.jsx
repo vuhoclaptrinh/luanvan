@@ -53,6 +53,9 @@ import Dannhmuchome from "./pages/userDanhmuc/Danhmuchome";
 import Thuonghieuhome from "./pages/userThuonghieu/ThuonghieuUser";
 import Wishlist from "./pages/userWishlist/Wishlist";
 import WishlistUser from "./pages/userWishlist/WishlistUser";
+import DetailSanpham from "./pages/DetaiSanpham/DetailSanpham";
+import DetailSanphamUser from "./pages/DetaiSanpham/DetailSanphamUser";
+
 
 
 
@@ -116,7 +119,8 @@ function App() {
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/profilehome" element={<ProfilePage />} />
               <Route path="/wishlist" element={<WishlistUser />} />
-              {/* <Route path="/sanpham/:id" element={<Chitietsanpham />} /> */}
+              <Route path="/sanpham/:id" element={<DetailSanphamUser />} />
+              {/* <Route path="/wishlist/:id" element={<Wishlist />} /> */}
 
 
             {/* Protected Routes */}

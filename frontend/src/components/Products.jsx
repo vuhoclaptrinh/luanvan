@@ -2,7 +2,9 @@ import { useState, useEffect } from "react"
 import axios from "axios"
 import { Card, Row, Col, Container, Modal, Button, Badge, Spinner } from "react-bootstrap"
 import { addToCart } from './../pages/userCart/Addcart';
-import { addtowwishlist } from "../pages/userWishlist/Addwishlist";
+import { addToWishlist } from "../pages/userWishlist/Addwishlist";
+import ProductDetailModal from "./ProductDetail";
+// import { addtowwishlist } from "../pages/userWishlist/Addwishlist";
 
 const getImageUrl = (path) => {
   if (!path) return "/placeholder.svg?height=300&width=300"
@@ -13,7 +15,7 @@ const getImageUrl = (path) => {
 const ProductList = () => {
   const [products, setProducts] = useState([])
   const [selectedProduct, setSelectedProduct] = useState(null)
-  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  //const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [visibleCount, setVisibleCount ] = useState(3) 
@@ -55,22 +57,22 @@ const ProductList = () => {
     setCurrentImageIndex(0)
   }
 
-  const handleCloseModal = () => {
-    setSelectedProduct(null)
-    setCurrentImageIndex(0)
-  }
+  // const handleCloseModal = () => {
+  //   setSelectedProduct(null)
+  //   setCurrentImageIndex(0)
+  // }
 
-  const handleNextImage = () => {
-    if (selectedProduct?.images?.length > 0) {
-      setCurrentImageIndex((currentImageIndex + 1) % selectedProduct.images.length)
-    }
-  }
+  // const handleNextImage = () => {
+  //   if (selectedProduct?.images?.length > 0) {
+  //     setCurrentImageIndex((currentImageIndex + 1) % selectedProduct.images.length)
+  //   }
+  // }
 
-  const handlePrevImage = () => {
-    if (selectedProduct?.images?.length > 0) {
-      setCurrentImageIndex(currentImageIndex === 0 ? selectedProduct.images.length - 1 : currentImageIndex - 1)
-    }
-  }
+  // const handlePrevImage = () => {
+  //   if (selectedProduct?.images?.length > 0) {
+  //     setCurrentImageIndex(currentImageIndex === 0 ? selectedProduct.images.length - 1 : currentImageIndex - 1)
+  //   }
+  // }
 
   // const handleShowMore = () => {
   //   setVisibleCount((prevCount) => Math.min(prevCount + 6, products.length))
@@ -191,168 +193,13 @@ const ProductList = () => {
         
 
         {/* Modal xem chi tiết sản phẩm */}
-        <Modal
-          show={selectedProduct !== null}
-          onHide={handleCloseModal}
-          size="lg"
-          centered
-          className="product-detail-modal"
-        >
-          <Modal.Header closeButton>
-            <Modal.Title className="fs-5">{selectedProduct?.ten_san_pham}</Modal.Title>
-          </Modal.Header>
-          <Modal.Body className="p-4">
-            <Row>
-              <Col md={6}>
-                <div className="position-relative mb-3">
-                  <img
-                    src={getImageUrl(selectedProduct?.images?.[currentImageIndex] || selectedProduct?.hinh_anh)}
-                    alt={selectedProduct?.ten_san_pham}
-                    className="img-fluid rounded"
-                    style={{ width: "100%", height: "350px", objectFit: "cover" }}
-                  />
-
-                  {selectedProduct?.images?.length > 1 && (
-                    <>
-                      <Button
-                        variant="light"
-                        size="sm"
-                        className="position-absolute top-50 start-0 translate-middle-y rounded-circle p-2 shadow-sm"
-                        onClick={handlePrevImage}
-                      >
-                        <i className="bi bi-chevron-left"></i>
-                      </Button>
-                      <Button
-                        variant="light"
-                        size="sm"
-                        className="position-absolute top-50 end-0 translate-middle-y rounded-circle p-2 shadow-sm"
-                        onClick={handleNextImage}
-                      >
-                        <i className="bi bi-chevron-right"></i>
-                      </Button>
-                      <div className="text-center mt-2 text-muted small">
-                        <i className="bi bi-info-circle me-1"></i>
-                        Ảnh {currentImageIndex + 1} / {selectedProduct.images.length}
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                {/* Thumbnail gallery */}
-                {selectedProduct?.images?.length > 1 && (
-                  <Row className="g-2 mt-2">
-                    {selectedProduct.images.map((img, index) => (
-                      <Col key={index} xs={3}>
-                        <img
-                          src={getImageUrl(img) || "/placeholder.svg"}
-                          alt={`Thumbnail ${index + 1}`}
-                          className={`img-thumbnail cursor-pointer ${index === currentImageIndex ? "border-primary" : ""}`}
-                          style={{
-                            height: "60px",
-                            objectFit: "cover",
-                            cursor: "pointer",
-                            opacity: index === currentImageIndex ? 1 : 0.6,
-                          }}
-                          onClick={() => setCurrentImageIndex(index)}
-                        />
-                      </Col>
-                    ))}
-                  </Row>
-                )}
-              </Col>
-
-              <Col md={6}>
-                <div className="mb-4">
-                  {selectedProduct?.thuong_hieu && (
-                    <div className="mb-2">
-                      <Badge bg="light" text="dark" className="me-2">
-                        {selectedProduct.thuong_hieu}
-                      </Badge>
-                      {selectedProduct?.danh_muc_ten && <Badge bg="primary">{selectedProduct.danh_muc_ten}</Badge>}
-                    </div>
-                  )}
-                  <h3 className="fs-4 mb-3">{selectedProduct?.ten_san_pham}</h3>
-                  <div className="fs-3 fw-bold text-primary mb-3">{selectedProduct?.gia_format}</div>
-                </div>
-
-                <div className="mb-4">
-                  <table className="table table-borderless">
-                    <tbody>
-                      {selectedProduct?.dung_tich && (
-                        <tr>
-                          <td className="text-muted ps-0" style={{ width: "40%" }}>
-                            Dung tích:
-                          </td>
-                          <td>{selectedProduct.dung_tich}</td>
-                        </tr>
-                      )}
-                      {selectedProduct?.so_luong_ton !== undefined && (
-                        <tr>
-                          <td className="text-muted ps-0">Tình trạng:</td>
-                          <td>
-                            {selectedProduct.so_luong_ton > 0 ? (
-                              <span className="text-success">
-                                <i className="bi bi-check-circle me-1"></i>
-                                Còn hàng ({selectedProduct.so_luong_ton})
-                              </span>
-                            ) : (
-                              <span className="text-danger">
-                                <i className="bi bi-x-circle me-1"></i>
-                                Hết hàng
-                              </span>
-                            )}
-                          </td>
-                        </tr>
-                      )}
-                      {selectedProduct?.danh_muc_ten && (
-                        <tr>
-                          <td className="text-muted ps-0">Danh mục:</td>
-                          <td>{selectedProduct.danh_muc_ten}</td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-
-                {selectedProduct?.mo_ta && (
-                  <div className="mb-4">
-                    <h5 className="fs-6 fw-bold mb-2">Mô tả sản phẩm:</h5>
-                    <p className="text-muted">{selectedProduct.mo_ta}</p>
-                  </div>
-                )}
-
-                <div className="d-grid gap-2">
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    style={{
-                      background: "linear-gradient(to right, #e83e8c, #6f42c1)",
-                      borderColor: "transparent",
-                    }}
-                     onClick={(e) => {
-                    e.stopPropagation()
-                    // Thêm vào giỏ hàng logic ở đây
-                    addToCart(selectedProduct)
-
-                    // alert(`Đã thêm ${selectedProduct.ten_san_pham} vào giỏ hàng!`)
-                  }}
-                  >
-                    
-                    <i className="bi bi-cart-plus me-2"></i>
-                    Thêm vào giỏ hàng
-                  </Button>
-                  <Button variant="outline-secondary" onClick={(e) => {
-                    e.stopPropagation()
-                    addtowwishlist(selectedProduct)
-                  }}>
-                    <i className="bi bi-heart me-2"></i>
-                    Thêm vào yêu thích
-                  </Button>
-                </div>
-              </Col>
-            </Row>
-          </Modal.Body>
-        </Modal>
+       <ProductDetailModal
+            product={selectedProduct}
+            show={selectedProduct !== null}
+            onHide={() => setSelectedProduct(null)}
+            addToCart={addToCart}
+            addToWishlist={addToWishlist}
+          />
       </Container>
     </section>
   )

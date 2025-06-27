@@ -10,7 +10,8 @@ import FilterSidebar from "../userSanpham/FilterSidebar"
 import "./styles.css"
 import { addToCart } from "../userCart/addcart"
 import { useParams } from "react-router-dom"
-import { addtowwishlist } from "../userWishlist/Addwishlist"
+//import { addtowwishlist } from "../userWishlist/Addwishlist"
+import { addToWishlist } from "../userWishlist/Addwishlist"
 import ProductDetailModal from "../../components/ProductDetail"
 
 const getImageUrl = (path) => {
@@ -45,93 +46,76 @@ const ViewDM = () => {
   const [inStockOnly, setInStockOnly] = useState(false)
 
   useEffect(() => {
-    const fetchCategoryAndProducts = async () => {
-      setLoading(true)
-      try {
-        console.log(`Fetching category ${id}...`)
+  const fetchCategoryAndProducts = async () => {
+    setLoading(true);
 
-        // Step 1: Fetch category info and basic product list
-        const categoryResponse = await axios.get(`http://127.0.0.1:8000/api/danhmuc/${id}`)
-        console.log("Category API Response:", categoryResponse.data)
+    try {
+      // B1: Lấy thông tin danh mục và danh sách sản phẩm cơ bản
+      const categoryResponse = await axios.get(`http://127.0.0.1:8000/api/danhmuc/${id}`);
+      const categoryData = categoryResponse.data;
+      const basicProducts = categoryData.sanphams || [];
 
-        const categoryData = categoryResponse.data
-        const basicProducts = categoryData.sanphams || []
+      setCategoryInfo({
+        id: categoryData.id,
+        ten_danh_muc: categoryData.ten_danh_muc,
+        mo_ta: categoryData.mo_ta,
+        created_at: categoryData.created_at,
+        updated_at: categoryData.updated_at,
+      });
 
-        // Set category info
-        setCategoryInfo({
-          id: categoryData.id,
-          ten_danh_muc: categoryData.ten_danh_muc,
-          mo_ta: categoryData.mo_ta,
-          created_at: categoryData.created_at,
-          updated_at: categoryData.updated_at,
-        })
-
-        if (basicProducts.length === 0) {
-          setProducts([])
-          setFilteredProducts([])
-          setLoading(false)
-          return
-        }
-
-        // Step 2: Fetch detailed product information
-        console.log(`Fetching detailed info for ${basicProducts.length} products...`)
-        const productIds = basicProducts.map((p) => p.id)
-
-        // Fetch all products and filter by IDs (more efficient than individual calls)
-        const allProductsResponse = await axios.get("http://127.0.0.1:8000/api/sanpham")
-        const allProducts = allProductsResponse.data.data || []
-
-        // Filter products that belong to this category
-        const detailedProducts = allProducts.filter((product) => productIds.includes(product.id))
-
-        console.log(`Found ${detailedProducts.length} detailed products`)
-        console.log("Sample product:", detailedProducts[0])
-
-        setProducts(detailedProducts)
-        setFilteredProducts(detailedProducts)
-
-        // Extract unique categories and brands from detailed products
-        const uniqueCategories = [...new Set(detailedProducts.map((p) => p.danh_muc_ten).filter(Boolean))]
-        const uniqueBrands = [...new Set(detailedProducts.map((p) => p.thuong_hieu).filter(Boolean))]
-
-        // Find max price
-        const prices = detailedProducts
-          .map((p) => {
-            const price = Number.parseFloat(p.gia_format?.replace(/[^\d]/g, "")) || 0
-            return price
-          })
-          .filter((price) => price > 0)
-
-        const highestPrice = prices.length > 0 ? Math.max(...prices) : 10000000
-
-        setMaxPrice(highestPrice)
-        setPriceRange([0, highestPrice])
-        setCategories(uniqueCategories)
-        setBrands(uniqueBrands)
-
-        console.log(`Setup complete:`)
-        console.log(`- Products: ${detailedProducts.length}`)
-        console.log(`- Categories: ${uniqueCategories.length}`)
-        console.log(`- Brands: ${uniqueBrands.length}`)
-        console.log(`- Max Price: ${highestPrice.toLocaleString("vi-VN")}`)
-      } catch (err) {
-        console.error("Error fetching data:", err)
-        if (err.response?.status === 404) {
-          setError("Không tìm thấy danh mục này.")
-        } else if (err.response?.data?.messsage) {
-          setError(err.response.data.messsage)
-        } else {
-          setError("Không thể tải dữ liệu danh mục.")
-        }
-      } finally {
-        setLoading(false)
+      if (basicProducts.length === 0) {
+        setProducts([]);
+        setFilteredProducts([]);
+        return;
       }
-    }
 
-    if (id) {
-      fetchCategoryAndProducts()
+      // B2: Lấy thông tin chi tiết tất cả sản phẩm
+      const productIds = basicProducts.map((p) => p.id);
+      const allProductsResponse = await axios.get("http://127.0.0.1:8000/api/sanpham");
+      const allProducts = allProductsResponse.data.data || [];
+
+      const detailedProducts = allProducts.filter((product) => productIds.includes(product.id));
+
+      setProducts(detailedProducts);
+      setFilteredProducts(detailedProducts);
+
+      // B3: Xử lý lọc danh mục, thương hiệu, giá
+      const uniqueCategories = [...new Set(detailedProducts.map((p) => p.danh_muc_ten).filter(Boolean))];
+      const uniqueBrands = [...new Set(detailedProducts.map((p) => p.thuong_hieu).filter(Boolean))];
+
+      const prices = detailedProducts
+        .map((p) => {
+          const price = Number.parseFloat(p.gia_format?.replace(/[^\d]/g, "")) || 0;
+          return price;
+        })
+        .filter((price) => price > 0);
+
+      const highestPrice = prices.length > 0 ? Math.max(...prices) : 10000000;
+
+      setMaxPrice(highestPrice);
+      setPriceRange([0, highestPrice]);
+      setCategories(uniqueCategories);
+      setBrands(uniqueBrands);
+    } catch (err) {
+      console.error("Lỗi tải dữ liệu:", err);
+      if (err.response?.status === 404) {
+        setError("Không tìm thấy danh mục này.");
+      } else if (err.response?.data?.messsage) {
+        setError(err.response.data.messsage);
+      } else {
+        setError("Không thể tải dữ liệu danh mục.");
+      }
+    } finally {
+      setLoading(false);
     }
-  }, [id])
+  };
+
+  if (id) {
+    fetchCategoryAndProducts();
+  }
+}, [id]);
+
+ 
 
   // Apply filters
   useEffect(() => {
@@ -163,28 +147,44 @@ const ViewDM = () => {
       const price = Number.parseFloat(p.gia_format?.replace(/[^\d]/g, "")) || 0
       return price >= priceRange[0] && price <= priceRange[1]
     })
+    const getMinPrice = (product) => {
+      if (Array.isArray(product.variants) && product.variants.length > 0) {
+        const prices = product.variants
+          .map((v) => Number(v.gia))
+          .filter((gia) => !isNaN(gia));
+        return prices.length > 0 ? Math.min(...prices) : 0;
+      }
+
+      return Number.parseFloat(product.gia_format?.replace(/[^\d]/g, "")) || 0;
+    };
 
     // Filter by stock
-    if (inStockOnly) {
-      result = result.filter((p) => p.so_luong_ton > 0)
+      if (inStockOnly) {
+    result = result.filter((p) => {
+      if (Array.isArray(p.variants) && p.variants.length > 0) {
+        // Nếu có biến thể, chỉ giữ sản phẩm có ít nhất 1 biến thể còn hàng
+        return p.variants.some(v => Number(v.so_luong_ton) > 0);
+      }
+      // Nếu không có biến thể, dùng so_luong_ton gốc
+      return Number(p.so_luong_ton) > 0;
+    });
     }
-
     // Apply sorting
     switch (sortOption) {
       case "price-asc":
         result.sort((a, b) => {
-          const priceA = Number.parseFloat(a.gia_format?.replace(/[^\d]/g, "")) || 0
-          const priceB = Number.parseFloat(b.gia_format?.replace(/[^\d]/g, "")) || 0
-          return priceA - priceB
-        })
-        break
+          const priceA = getMinPrice(a);
+          const priceB = getMinPrice(b);
+          return priceA - priceB;
+        });
+        break;
       case "price-desc":
         result.sort((a, b) => {
-          const priceA = Number.parseFloat(a.gia_format?.replace(/[^\d]/g, "")) || 0
-          const priceB = Number.parseFloat(b.gia_format?.replace(/[^\d]/g, "")) || 0
-          return priceB - priceA
-        })
-        break
+          const priceA = getMinPrice(a);
+          const priceB = getMinPrice(b);
+          return priceB - priceA;
+        });
+        break;
       case "name-asc":
         result.sort((a, b) => (a.ten_san_pham || "").localeCompare(b.ten_san_pham || ""))
         break
@@ -315,9 +315,17 @@ const ViewDM = () => {
                   {products.length} sản phẩm
                 </Badge>
                 <Badge bg="success" className="fs-6 px-3 py-2">
-                  <i className="bi bi-check-circle me-1"></i>
-                  {products.filter((p) => p.so_luong_ton > 0).length} còn hàng
-                </Badge>
+                <i className="bi bi-check-circle me-1"></i>
+                {
+                  products.filter((p) => {
+                    if (Array.isArray(p.variants) && p.variants.length > 0) {
+                      return p.variants.some(v => Number(v.so_luong_ton) > 0)
+                    }
+                    return Number(p.so_luong_ton) > 0
+                  }).length
+                }{" "}
+                còn hàng
+              </Badge>
               </div>
             </div>
             {/* Decorative elements */}
@@ -466,7 +474,7 @@ const ViewDM = () => {
             show={selectedProduct !== null}
             onHide={() => setSelectedProduct(null)}
             addToCart={addToCart}
-            addToWishlist={addtowwishlist}/>
+            addToWishlist={addToWishlist}/>
         </Container>
       </section>
     </>

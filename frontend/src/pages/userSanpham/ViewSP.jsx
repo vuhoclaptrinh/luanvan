@@ -8,7 +8,8 @@ import ProductGrid from "./ProductGrid"
 import FilterSidebar from "./FilterSidebar"
 import "./styles.css"
 import { addToCart } from "../userCart/addcart"
-import { addtowwishlist } from "../userWishlist/Addwishlist"
+// import { addtowwishlist } from "../userWishlist/Addwishlist"
+import { addToWishlist } from "../userWishlist/Addwishlist"
 import ProductDetailModal from "../../components/ProductDetail"
 
 const getImageUrl = (path) => {
@@ -42,40 +43,41 @@ const ViewSP = () => {
 
  
   useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true)
-      try {
-        const response = await axios.get("http://127.0.0.1:8000/api/sanpham")
-        const productsData = response.data.data || []
-        setProducts(productsData)
-        setFilteredProducts(productsData)
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      const { data } = await axios.get("http://127.0.0.1:8000/api/sanpham");
+      const productsData = data?.data || [];
 
-        // Extract unique categories and brands
-        const uniqueCategories = [...new Set(productsData.map((p) => p.danh_muc_ten).filter(Boolean))]
-        const uniqueBrands = [...new Set(productsData.map((p) => p.thuong_hieu).filter(Boolean))]
+      setProducts(productsData);
+      setFilteredProducts(productsData);
 
-        // Find max price
-        const highestPrice = Math.max(
-          ...productsData.map((p) => {
-            const price = Number.parseFloat(p.gia_format?.replace(/[^\d]/g, "")) || 0
-            return price
-          }),
-        )
+      // Lọc danh mục và thương hiệu duy nhất
+      const uniqueCategories = [...new Set(productsData.map(p => p.danh_muc_ten).filter(Boolean))];
+      const uniqueBrands = [...new Set(productsData.map(p => p.thuong_hieu).filter(Boolean))];
 
-        setMaxPrice(highestPrice || 10000000)
-        setPriceRange([0, highestPrice || 10000000])
-        setCategories(uniqueCategories)
-        setBrands(uniqueBrands)
-      } catch (err) {
-        console.error("Error fetching products:", err)
-        setError("Không thể tải dữ liệu sản phẩm.")
-      } finally {
-        setLoading(false)
-      }
+      // Tính giá cao nhất (fallback nếu không có giá nào)
+      const prices = productsData
+        .map(p => Number.parseFloat(p.gia_format?.replace(/[^\d]/g, "")) || 0)
+        .filter(p => p > 0);
+
+      const highestPrice = prices.length > 0 ? Math.max(...prices) : 30000000;
+
+      setMaxPrice(highestPrice);
+      setPriceRange([0, highestPrice]);
+      setCategories(uniqueCategories);
+      setBrands(uniqueBrands);
+    } catch (err) {
+      console.error("Lỗi khi tải sản phẩm:", err);
+      setError("Không thể tải dữ liệu sản phẩm.");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    fetchProducts()
-  }, [])
+  fetchProducts();
+}, []);
+
 
   // Apply filters
   useEffect(() => {
@@ -103,32 +105,59 @@ const ViewSP = () => {
     }
 
     // Filter by price range
-    result = result.filter((p) => {
-      const price = Number.parseFloat(p.gia_format?.replace(/[^\d]/g, "")) || 0
-      return price >= priceRange[0] && price <= priceRange[1]
-    })
+   result = result.filter((p) => {
+  // Nếu có biến thể, duyệt từng variant để lấy giá
+    if (Array.isArray(p.variants) && p.variants.length > 0) {
+      return p.variants.some((v) => {
+        const gia = Number(v.gia) || 0;
+        return gia >= priceRange[0] && gia <= priceRange[1];
+      });
+    }
 
+    // Nếu không có biến thể, dùng giá gốc
+    const gia = Number.parseFloat(p.gia_format?.replace(/[^\d]/g, "")) || 0;
+    return gia >= priceRange[0] && gia <= priceRange[1];
+    });
+
+    const getMinPrice = (product) => {
+      if (Array.isArray(product.variants) && product.variants.length > 0) {
+        const prices = product.variants
+          .map((v) => Number(v.gia))
+          .filter((gia) => !isNaN(gia));
+        return prices.length > 0 ? Math.min(...prices) : 0;
+      }
+
+      return Number.parseFloat(product.gia_format?.replace(/[^\d]/g, "")) || 0;
+    };
     // Filter by stock
     if (inStockOnly) {
-      result = result.filter((p) => p.so_luong_ton > 0)
+    result = result.filter((p) => {
+      if (Array.isArray(p.variants) && p.variants.length > 0) {
+        // Nếu có biến thể, chỉ giữ sản phẩm có ít nhất 1 biến thể còn hàng
+        return p.variants.some(v => Number(v.so_luong_ton) > 0);
+      }
+      // Nếu không có biến thể, dùng so_luong_ton gốc
+      return Number(p.so_luong_ton) > 0;
+    });
     }
 
     // Apply sorting
     switch (sortOption) {
-      case "price-asc":
-        result.sort((a, b) => {
-          const priceA = Number.parseFloat(a.gia_format?.replace(/[^\d]/g, "")) || 0
-          const priceB = Number.parseFloat(b.gia_format?.replace(/[^\d]/g, "")) || 0
-          return priceA - priceB
-        })
-        break
-      case "price-desc":
-        result.sort((a, b) => {
-          const priceA = Number.parseFloat(a.gia_format?.replace(/[^\d]/g, "")) || 0
-          const priceB = Number.parseFloat(b.gia_format?.replace(/[^\d]/g, "")) || 0
-          return priceB - priceA
-        })
-        break
+     case "price-asc":
+      result.sort((a, b) => {
+        const priceA = getMinPrice(a);
+        const priceB = getMinPrice(b);
+        return priceA - priceB;
+      });
+      break;
+
+    case "price-desc":
+      result.sort((a, b) => {
+        const priceA = getMinPrice(a);
+        const priceB = getMinPrice(b);
+        return priceB - priceA;
+      });
+      break;
       case "name-asc":
         result.sort((a, b) => (a.ten_san_pham || "").localeCompare(b.ten_san_pham || ""))
         break
@@ -299,7 +328,7 @@ const ViewSP = () => {
             show={selectedProduct !== null}
             onHide={() => setSelectedProduct(null)}
             addToCart={addToCart}
-            addToWishlist={addtowwishlist}
+            addToWishlist={addToWishlist}
           />
       </Container>
     </section>

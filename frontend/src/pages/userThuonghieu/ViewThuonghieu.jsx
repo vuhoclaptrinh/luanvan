@@ -12,7 +12,8 @@ import ProductGrid from "../userSanpham/ProductGrid"
 import FilterSidebar from "../userSanpham/FilterSidebar"
 import { addToCart } from "../userCart/addcart"
 import "./styles.css"
-import { addtowwishlist } from "../userWishlist/Addwishlist"
+//import { addtowwishlist } from "../userWishlist/Addwishlist"
+import { addToWishlist } from "../userWishlist/Addwishlist"
 import ProductDetailModal from "../../components/ProductDetail"
 //hook
 import Chitiietspdg from "../../hook/Chitietspdg"
@@ -51,76 +52,63 @@ const ViewBrand = () => {
   const [inStockOnly, setInStockOnly] = useState(false)
 
   useEffect(() => {
-    const fetchBrandProducts = async () => {
-      setLoading(true)
-      try {
-        console.log(`Fetching products for brand: ${decodedBrand}`)
+  const fetchBrandProducts = async () => {
+    setLoading(true);
+    try {
+      // B1: Gọi API tất cả sản phẩm
+      const response = await axios.get("http://127.0.0.1:8000/api/sanpham");
+      const allProducts = response.data.data || [];
 
-        // Fetch tất cả sản phẩm từ API
-        const response = await axios.get("http://127.0.0.1:8000/api/sanpham")
-        console.log("All products response:", response.data)
+      // B2: Lọc theo thương hiệu
+      const brandProducts = allProducts.filter(
+        (product) =>
+          product.thuong_hieu?.toLowerCase() === decodedBrand.toLowerCase()
+      );
 
-        const allProducts = response.data.data || []
-
-        // Filter sản phẩm theo thương hiệu
-        const brandProducts = allProducts.filter(
-          (product) => product.thuong_hieu?.toLowerCase() === decodedBrand.toLowerCase(),
-        )
-
-        console.log(`Found ${brandProducts.length} products for brand: ${decodedBrand}`)
-
-        if (brandProducts.length === 0) {
-          setProducts([])
-          setFilteredProducts([]) 
-          setLoading(false)
-          return
-        }
-
-        // Set brand info từ sản phẩm đầu tiên
-        setBrandInfo({
-          ten_thuong_hieu: decodedBrand,
-          so_luong_san_pham: brandProducts.length,
-          mo_ta: `Khám phá bộ sưu tập nước hoa ${decodedBrand} chính hãng với ${brandProducts.length} sản phẩm đa dạng.`,
-        })
-
-        setProducts(brandProducts)
-        setFilteredProducts(brandProducts)
-
-        // Extract unique categories và brands từ sản phẩm của thương hiệu
-        const uniqueCategories = [...new Set(brandProducts.map((p) => p.danh_muc_ten).filter(Boolean))]
-        const uniqueBrands = [...new Set(brandProducts.map((p) => p.thuong_hieu).filter(Boolean))]
-
-        // Find max price
-        const prices = brandProducts
-          .map((p) => {
-            const price = Number.parseFloat(p.gia_format?.replace(/[^\d]/g, "")) || 0
-            return price
-          })
-          .filter((price) => price > 0)
-
-        const highestPrice = prices.length > 0 ? Math.max(...prices) : 10000000
-
-        setMaxPrice(highestPrice)
-        setPriceRange([0, highestPrice])
-        setCategories(uniqueCategories)
-        setBrands(uniqueBrands)
-
-        console.log(`Setup complete:`)
-        console.log(`- Products: ${brandProducts.length}`)
-        console.log(`- Categories: ${uniqueCategories.length}`)
-        console.log(`- Max Price: ${highestPrice.toLocaleString("vi-VN")}`)
-      } catch (err) {
-        console.error("Error fetching brand products:", err)
-        setError("Không thể tải dữ liệu sản phẩm.")
-      } finally {
-        setLoading(false)
+      if (brandProducts.length === 0) {
+        setProducts([]);
+        setFilteredProducts([]);
+        return;
       }
-    }
 
-    if (decodedBrand) {
-      fetchBrandProducts()
+      // B3: Gán thông tin thương hiệu (sử dụng sản phẩm đầu tiên)
+      setBrandInfo({
+        ten_thuong_hieu: decodedBrand,
+        so_luong_san_pham: brandProducts.length,
+        mo_ta: `Khám phá bộ sưu tập nước hoa ${decodedBrand} chính hãng với ${brandProducts.length} sản phẩm đa dạng.`,
+      });
+
+      setProducts(brandProducts);
+      setFilteredProducts(brandProducts);
+
+      // B4: Lọc danh mục & thương hiệu (từ danh sách sản phẩm của thương hiệu)
+      const uniqueCategories = [...new Set(brandProducts.map((p) => p.danh_muc_ten).filter(Boolean))];
+      const uniqueBrands = [...new Set(brandProducts.map((p) => p.thuong_hieu).filter(Boolean))];
+
+      // B5: Tính giá cao nhất
+      const prices = brandProducts
+        .map((p) => Number.parseFloat(p.gia_format?.replace(/[^\d]/g, "")) || 0)
+        .filter((price) => price > 0);
+
+      const highestPrice = prices.length > 0 ? Math.max(...prices) : 30000000;
+
+      setMaxPrice(highestPrice);
+      setPriceRange([0, highestPrice]);
+      setCategories(uniqueCategories);
+      setBrands(uniqueBrands);
+    } catch (err) {
+      console.error("Lỗi khi tải sản phẩm theo thương hiệu:", err);
+      setError("Không thể tải dữ liệu sản phẩm.");
+    } finally {
+      setLoading(false);
     }
-  }, [decodedBrand])
+  };
+
+  if (decodedBrand) {
+    fetchBrandProducts();
+  }
+}, [decodedBrand]);
+
 
   // Apply filters - tương tự ViewDM
   useEffect(() => {
@@ -152,28 +140,42 @@ const ViewBrand = () => {
       const price = Number.parseFloat(p.gia_format?.replace(/[^\d]/g, "")) || 0
       return price >= priceRange[0] && price <= priceRange[1]
     })
+    const getMinPrice = (product) => {
+      if (Array.isArray(product.variants) && product.variants.length > 0) {
+        const prices = product.variants
+          .map((v) => Number(v.gia))
+          .filter((gia) => !isNaN(gia));
+        return prices.length > 0 ? Math.min(...prices) : 0;
+      }
 
-    // Filter by stock
-    if (inStockOnly) {
-      result = result.filter((p) => p.so_luong_ton > 0)
+      return Number.parseFloat(product.gia_format?.replace(/[^\d]/g, "")) || 0;
+    };
+   // Filter by stock
+      if (inStockOnly) {
+      result = result.filter((p) => {
+        if (Array.isArray(p.variants) && p.variants.length > 0) {
+          return p.variants.some(v => Number(v.so_luong_ton) > 0);
+        }
+        return Number(p.so_luong_ton) > 0;
+      });
     }
 
     // Apply sorting
     switch (sortOption) {
-      case "price-asc":
+       case "price-asc":
         result.sort((a, b) => {
-          const priceA = Number.parseFloat(a.gia_format?.replace(/[^\d]/g, "")) || 0
-          const priceB = Number.parseFloat(b.gia_format?.replace(/[^\d]/g, "")) || 0
-          return priceA - priceB
-        })
-        break
+          const priceA = getMinPrice(a);
+          const priceB = getMinPrice(b);
+          return priceA - priceB;
+        });
+        break;
       case "price-desc":
         result.sort((a, b) => {
-          const priceA = Number.parseFloat(a.gia_format?.replace(/[^\d]/g, "")) || 0
-          const priceB = Number.parseFloat(b.gia_format?.replace(/[^\d]/g, "")) || 0
-          return priceB - priceA
-        })
-        break
+          const priceA = getMinPrice(a);
+          const priceB = getMinPrice(b);
+          return priceB - priceA;
+        });
+        break;
       case "name-asc":
         result.sort((a, b) => (a.ten_san_pham || "").localeCompare(b.ten_san_pham || ""))
         break
@@ -314,9 +316,17 @@ const ViewBrand = () => {
                   {products.length} sản phẩm
                 </Badge>
                 <Badge bg="success" className="fs-6 px-3 py-2">
-                  <i className="bi bi-check-circle me-1"></i>
-                  {products.filter((p) => p.so_luong_ton > 0).length} còn hàng
-                </Badge>
+                <i className="bi bi-check-circle me-1"></i>
+                {
+                  products.filter((p) => {
+                    if (Array.isArray(p.variants) && p.variants.length > 0) {
+                      return p.variants.some(v => Number(v.so_luong_ton) > 0)
+                    }
+                    return Number(p.so_luong_ton) > 0
+                  }).length
+                }{" "}
+                còn hàng
+              </Badge>
                 {categories.length > 0 && (
                   <Badge bg="info" className="fs-6 px-3 py-2">
                     <i className="bi bi-tags me-1"></i>
@@ -471,7 +481,7 @@ const ViewBrand = () => {
             show={selectedProduct !== null}
             onHide={() => setSelectedProduct(null)}
             addToCart={addToCart}
-            addToWishlist={addtowwishlist}
+            addToWishlist={addToWishlist}
           />
          
         </Container>

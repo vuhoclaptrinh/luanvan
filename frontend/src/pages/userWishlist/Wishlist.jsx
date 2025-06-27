@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Container, Row, Col } from "react-bootstrap"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, Navigate, useNavigate } from "react-router-dom"
 import {
   ArrowLeft,
   Trash2,
@@ -12,28 +12,38 @@ import {
   ShoppingBag,
 } from "lucide-react"
 import { Modal, Badge, Button } from "react-bootstrap"
-import { addToCart } from "../userCart/addcart" // Cập nhật đường dẫn nếu cần
+
 
 import "./wishlist.css"
 
 const Wishlist = () => {
+
   const [wishlist, setWishlist] = useState([])
   const [loading, setLoading] = useState(true)
-//   const navigate = useNavigate()
+  const navigate = useNavigate()
   const [selectedProduct, setSelectedProduct] = useState(null)
+   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
 
   const handleCloseModal = () => setSelectedProduct(null)
   // Hàm xử lý ảnh
   const getImageUrl = (path) => {
-    if (!path) return "/placeholder.svg?height=100&width=100"
-    if (path.startsWith("http")) return path
-    return `http://127.0.0.1:8000/storage/images/${path.replace(/^images\//, "")}`
+  if (!path) return "/placeholder.svg?height=100&width=100"
+
+  // Nếu là object có image_path (phòng trường hợp khác)
+  if (typeof path === "object" && path.image_path) {
+    path = path.image_path
   }
+
+  if (typeof path === "string" && path.startsWith("http")) return path
+
+    return `http://127.0.0.1:8000/storage/images/${path.replace(/^images\//, "")}`
+}
 
   // Lấy wishlist từ session
   const getWishlist = () => {
     return JSON.parse(sessionStorage.getItem("wishlist")) || []
+    
   }
 
   // Xoá 1 sản phẩm
@@ -140,13 +150,7 @@ const Wishlist = () => {
                             <Button size="sm" variant="info" onClick={() => setSelectedProduct(product)}>
                                 Xem chi tiết
                             </Button>
-                            <Button
-                                size="sm"
-                                variant="primary"
-                                onClick={() => addToCart(product)}
-                            >
-                                Thêm vào giỏ
-                            </Button>
+                           
                         </div>
                         <button className="remove-item" onClick={() => removeFromWishlist(product.id)}>
                             <X size={18} />
@@ -170,17 +174,81 @@ const Wishlist = () => {
         {selectedProduct && (
         <Modal show onHide={handleCloseModal} centered size="lg">
             <Modal.Header closeButton>
-            <Modal.Title>Chi tiết sản phẩm</Modal.Title>
+            <Modal.Title className="fs-5 text-primary">
+              <i className="bi bi-eye me-2"></i>
+              Chi tiết sản phẩm
+            </Modal.Title>
             </Modal.Header>
-            <Modal.Body>
+            <Modal.Body className="p-4">
+              {console.log("Ảnh phụ:", selectedProduct.images)}
             <Row>
-                <Col md={6}>
-                <img
-                    src={getImageUrl(selectedProduct.hinh_anh)}
-                    alt={selectedProduct.ten_san_pham}
-                    className="img-fluid rounded"
-                    style={{ height: "300px", objectFit: "cover", width: "100%" }}
-                />
+                 <Col md={6}>
+                  <div className="position-relative mb-3">
+                    <img
+                      src={getImageUrl(selectedProduct.images?.[currentImageIndex] || selectedProduct.hinh_anh)}
+                      alt={selectedProduct.ten_san_pham}
+                      className="img-fluid rounded"
+                      style={{ width: "100%", height: "350px", objectFit: "cover" }}
+                    />
+                    {selectedProduct.images?.length > 1 && (
+                      <>
+                        <Button
+                          variant="light"
+                          size="sm"
+                          className="position-absolute top-50 start-0 translate-middle-y rounded-circle p-2 shadow-sm"
+                          onClick={() =>
+                            setCurrentImageIndex(
+                              currentImageIndex === 0
+                                ? selectedProduct.images.length - 1
+                                : currentImageIndex - 1
+                            )
+                          }
+                        >
+                          <i className="bi bi-chevron-left"></i>
+                        </Button>
+                        <Button
+                          variant="light"
+                          size="sm"
+                          className="position-absolute top-50 end-0 translate-middle-y rounded-circle p-2 shadow-sm"
+                          onClick={() =>
+                            setCurrentImageIndex((currentImageIndex + 1) % selectedProduct.images.length)
+                          }
+                        >
+                          <i className="bi bi-chevron-right"></i>
+                        </Button>
+                        <div className="text-center mt-2 text-muted small">
+                          <i className="bi bi-info-circle me-1"></i>
+                          Ảnh {currentImageIndex + 1} / {selectedProduct.images.length}
+                        </div>
+                      </>
+                      
+                    )}
+                  </div>
+  
+                  {selectedProduct.images?.length > 1 && (
+                  <Row className="g-2 mt-2">
+                    {selectedProduct.images.map((img, index) => (
+                      <Col key={index} xs={3}>
+                        <img
+                          src={getImageUrl(img)}
+                          alt={`Thumbnail ${index + 1}`}
+                          className={`img-thumbnail cursor-pointer ${
+                            index === currentImageIndex ? "border-primary border-2" : ""
+                          }`}
+                          style={{
+                            height: "60px",
+                            objectFit: "cover",
+                            cursor: "pointer",
+                            opacity: index === currentImageIndex ? 1 : 0.6,
+                          }}
+                          onClick={() => setCurrentImageIndex(index)}
+                        />
+                      </Col>
+                    ))}
+                  </Row>
+                  
+
+                  )}
                 </Col>
                 <Col md={6}>
                 <h4>{selectedProduct.ten_san_pham}</h4>
@@ -193,7 +261,7 @@ const Wishlist = () => {
                 <p><strong>Năm phát hành:</strong> {selectedProduct.nam_phat_hanh}</p>
                 <p><strong>Độ lưu hương:</strong> {selectedProduct.do_luu_huong}</p>
                 <p><strong>Độ toả hương:</strong> {selectedProduct.do_toa_huong}</p>
-                <p>
+                {/* <p>
                     <strong>Tình trạng:</strong>{" "}
                     <td>
                           {(() => {
@@ -217,17 +285,17 @@ const Wishlist = () => {
                           })()}
                         </td>
                    
-                </p>
+                </p> */}
                 <div className="d-grid gap-2 mt-3">
-                    <Button
+                  <Button
                     variant="primary"
                     onClick={() => {
-                        addToCart(selectedProduct)
-                        handleCloseModal()
+                       handleCloseModal() 
+                      navigate(`/sanpham/${selectedProduct.id}`)
                     }}
-                    >
-                    <i className="bi bi-cart-plus me-1"></i> Thêm vào giỏ hàng
-                    </Button>
+                  >
+                    <i className="bi bi-box-arrow-up-right me-1"></i> Trang chi tiết sản phẩm
+                  </Button>
                 </div>
                 </Col>
             </Row>

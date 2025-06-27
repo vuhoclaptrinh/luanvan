@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Modal, Button, Col, Row, Badge, Spinner } from "react-bootstrap";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const getImageUrl = (path) => {
   if (!path) return "/placeholder.svg?height=300&width=300";
@@ -11,8 +12,8 @@ const getImageUrl = (path) => {
 
 const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist }) => {
   // Đảm bảo không có bất kỳ hook hoặc logic nào phía trên dòng này
-  if (!product) return null;
 
+  const navigate = useNavigate();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showReviewPanel, setShowReviewPanel] = useState(false);
   const [reviews, setReviews] = useState([]);
@@ -20,6 +21,11 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
   const [selectedVariantId, setSelectedVariantId] = useState(null);
   const [quantity, setQuantity] = useState(1);
 
+  const handleViewDetail = () => {
+  if (product?.id) {
+    navigate(`/sanpham/${product.id}`);
+  }
+  };
   useEffect(() => {
     if (product && show) {
       setCurrentImageIndex(0);
@@ -46,7 +52,7 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
       fetchReviews();
     }
   }, [showReviewPanel, product?.id]);
-
+  if (!product) return null;
   // Lấy biến thể đã chọn
   const selectedVariant = Array.isArray(product.variants) && product.variants.length > 0
     ? product.variants.find(v => v.id === selectedVariantId)
@@ -74,7 +80,7 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
                     src={getImageUrl(product.images?.[currentImageIndex] || product.hinh_anh)}
                     alt={product.ten_san_pham}
                     className="img-fluid rounded"
-                    style={{ width: "100%", height: "350px", objectFit: "cover" }}
+                    style={{ width: "100%", height: "350px", objectFit: "contain" }}
                   />
                   {product.images?.length > 1 && (
                     <>
@@ -122,7 +128,7 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
                           }`}
                           style={{
                             height: "60px",
-                            objectFit: "cover",
+                            objectFit: "contain",
                             cursor: "pointer",
                             opacity: index === currentImageIndex ? 1 : 0.6,
                           }}
@@ -287,14 +293,21 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
                   </table>
                 </div>
 
-                {product.mo_ta && (
+                {/* {product.mo_ta && (
                   <div className="mb-4">
                     <h5 className="fs-6 fw-bold mb-2">Mô tả sản phẩm:</h5>
                     <p className="text-muted">{product.mo_ta}</p>
                   </div>
-                )}
+                )} */}
 
                 <div className="d-grid gap-2">
+                  <Button
+                    variant="dark"
+                    className="mt-3 w-100"
+                    onClick={handleViewDetail}
+                  >
+                    Xem chi tiết sản phẩm
+                  </Button>
                   <Button
                     variant="primary"
                     size="lg"
@@ -322,7 +335,7 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
                     <i className="bi bi-cart-plus me-2"></i>
                     Thêm vào giỏ hàng
                   </Button>
-                  <Button variant="outline-secondary" onClick={() => addToWishlist(product)}>
+                  <Button variant="danger" onClick={() => addToWishlist(product)}>
                     <i className="bi bi-heart me-2"></i>
                     Thêm vào yêu thích
                   </Button>
