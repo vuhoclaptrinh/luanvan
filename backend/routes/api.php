@@ -70,6 +70,8 @@ Route::delete('/khachhang/{id}', [KhachhangController::class, 'delete']);
 Route::post('/login', [KhachhangController::class, 'login']);
 //add
 Route::post('/khachhang/register', [KhachhangController::class, 'register']);
+Route::post('/forgot-password', [KhachhangController::class, 'forgotPassword']);
+Route::post('/reset-password', [KhachhangController::class, 'resetPassword']);
 
 //Mã Giàm Giá
 //GET

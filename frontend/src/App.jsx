@@ -24,6 +24,8 @@ import AboutPage from "./components/About";
 import ContactPage from "./components/Contact";
 import ProfilePage from "./components/ProfileHome";
 import BackToTop from "./components/Backtotop";
+import ForgotPassword from "./components/ForgotPassword";
+import ResetPassword from "./components/ResetPassword";
 
 // Import pages
 import Login from "./pages/Login";
@@ -108,6 +110,9 @@ function App() {
             {/* Public Routes */}
             <Route path="/home" element={<Home />} />
              <Route path="/login" element={<Login />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              
               <Route path="/products" element={<SanphamUser />} />
               <Route path="/cart" element={<Cartuser/>}/>
               <Route path="/checkout" element={<Checkout/>}/>

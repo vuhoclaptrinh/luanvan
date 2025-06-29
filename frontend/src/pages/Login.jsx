@@ -213,7 +213,10 @@ const LoginRegister = () => {
                         />
                         <Button
                           variant="outline-secondary"
-                          onClick={togglePasswordVisibility}
+                          onClick={() => {
+                            togglePasswordVisibility();
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }}
                           className="password-toggle"
                         >
                           {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -221,6 +224,11 @@ const LoginRegister = () => {
                         <Form.Control.Feedback type="invalid">Vui lòng nhập mật khẩu.</Form.Control.Feedback>
                       </InputGroup>
                     </Form.Group>
+                    <div className="text-end mb-3">
+                    <Button variant="link" className="p-0 text-primary" onClick={() => navigate("/forgot-password")}>
+                      Quên mật khẩu?
+                    </Button>
+                  </div>
 
                     <Button type="submit" className="auth-submit-btn" disabled={loading}>
                       {loading ? (

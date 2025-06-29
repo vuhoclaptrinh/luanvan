@@ -143,7 +143,7 @@ export default function ProductDetail() {
   }
 
   const handleGoHome = () => {
-    navigate("/")
+    navigate("/home")
   }
 
   const handleRelatedProductClick = (productId) => {

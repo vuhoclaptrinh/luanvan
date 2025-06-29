@@ -301,33 +301,47 @@ useEffect(() => {
   }
 
   //Hàm render nav link
-  const renderNavLink = ({ href, label }, index) => (
-    <Nav.Link
+  const renderNavLink = ({ href, label }, index) => {
+  const isDropdown = label === "Danh mục" || label === "Thương hiệu"
+  const isHovering = showMegaMenu === label
+
+  return (
+    <div
       key={`${href}-${index}`}
-      as={Link}
-      to={href}
-      className={`mx-2 position-relative ${isActive(href) ? "fw-bold" : ""}`}
-      onMouseEnter={() =>
-        label === "Sản phẩm" || label === "Danh mục" || label === "Thương hiệu" ? setShowMegaMenu(label) : null
-      }
-      onMouseLeave={() => setShowMegaMenu(null)}
+      className="position-relative mx-2"
+      onMouseEnter={() => isDropdown && setShowMegaMenu(label)}
+      onMouseLeave={() => isDropdown && setShowMegaMenu(null)}
     >
-      {label}
-      {isActive(href) && (
-        <span
-          className="position-absolute"
-          style={{
-            height: "2px",
-            width: "80%",
-            backgroundColor: "#e83e8c",
-            bottom: "0",
-            left: "10%",
-          }}
-        ></span>
+      {/* Link chính */}
+      {href ? (
+        <Nav.Link
+          as={Link}
+          to={href}
+          className={`position-relative ${isActive(href) ? "fw-bold" : ""}`}
+        >
+          {label}
+          {isActive(href) && (
+            <span
+              className="position-absolute"
+              style={{
+                height: "2px",
+                width: "80%",
+                backgroundColor: "#e83e8c",
+                bottom: "0",
+                left: "10%",
+              }}
+            ></span>
+          )}
+        </Nav.Link>
+      ) : (
+        <span className="nav-link text-dark">{label}</span>
       )}
-      {renderMegaMenu(label)}
-    </Nav.Link>
+
+      {/* Mega menu tách riêng bên ngoài thẻ Link */}
+      {isDropdown && isHovering && renderMegaMenu(label)}
+    </div>
   )
+}
 //   const renderNavLink = ({ href, label }, index) => {
 //   const isDropdown = label === "Danh mục" || label === "Thương hiệu" // kiểm tra có phải là mục đặc biệt có menu phụ không
 

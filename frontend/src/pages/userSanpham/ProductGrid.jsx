@@ -176,7 +176,7 @@ useEffect(() => {
                     )}
                     {/* Kiểm tra và hiện form đánh giá nếu đã mua */}
                    {khachHangId && !reviewedMap[product.id] && (
-  <>
+                    <>
                   {daMuaMap[product.id] === undefined && (
                     <Button
                       size="sm"

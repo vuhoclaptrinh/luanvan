@@ -164,6 +164,12 @@ const ViewSP = () => {
       case "name-desc":
         result.sort((a, b) => (b.ten_san_pham || "").localeCompare(a.ten_san_pham || ""))
         break
+      case "newest":
+        result.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        break
+      case "popular":
+        result.sort((a, b) => (b.so_luong_ton || 0) - (a.so_luong_ton || 0))
+        break
       default:
         // Default sorting (newest first or featured)
         break
@@ -253,6 +259,8 @@ const ViewSP = () => {
                   onChange={(e) => setSortOption(e.target.value)}
                   style={{ width: "auto" }}
                 >
+                  <option value="newest">Mới nhất</option>
+                  <option value="popular">Phổ biến nhất</option>
                   <option value="default">Sắp xếp mặc định</option>
                   <option value="price-asc">Giá: Thấp đến cao</option>
                   <option value="price-desc">Giá: Cao đến thấp</option>

@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Khachhang;
+use Illuminate\Container\Facades\DB;
+use Illuminate\Support\Facades\DB as FacadesDB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class KhachhangController extends Controller
 {
@@ -191,5 +194,59 @@ class KhachhangController extends Controller
             'user' => $khachhang
         ], 201);
     }
+    public function forgotPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:khachhang,email',
+        ]);
 
+        $token = Str::random(60);
+
+        // Lưu token vào bảng reset_password
+        FacadesDB::table('reset_password')->updateOrInsert(
+            ['email' => $request->email],
+            [
+                'token' => $token,
+                'created_at' => now()
+            ]
+        );
+
+        // Tạo link reset mật khẩu (trả về cho frontend hiển thị)
+        $resetLink = "http://localhost:5173/reset-password?token=$token&email=" . urlencode($request->email);
+
+        return response()->json([
+            'message' => 'Yêu cầu đặt lại mật khẩu đã được xử lý.',
+            'reset_link' => $resetLink
+        ]);
+    }
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'token' => 'required|string',
+            'new_password' => 'required|string|min:6|confirmed'
+        ]);
+
+        $record = FacadesDB::table('reset_password')
+            ->where('email', $request->email)
+            ->where('token', $request->token)
+            ->first();
+
+        if (!$record) {
+            return response()->json(['message' => 'Token không hợp lệ hoặc đã hết hạn'], 400);
+        }
+
+        $khachhang = Khachhang::where('email', $request->email)->first();
+
+        if (!$khachhang) {
+            return response()->json(['message' => 'Không tìm thấy tài khoản'], 404);
+        }
+
+        $khachhang->mat_khau = Hash::make($request->new_password);
+        $khachhang->save();
+
+        FacadesDB::table('reset_password')->where('email', $request->email)->delete();
+
+        return response()->json(['message' => 'Đặt lại mật khẩu thành công']);
+    }
 }
