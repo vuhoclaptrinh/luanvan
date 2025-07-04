@@ -105,9 +105,32 @@ const SanphamAdd = ({ open, onClose, onUpdate }) => {
       setAnhPhu([]);
 
     } catch (error) {
-      console.error(error.response?.data || error);
-      enqueueSnackbar('Thêm sản phẩm thất bại!', { variant: 'error' });
-    }
+        const res = error.response;
+
+        // Laravel validation lỗi chuẩn (422)
+        if (res?.status === 422 && res.data?.errors) {
+          Object.values(res.data.errors).forEach((msgs) => {
+            msgs.forEach((msg) => enqueueSnackbar(msg, { variant: 'error' }));
+          });
+        }
+
+        // Laravel bắt lỗi thủ công trong try-catch
+        else if (res?.data?.error) {
+          enqueueSnackbar(res.data.error, { variant: 'error' });
+        }
+
+        // Có message chung
+        else if (res?.data?.message) {
+          enqueueSnackbar(res.data.message, { variant: 'error' });
+        }
+
+        // Fallback
+        else {
+          enqueueSnackbar('Thêm sản phẩm thất bại!', { variant: 'error' });
+        }
+
+        console.error(res?.data || error);
+      }
   };
 
   return (

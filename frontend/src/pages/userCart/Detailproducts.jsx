@@ -19,6 +19,20 @@ const Detailproducts = () => {
 
   const API_BASE = "http://127.0.0.1:8000/api/"
 
+  const handleCancelOrder = async () => {
+  if (!donhangInfo?.id) return
+  if (!window.confirm("Bạn có chắc chắn muốn huỷ đơn hàng này không?")) return
+
+  try {
+    await axios.put(`${API_BASE}donhang/${donhangInfo.id}/huy`)
+    alert("Đơn hàng đã được huỷ thành công.")
+    // Reload lại đơn hàng để cập nhật trạng thái mới
+    window.location.reload()
+  } catch (error) {
+    console.error("Lỗi khi huỷ đơn hàng:", error)
+    alert("Không thể huỷ đơn hàng. Vui lòng thử lại.")
+  }
+}
   useEffect(() => {
     const fetchOrderData = async () => {
       try {
@@ -92,7 +106,8 @@ const Detailproducts = () => {
         return "primary"
       case "đã giao":
         return "success"
-     
+     case "đã huỷ":
+        return "danger"
       default:
         return "secondary"
     }
@@ -352,10 +367,21 @@ const Detailproducts = () => {
 
                     <div className="payment-status">
                       <div className="payment-label">Trạng thái thanh toán</div>
-                      <Badge bg={getStatusVariant(donhangInfo.trang_thai)} className="payment-badge">
+                      <Badge bg={getStatusVariant(donhangInfo.trang_thai)} className="payment-badge" >
                         {donhangInfo.trang_thai}
                       </Badge>
+                     {donhangInfo.trang_thai?.toLowerCase() === "chờ xử lý" && (
+                      <Button
+                        variant="error"
+                        size="sm"
+                        className="ms-3"
+                        onClick={handleCancelOrder}
+                      >
+                        Huỷ đơn hàng
+                      </Button>
+                    )}
                     </div>
+                    
                   </div>
                 </Card.Body>
               </Card>

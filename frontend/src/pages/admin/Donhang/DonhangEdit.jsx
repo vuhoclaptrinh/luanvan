@@ -144,6 +144,7 @@ useEffect(() => {
           name="trang_thai"
           value={formdata.trang_thai}
           onChange={handleChange}
+          disabled={formdata.trang_thai === "đã giao" || formdata.trang_thai === "đã huỷ"}
         >
           <MenuItem value="chờ xử lý" disabled={formdata.trang_thai !== "chờ xử lý"}>
             Chờ xử lý
@@ -153,6 +154,9 @@ useEffect(() => {
           </MenuItem>
           <MenuItem value="đã giao">
             Đã giao
+          </MenuItem>
+          <MenuItem value="đã huỷ">
+            Đã huỷ
           </MenuItem>
         </Select>
       </FormControl>

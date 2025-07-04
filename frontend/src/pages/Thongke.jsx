@@ -43,6 +43,7 @@ const Thongke = () => {
     totalReview: 0,
   });
   const [revenueData, setRevenueData] = useState([]);
+ 
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -74,10 +75,9 @@ const Thongke = () => {
         const reviews = reviewRes.data.data || [];
         const revenueRaw = revenueRes.data.data || [];
 
-        const totalRevenue = orders.reduce(
-          (sum, order) => sum + Number(order.tong_tien   || 0),
-          0
-        );
+        const totalRevenue = orders
+          .filter((order) => order.trang_thai?.toLowerCase() === "đã giao")
+          .reduce((sum, order) => sum + Number(order.tong_tien || 0), 0);
 
         // Map month number to label: 1 → Tháng 1
         const formattedRevenue = revenueRaw.map((item) => ({

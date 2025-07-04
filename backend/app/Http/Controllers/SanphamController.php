@@ -92,23 +92,80 @@ class SanphamController extends Controller
     public function add(Request $request)
     {
         try {
-            $request->validate([
-                'ten_san_pham' => 'required|string|max:255',
-                'thuong_hieu' => 'required|string|max:100',
-                'xuat_xu' => 'nullable|string|max:255',
-                'phong_cach' => 'nullable|string|max:255',
-                'nam_phat_hanh' => 'nullable|string|max:255',
-                'do_luu_huong' => 'nullable|string|max:255',
-                'do_toa_huong' => 'nullable|string|max:255',
-                'mo_ta' => 'nullable|string',
-                'danh_muc_id' => 'nullable|exists:danhmuc,id',
-                'variants' => 'required|array|min:1',
-                'variants.*.dung_tich' => 'required|string|max:255',
-                'variants.*.gia' => 'required|numeric',
-                'variants.*.so_luong_ton' => 'required|integer',
-                'hinh_anh' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-                'hinh_phu.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            ]);
+            $request->validate(
+                [
+                    'ten_san_pham' => 'required|string|max:255|unique:sanpham,ten_san_pham',
+                    'thuong_hieu' => 'required|string|max:100',
+                    'xuat_xu' => 'nullable|string|max:255',
+                    'phong_cach' => 'nullable|string|max:255',
+                    'nam_phat_hanh' => 'nullable|integer|min:1900|max:' . date('Y'),
+                    'do_luu_huong' => 'nullable|string|max:255',
+                    'do_toa_huong' => 'nullable|string|max:255',
+                    'mo_ta' => 'nullable|string',
+                    'danh_muc_id' => 'nullable|exists:danhmuc,id',
+
+                    'variants' => 'required|array|min:1',
+                    'variants.*.dung_tich' => 'required|string|max:255',
+                    'variants.*.gia' => 'required|numeric',
+                    'variants.*.so_luong_ton' => 'required|integer',
+
+                    'hinh_anh' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                    'hinh_phu.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                ],
+                [
+                    // Thông báo lỗi tùy chỉnh
+                    'ten_san_pham.required' => 'Tên sản phẩm không được đer trống.',
+                    'ten_san_pham.string' => 'Tên sản phẩm phải là chuỗi.',
+                    'ten_san_pham.unique' => 'Tên sản phẩm đã tồn tại.',
+                    'ten_san_pham.max' => 'Tên sản phẩm không được vượt quá 255 ký tự.',
+
+                    'thuong_hieu.required' => 'Thương hiệu không được để trống.',
+                    'thuong_hieu.string' => 'Thương hiệu phải là chuỗi.',
+                    'thuong_hieu.max' => 'Thương hiệu không được vượt quá 100 ký tự.',
+
+                    'xuat_xu.string' => 'Xuất xứ phải là chuỗi.',
+                    'xuat_xu.max' => 'Xuất xứ không được vượt quá 255 ký tự.',
+
+                    'phong_cach.string' => 'Phong cách phải là chuỗi.',
+                    'phong_cach.max' => 'Phong cách không được vượt quá 255 ký tự.',
+
+                    'nam_phat_hanh.integer' => 'Năm phát hành phải là số nguyên.',
+                    'nam_phat_hanh.min' => 'Năm phát hành không được nhỏ hơn 1900.',
+                    'nam_phat_hanh.max' => 'Năm phát hành không được lớn hơn năm hiện tại.',
+
+                    'do_luu_huong.string' => 'Độ lưu hương phải là chuỗi.',
+                    'do_luu_huong.max' => 'Độ lưu hương không được vượt quá 255 ký tự.',
+
+                    'do_toa_huong.string' => 'Độ toả hương phải là chuỗi.',
+                    'do_toa_huong.max' => 'Độ toả hương không được vượt quá 255 ký tự.',
+
+                    'mo_ta.string' => 'Mô tả phải là chuỗi.',
+
+                    'danh_muc_id.exists' => 'Danh mục đã chọn không tồn tại.',
+
+                    'variants.required' => 'Phải có ít nhất một biến thể sản phẩm.',
+                    'variants.array' => 'Biến thể phải là mảng.',
+                    'variants.min' => 'Phải có ít nhất một biến thể sản phẩm.',
+
+                    'variants.*.dung_tich.required' => 'Dung tích của biến thể không được để trống.',
+                    'variants.*.dung_tich.string' => 'Dung tích của biến thể phải là chuỗi.',
+                    'variants.*.dung_tich.max' => 'Dung tích của biến thể không được vượt quá 255 ký tự.',
+
+                    'variants.*.gia.required' => 'Giá của biến thể không được để trống.',
+                    'variants.*.gia.numeric' => 'Giá của biến thể phải là số.',
+
+                    'variants.*.so_luong_ton.required' => 'Số lượng tồn của biến thể không được để trống.',
+                    'variants.*.so_luong_ton.integer' => 'Số lượng tồn của biến thể phải là số nguyên.',
+
+                    'hinh_anh.image' => 'Hình ảnh đại diện phải là định dạng ảnh.',
+                    'hinh_anh.mimes' => 'Hình ảnh đại diện chỉ cho phép các định dạng: jpeg, png, jpg, gif, svg.',
+                    'hinh_anh.max' => 'Kích thước ảnh đại diện không được vượt quá 2MB.',
+
+                    'hinh_phu.*.image' => 'Mỗi hình ảnh phụ phải là một ảnh hợp lệ.',
+                    'hinh_phu.*.mimes' => 'Ảnh phụ chỉ cho phép các định dạng: jpeg, png, jpg, gif, svg.',
+                    'hinh_phu.*.max' => 'Kích thước mỗi ảnh phụ không được vượt quá 2MB.',
+                ]
+            );
 
             $sanpham = new Sanpham($request->only([
                 'ten_san_pham',
@@ -160,7 +217,7 @@ class SanphamController extends Controller
     {
         try {
             $request->validate([
-                'ten_san_pham' => 'required|string|max:255',
+                'ten_san_pham' => 'required|string|max:255|unique:sanpham,ten_san_pham,' . $id,
                 'thuong_hieu' => 'required|string|max:100',
                 'xuat_xu' => 'nullable|string|max:255',
                 'phong_cach' => 'nullable|string|max:255',
@@ -176,6 +233,8 @@ class SanphamController extends Controller
                 'hinh_anh' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'hinh_phu.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'images_phu_deleted' => 'nullable|string',
+            ], [
+                'ten_san_pham.unique' => 'Tên sản phẩm đã tồn tại.',
             ]);
 
             $sanpham = Sanpham::findOrFail($id);

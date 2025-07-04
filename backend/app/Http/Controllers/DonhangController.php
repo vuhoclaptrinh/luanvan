@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Donhang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class DonhangController extends Controller
 {
@@ -284,14 +285,13 @@ class DonhangController extends Controller
         try {
             $year = $year ?? Carbon::now()->year;
 
-            // Dùng Eloquent với selectRaw
             $doanhThuTheoThang = Donhang::whereYear('ngay_dat', $year)
+                ->where('trang_thai', 'đã giao') // ✅ chỉ tính đơn đã giao
                 ->selectRaw('MONTH(ngay_dat) as thang, SUM(tong_tien) as doanh_thu')
                 ->groupBy('thang')
                 ->orderBy('thang')
                 ->get();
 
-            // Đảm bảo có đủ 12 tháng
             $result = [];
             for ($i = 1; $i <= 12; $i++) {
                 $thangData = $doanhThuTheoThang->firstWhere('thang', $i);
@@ -364,5 +364,117 @@ class DonhangController extends Controller
                 'message' => 'Có lỗi xảy ra: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function createGHTK(Request $request, $id)
+    {
+        $donhang = Donhang::with(['chitietdonhang.sanpham'])->find($id);
+
+        if (!$donhang) {
+            return response()->json(['message' => 'Không tìm thấy đơn hàng'], 404);
+        }
+
+        // Tách tỉnh và quận/huyện
+        $parts = explode(',', $donhang->dia_chi);
+        $province = $this->cleanAddressPart(trim($parts[count($parts) - 1] ?? ''));
+        $district = $this->cleanAddressPart(trim($parts[count($parts) - 2] ?? ''));
+
+        // Chuẩn bị danh sách sản phẩm
+        $products = [];
+        foreach ($donhang->chitietdonhang as $item) {
+            $productName = $item->sanpham->ten_san_pham ?? 'Sản phẩm không tên';
+
+            $products[] = [
+                'name' => $productName,
+                'weight' => $item->sanpham->weight ?? 0.2,
+                'quantity' => $item->so_luong,
+            ];
+
+
+        }
+        $addressParts = explode(',', $donhang->dia_chi);
+
+        if (count($addressParts) >= 5) {
+            // Chèn "Tổ 1" vào sau xã (vị trí thứ 3 → index 2)
+            array_splice($addressParts, 3, 0, 'Tổ 1');
+        }
+
+        $fullAddress = implode(',', $addressParts);
+        // Payload gửi GHTK
+        $payload = [
+            'order' => [
+                'id' => 'DH' . $donhang->id,
+                'pick_name' => 'Shop Nước Hoa ABC',
+                'pick_address' => '123 Nguyễn Văn A',
+                'pick_province' => 'Hồ Chí Minh',
+                'pick_district' => 'Quận 1',
+                'pick_tel' => '0909123456',
+
+                'tel' => '0' . ltrim($donhang->so_dien_thoai, '0'),
+                'name' => $donhang->khachhang->ho_ten ?? 'Khách hàng',
+                'address' => $donhang->dia_chi,
+                'province' => $province,
+                'district' => $district,
+
+                'is_freeship' => '0',
+                'pick_money' => (int) $donhang->tong_tien,
+                'value' => (int) $donhang->tong_tien,
+                'note' => 'Đơn hàng từ website',
+                'transport' => 'road',
+                'products' => $products,
+                'total_weight' => 0.2,
+            ]
+        ];
+
+        // Gửi request đến GHTK
+        $response = Http::withOptions(['verify' => false])
+            ->withHeaders([
+                'Token' => env('GHTK_TOKEN'),
+            ])
+            ->acceptJson()
+            ->post('https://services.giaohangtietkiem.vn/services/shipment/order', $payload);
+        // Xử lý phản hồi
+        if ($response->successful() && isset($response->json()['order'])) {
+            $label = $response->json()['order']['label'];
+            $donhang->tracking_code = $label;
+            $donhang->save();
+
+            return response()->json([
+                'success' => true,
+                'tracking_code' => $label,
+            ]);
+        } else {
+            Log::error('Lỗi từ GHTK:', [
+                'payload' => $payload,
+                'response' => $response->body(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Tạo đơn GHTK thất bại',
+                'ghtk_error' => $response->json(),
+            ], 500);
+        }
+    }
+
+    function cleanAddressPart($text)
+    {
+        return trim(preg_replace('/^(Tỉnh|Thành phố|TP|Quận|Huyện|Thị xã)\s+/ui', '', $text));
+    }
+    public function huyDonHang($id)
+    {
+        $donhang = DonHang::find($id);
+        if (!$donhang) {
+            return response()->json(['message' => 'Không tìm thấy đơn hàng'], 404);
+        }
+
+        if (strtolower($donhang->trang_thai) !== 'chờ xử lý') {
+            return response()->json(['message' => 'Chỉ được huỷ đơn khi đang chờ xác nhận'], 400);
+        }
+
+        $donhang->trang_thai = 'Đã huỷ';
+        $donhang->save();
+
+        return response()->json(['message' => 'Đã huỷ đơn hàng thành công']);
     }
 }

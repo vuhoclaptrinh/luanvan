@@ -154,9 +154,9 @@ const columns = [
       case 'chờ xử lý':
         chipColor = 'warning';
         break;
-     
-       
-      
+      case 'đã huỷ':
+        chipColor = 'error';
+        break;
       case 'đang giao':
         chipColor = 'info';
         break;
@@ -171,13 +171,14 @@ const columns = [
       <Chip
         label={value}
         color={chipColor}
-        variant="outlined"
+        variant="background"
         size="small"
-        sx={{ fontWeight: 500, textTransform: 'capitalize' }}
+        sx={{ fontWeight: 500, textTransform: 'capitalize'}}
       />
     );
      },
     },
+    
      { field: 'ten_ma_giam_gia', headerName: 'Mã Giảm Giá', width: 100 },
     {
       field: 'actions',

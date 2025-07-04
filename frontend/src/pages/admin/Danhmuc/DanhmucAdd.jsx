@@ -48,7 +48,7 @@ const DanhmucAdd = ({ open, onClose, onUpdate }) => {
       onUpdate();    // cập nhật lại danh sách
     } catch (error) {
       console.error('Lỗi khi thêm danh mục:', error);
-      enqueueSnackbar('Thêm thất bại!', { variant: 'error' });
+      enqueueSnackbar('Thêm thất bại , tên trùng!', { variant: 'error' });
     } finally {
       setLoading(false);
     }

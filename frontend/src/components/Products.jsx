@@ -5,6 +5,7 @@ import { addToCart } from './../pages/userCart/Addcart';
 import { addToWishlist } from "../pages/userWishlist/Addwishlist";
 import ProductDetailModal from "./ProductDetail";
 // import { addtowwishlist } from "../pages/userWishlist/Addwishlist";
+import { useNavigate } from "react-router-dom";
 
 const getImageUrl = (path) => {
   if (!path) return "/placeholder.svg?height=300&width=300"
@@ -19,6 +20,7 @@ const ProductList = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [visibleCount, setVisibleCount ] = useState(3) 
+ const navigate = useNavigate();
 
   useEffect(() => {
     setLoading(true)
@@ -54,7 +56,7 @@ const ProductList = () => {
 
   const handleCardClick = (product) => {
     setSelectedProduct(product)
-    setCurrentImageIndex(0)
+    //setCurrentImageIndex(0)
   }
 
   // const handleCloseModal = () => {
@@ -172,15 +174,16 @@ const ProductList = () => {
                       <Button
                         variant="outline-primary"
                         size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          // Thêm vào giỏ hàng logic ở đây
-                          addToCart(product)
+                        onClick={() => {
+                          
+                        
+                          
+                          navigate(`/sanpham/${product.id}`);
 
-                          // alert(`Đã thêm ${product.ten_san_pham} vào giỏ hàng!`)
+                          
                         }}
                       >
-                        <i className="bi bi-cart-plus"></i>
+                        <i className="bi bi-eye"></i>
                       </Button>
                     </div>
                   </div>

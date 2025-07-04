@@ -160,18 +160,14 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
     setLoading(true);
     try {
       const formPayload = new FormData();
-
       // Thêm các trường dữ liệu
       Object.entries(formdata).forEach(([key, value]) => {
         formPayload.append(key, value);
       });
-
-      // Ảnh chính mới
+     
       if (newImageFile) {
         formPayload.append('hinh_anh', newImageFile);
       }
-
-      // Ảnh phụ mới
       newImagesPhuFiles.forEach((file, ) => { 
         formPayload.append('hinh_phu[]', file);
       });
@@ -212,9 +208,25 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
         enqueueSnackbar('Cập nhật sản phẩm thất bại!', { variant: 'error' });
       }
     } catch (error) {
-       console.error('Lỗi cập nhật:', error.response?.data || error.message || error);
-      console.error('Lỗi cập nhật:', error?.response?.data || error);
-      enqueueSnackbar('Cập nhật sản phẩm thất bại!', { variant: 'error' });
+      const res = error.response;
+
+      //  (validate)
+      if (res?.status === 422 && res.data?.errors) {
+        Object.values(res.data.errors).forEach((msgs) => {
+          msgs.forEach((msg) => enqueueSnackbar(msg, { variant: 'error', position: "top-center" }));
+        });
+      }
+      else if (res?.data?.error) {
+        enqueueSnackbar(res.data.error, { variant: 'error', position: "top-center" });
+      }
+      else if (res?.data?.message) {
+        enqueueSnackbar(res.data.message, { variant: 'error', position: "top-center" });
+      }
+      // Fallback
+      else {
+        enqueueSnackbar('Cập nhật sản phẩm thất bại!', { variant: 'error', position: "top-center" });
+      }
+      console.error('Lỗi cập nhật:', res?.data || error.message || error);
     } finally {
       setLoading(false);
     }

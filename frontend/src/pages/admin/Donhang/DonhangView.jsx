@@ -79,6 +79,18 @@ const DonhangView = ({ open, onClose, donhangId }) => {
     fetchDetails();
   }, [open, donhangId]);
 
+  // Tách tỉnh và quận/huyện từ địa chỉ
+    
+   const sendToGHTK = async () => {
+  try {
+    const res = await axios.post(`${API_BASE}donhang/${donhangId}/create-ghtk`);
+    alert(`Tạo đơn thành công! Mã vận đơn: ${res.data.tracking_code}`);
+  } catch (err) {
+    console.error("Lỗi tạo đơn GHTK:", err.response?.data || err.message);
+    alert("Tạo đơn hàng GHTK thất bại.");
+  }
+};
+
   const InfoItem = ({ icon, label, value, color = "primary" }) => (
     <Box display="flex" alignItems="center" mb={2}>
       <Box 
@@ -113,6 +125,8 @@ const DonhangView = ({ open, onClose, donhangId }) => {
       case 'completed':
       case 'đã giao':
         return 'success';
+      case 'đã huỷ':
+        return 'error';
       case 'pending':
       case 'chờ xử lý':
         return 'warning';
@@ -448,6 +462,20 @@ const DonhangView = ({ open, onClose, donhangId }) => {
       </DialogContent>
 
       <DialogActions sx={{ p: 3, bgcolor: 'grey.50' }}>
+        <Button 
+          onClick={sendToGHTK}
+          variant="contained"
+          color="success"
+          size="large"
+          sx={{ 
+            borderRadius: 2,
+            px: 4,
+            fontWeight: 'bold',
+            mr: 2
+          }}
+        >
+          Lên đơn GHTK
+        </Button>
         <Button 
           onClick={onClose} 
           variant="contained"

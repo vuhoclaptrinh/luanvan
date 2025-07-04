@@ -1,10 +1,10 @@
 "use client"
 import { Row, Col, Card, Button, Badge } from "react-bootstrap"
 
-import { addToCart } from "../userCart/addcart"
+// import { addToCart } from "../userCart/addcart"
 import { useEffect, useState } from "react";
 
-
+import { useNavigate } from "react-router-dom";
 
 const ProductGrid = ({
   filteredProducts,
@@ -23,6 +23,7 @@ const ProductGrid = ({
   const [daMuaMap, setDaMuaMap] = useState({});
   const [reviewedMap, setReviewedMap] = useState({});
   const [reviewCounts, setReviewCounts] = useState({});
+   const navigate = useNavigate();
   
  // const [daDanhGiaMap, setDaDanhGiaMap] = useState({});
 
@@ -286,13 +287,14 @@ useEffect(() => {
                         variant="outline-primary"
                         size="sm"
                         onClick={(e) => {
-                          e.stopPropagation()
-                           addToCart(product)
+                          e.stopPropagation();
+                          navigate(`/sanpham/${product.id}`);
+                          // addToCart(product)
                           // Thêm vào giỏ hàng logic
                           // alert(`Đã thêm ${product.ten_san_pham} vào giỏ hàng!`)
                         }}
                       >
-                        <i className="bi bi-cart-plus"></i>
+                        <i className="bi bi-eye"></i>
                       </Button>
                     </div>
                   </div>

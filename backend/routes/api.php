@@ -123,6 +123,9 @@ Route::get('/donhang/khachhang/{id}', [DonhangController::class, 'getByKhachHang
 //thong ke doanh thu
 Route::get('/doanhthutheothang/{year?}', [DonhangController::class, 'getDoanhThuTheoThang']);
 
+Route::post('/donhang/{id}/create-ghtk', [DonhangController::class, 'createGHTK']);
+Route::put('/donhang/{id}/huy', [DonHangController::class, 'huyDonHang']);
+
 
 
 //CHI TIẾT ĐƠN HÀNG

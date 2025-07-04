@@ -41,7 +41,7 @@ class DanhmucController extends Controller
     {
         try {
             $request->validate([
-                'ten_danh_muc' => 'required|string|max:255',
+                'ten_danh_muc' => 'required|string|max:255|unique:danhmuc,ten_danh_muc',
                 'mo_ta' => 'required|string|max:255'
             ]);
             // tao
@@ -70,7 +70,7 @@ class DanhmucController extends Controller
     {
         try {
             $request->validate([
-                'ten_danh_muc' => 'required|string|max:255',
+                'ten_danh_muc' => 'required|string|max:255|unique:danhmuc,ten_danh_muc,' . $id,
                 'mo_ta' => 'required|string|max:255'
             ]);
             // tim
@@ -110,7 +110,7 @@ class DanhmucController extends Controller
             if ($e->getCode() == '23000') {
                 // 23000 = SQLSTATE ràng buộc khóa ngoại
                 return response()->json([
-                    'message' => 'Không thể xoá danh mục vì có ràng buộc dữ liệu',
+                    'message' => 'Không thể xoá danh mục vì có ràng buộc dữ liệu tồn tại sản phẩm',
                     'error' => $e->getMessage()
                 ], 409);
             }

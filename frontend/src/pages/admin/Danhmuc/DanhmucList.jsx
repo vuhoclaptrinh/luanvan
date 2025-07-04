@@ -92,7 +92,7 @@ const DanhmucList = () => {
       setDanhmuc((prev) => prev.filter((dm) => dm.id !== deleteId));
     } catch (error) {
       if (error.response?.status === 409) {
-        enqueueSnackbar(error.response.data.message || 'Không thể xoá do ràng buộc dữ liệu', {
+        enqueueSnackbar(error.response.data.message || 'Không thể xoá do ràng buộc dữ liệu do tồn tại sản phẩm', {
           variant: 'error',
         });
       } else {

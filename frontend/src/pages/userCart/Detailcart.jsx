@@ -101,7 +101,7 @@ const Detailcart = () => {
         return "primary"
       case "đã giao":
         return "success"
-      case "đã hủy":
+      case "đã huỷ":
         return "danger"
       default:
         return "secondary"
@@ -200,7 +200,8 @@ const Detailcart = () => {
                     <Dropdown.Item onClick={() => setStatusFilter("đang xử lý")}>Chờ xử lý</Dropdown.Item>
                     <Dropdown.Item onClick={() => setStatusFilter("đang giao")}>Đang giao</Dropdown.Item>
                     <Dropdown.Item onClick={() => setStatusFilter("đã giao")}>Đã giao</Dropdown.Item>
-                    
+                    <Dropdown.Item onClick={() => setStatusFilter("đã huỷ")}>Đã huỷ</Dropdown.Item>
+
                   </Dropdown.Menu>
                 </Dropdown>
 
@@ -236,7 +237,7 @@ const Detailcart = () => {
                       <div className="order-header">
                         <div className="order-id">
                           <h5>Đơn hàng #{order.id}</h5>
-                          <Badge bg={getStatusVariant(order.trang_thai)} className="status-badge">
+                          <Badge bg={getStatusVariant(order.trang_thai)} className="status-badge" text="light" >
                             {order.trang_thai}
                           </Badge>
                         </div>

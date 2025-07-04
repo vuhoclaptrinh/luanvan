@@ -27,6 +27,18 @@ const Checkout = () => {
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [selectedWard, setSelectedWard] = useState(null);
 
+  // Form state
+  const [formData, setFormData] = useState({
+    ho_ten: "",
+    email: "",
+    so_dien_thoai: "",
+    dia_chi: "",
+    city: "",
+    district: "",
+    ward: "",
+    paymentMethod: "cod",
+    notes: "",
+  })
   // Load tỉnh
   useEffect(() => {
     fetch("https://provinces.open-api.vn/api/?depth=1")
@@ -93,18 +105,7 @@ const Checkout = () => {
   
 
 
-  // Form state
-  const [formData, setFormData] = useState({
-    ho_ten: "",
-    email: "",
-    so_dien_thoai: "",
-    dia_chi: "",
-    city: "",
-    district: "",
-    ward: "",
-    paymentMethod: "cod",
-    notes: "",
-  })
+  
 
   // Validation state
   const [validated, setValidated] = useState(false)
@@ -283,7 +284,7 @@ const Checkout = () => {
       ].filter(Boolean).join(", ");
 
       // Submit order to API
-      const res = await axios.post("http://localhost:8000/api/donhang", {
+      const res = await axios.post("http://127.0.0.1:8000/api/donhang", {
         khach_hang_id: user.id,
         ngay_dat: new Date().toISOString().split("T")[0],
         tong_tien: total,
@@ -306,7 +307,7 @@ const Checkout = () => {
       // Create order details for each cart item
       await Promise.all(
         cart.map((item) =>
-          axios.post("http://localhost:8000/api/chitietdonhang", {
+          axios.post("http://127.0.0.1:8000/api/chitietdonhang", {
             don_hang_id: donhang.id,
             san_pham_id: item.id,
             so_luong: item.quantity,
@@ -472,83 +473,83 @@ const Checkout = () => {
                   </Form.Group>
 
                  <Row>
-  <Col md={4}>
-    <Form.Group className="form-group">
-      <Form.Label>
-        Tỉnh/Thành phố <span className="required">*</span>
-      </Form.Label>
-      <Form.Select
-        name="city"
-        value={formData.city}
-        onChange={handleProvinceChange}
-        isInvalid={validated && !!errors.city}
-        required
-      >
-        <option value="">-- Chọn tỉnh/thành phố --</option>
-        {provinces.map((p) => (
-          <option key={p.code} value={p.code}>
-            {p.name}
-          </option>
-        ))}
-      </Form.Select>
-      <Form.Control.Feedback type="invalid">
-        {errors.city}
-      </Form.Control.Feedback>
-    </Form.Group>
-  </Col>
+                  <Col md={4}>
+                    <Form.Group className="form-group">
+                      <Form.Label>
+                        Tỉnh/Thành phố <span className="required">*</span>
+                      </Form.Label>
+                      <Form.Select
+                        name="city"
+                        value={formData.city}
+                        onChange={handleProvinceChange}
+                        isInvalid={validated && !!errors.city}
+                        required
+                      >
+                        <option value="">-- Chọn tỉnh/thành phố --</option>
+                        {provinces.map((p) => (
+                          <option key={p.code} value={p.code}>
+                            {p.name}
+                          </option>
+                        ))}
+                      </Form.Select>
+                      <Form.Control.Feedback type="invalid">
+                        {errors.city}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                  </Col>
 
-  <Col md={4}>
-    <Form.Group className="form-group">
-      <Form.Label>
-        Quận/Huyện <span className="required">*</span>
-      </Form.Label>
-      <Form.Select
-        name="district"
-        value={formData.district}
-        onChange={handleDistrictChange}
-        isInvalid={validated && !!errors.district}
-        required
-        disabled={!districts.length}
-      >
-        <option value="">-- Chọn quận/huyện --</option>
-        {districts.map((d) => (
-          <option key={d.code} value={d.code}>
-            {d.name}
-          </option>
-        ))}
-      </Form.Select>
-      <Form.Control.Feedback type="invalid">
-        {errors.district}
-      </Form.Control.Feedback>
-    </Form.Group>
-  </Col>
+                  <Col md={4}>
+                    <Form.Group className="form-group">
+                      <Form.Label>
+                        Quận/Huyện <span className="required">*</span>
+                      </Form.Label>
+                      <Form.Select
+                        name="district"
+                        value={formData.district}
+                        onChange={handleDistrictChange}
+                        isInvalid={validated && !!errors.district}
+                        required
+                        disabled={!districts.length}
+                      >
+                        <option value="">-- Chọn quận/huyện --</option>
+                        {districts.map((d) => (
+                          <option key={d.code} value={d.code}>
+                            {d.name}
+                          </option>
+                        ))}
+                      </Form.Select>
+                      <Form.Control.Feedback type="invalid">
+                        {errors.district}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                  </Col>
 
-  <Col md={4}>
-    <Form.Group className="form-group">
-      <Form.Label>
-        Phường/Xã <span className="required">*</span>
-      </Form.Label>
-      <Form.Select
-        name="ward"
-        value={formData.ward}
-        onChange={handleWardChange}
-        isInvalid={validated && !!errors.ward}
-        required
-        disabled={!wards.length}
-      >
-        <option value="">-- Chọn phường/xã --</option>
-        {wards.map((w) => (
-          <option key={w.code} value={w.code}>
-            {w.name}
-          </option>
-        ))}
-      </Form.Select>
-      <Form.Control.Feedback type="invalid">
-        {errors.ward}
-      </Form.Control.Feedback>
-    </Form.Group>
-  </Col>
-</Row>
+                  <Col md={4}>
+                    <Form.Group className="form-group">
+                      <Form.Label>
+                        Phường/Xã <span className="required">*</span>
+                      </Form.Label>
+                      <Form.Select
+                        name="ward"
+                        value={formData.ward}
+                        onChange={handleWardChange}
+                        isInvalid={validated && !!errors.ward}
+                        required
+                        disabled={!wards.length}
+                      >
+                        <option value="">-- Chọn phường/xã --</option>
+                        {wards.map((w) => (
+                          <option key={w.code} value={w.code}>
+                            {w.name}
+                          </option>
+                        ))}
+                      </Form.Select>
+                      <Form.Control.Feedback type="invalid">
+                        {errors.ward}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                  </Col>
+                </Row>
                 </Card.Body>
               </Card>
 

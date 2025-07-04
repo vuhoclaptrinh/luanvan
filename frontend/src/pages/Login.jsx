@@ -14,6 +14,7 @@ const LoginRegister = () => {
   const [formData, setFormData] = useState({
     email: "",
     mat_khau: "",
+    confirm_password: "",
     ho_ten: "",
   })
   const [error, setError] = useState("")
@@ -28,7 +29,7 @@ const LoginRegister = () => {
   const handleTabChange = (tab) => {
     setActiveTab(tab)
     setError("")
-    setFormData({ email: "", mat_khau: "", ho_ten: "" })
+    setFormData({ email: "", mat_khau: "", confirm_password: "", ho_ten: "" })
     setShowPassword(false)
     setValidated(false)
   }
@@ -95,6 +96,11 @@ const LoginRegister = () => {
 
     setError("")
     setLoading(true)
+    if (formData.mat_khau !== formData.confirm_password) {
+      setError("Mật khẩu xác nhận không khớp.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await axios.post("http://127.0.0.1:8000/api/khachhang/register", {
@@ -312,6 +318,33 @@ const LoginRegister = () => {
                         <Form.Control.Feedback type="invalid">Mật khẩu phải có ít nhất 6 ký tự.</Form.Control.Feedback>
                       </InputGroup>
                     </Form.Group>
+
+                    <Form.Group className="mb-4">
+                      <Form.Label>Xác nhận mật khẩu</Form.Label>
+                      <InputGroup>
+                        <InputGroup.Text>
+                          <Lock size={18} />
+                        </InputGroup.Text>
+                        <Form.Control
+                          type={showPassword ? "text" : "password"}
+                          name="confirm_password"
+                          value={formData.confirm_password}
+                          onChange={handleInputChange}
+                          placeholder="Nhập lại mật khẩu"
+                          required
+                          isInvalid={validated && formData.confirm_password !== formData.mat_khau}
+                        />
+                        <Button
+                          variant="outline-secondary"
+                          onClick={togglePasswordVisibility}
+                          className="password-toggle"
+                        >
+                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </Button>
+                        <Form.Control.Feedback type="invalid">Mật khẩu xác nhận không khớp.</Form.Control.Feedback>
+                      </InputGroup>
+                    </Form.Group>
+
 
                     <Button type="submit" className="auth-submit-btn" disabled={loading}>
                       {loading ? (
