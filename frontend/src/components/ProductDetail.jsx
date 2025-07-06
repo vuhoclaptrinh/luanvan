@@ -187,6 +187,15 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
                           );
                         })}
                       </div>
+                      {selectedVariantId && (
+                        <div className="mb-2 text-muted">
+                          Còn lại:{" "}
+                          <span className={displayStock <= 5 ? "text-danger fw-semibold" : "fw-semibold"}>
+                            {displayStock}
+                          </span>{" "}
+                          sản phẩm
+                        </div>
+                      )}
                     </div>
                   )}
                   {/* Hiển thị giá và số lượng tồn theo biến thể đã chọn */}

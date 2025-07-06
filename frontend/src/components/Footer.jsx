@@ -131,21 +131,7 @@ function Footer() {
           </Col>
         </Row>
 
-        {/* Newsletter
-        <div className="border-top pt-4 mt-4">
-          <Row className="justify-content-center">
-            <Col md={8} lg={6}>
-              <div className="text-center">
-                <h5 className="fw-bold mb-3">Đăng ký nhận tin</h5>
-                <p className="text-muted small mb-3">Nhận thông tin về sản phẩm mới và ưu đãi đặc biệt</p>
-                <InputGroup className="mb-3">
-                  <Form.Control placeholder="Nhập email của bạn" aria-label="Email" />
-                  <Button variant="primary">Đăng ký</Button>
-                </InputGroup>
-              </div>
-            </Col>
-          </Row>
-        </div> */}
+       
 
         {/* Copyright */}
         <div className="border-top pt-4 mt-4 text-center">

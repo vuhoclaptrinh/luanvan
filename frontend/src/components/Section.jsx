@@ -15,7 +15,7 @@ function HeroSection() {
         "Bộ sưu tập nước hoa chính hãng từ các thương hiệu nổi tiếng thế giới. Tìm kiếm hương thơm hoàn hảo cho phong cách của bạn.",
     },
     {
-      
+
       src: "src/assets/img/logo.png",
       title: "Hương thơm quyến rũ",
       subtitle: "Dành cho phái đẹp",
@@ -38,13 +38,7 @@ function HeroSection() {
     return () => clearInterval(interval)
   }, [heroImages.length])
 
-  // const nextSlide = () => {
-  //   setCurrentSlide((prev) => (prev + 1) % heroImages.length)
-  // }
 
-  // const prevSlide = () => {
-  //   setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length)
-  // }
 
   const goToSlide = (index) => {
     setCurrentSlide(index)
@@ -86,58 +80,7 @@ function HeroSection() {
         }}
       />
 
-      {/* Navigation Arrows */}
-      {/* <button
-        className="position-absolute start-0 top-50 translate-middle-y btn btn-link text-white p-3"
-        onClick={prevSlide}
-        style={{
-          zIndex: 4,
-          fontSize: "2rem",
-          marginLeft: "20px",
-          background: "rgba(255,255,255,0.1)",
-          borderRadius: "50%",
-          width: "60px",
-          height: "60px",
-          border: "2px solid rgba(255,255,255,0.3)",
-          transition: "all 0.3s ease",
-        }} 
-        onMouseEnter={(e) => {
-          e.target.style.background = "rgba(255,255,255,0.2)"
-          e.target.style.transform = "scale(1.1)"
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.background = "rgba(255,255,255,0.1)"
-          e.target.style.transform = "scale(1)"
-        }}
-      >
-        <i className="bi bi-chevron-left"></i>
-      </button>
 
-      <button
-        className="position-absolute end-0 top-50 translate-middle-y btn btn-link text-white p-3"
-        onClick={nextSlide}
-        style={{
-          zIndex: 4,
-          fontSize: "2rem",
-          marginRight: "20px",
-          background: "rgba(255,255,255,0.1)",
-          borderRadius: "50%",
-          width: "60px",
-          height: "60px",
-          border: "2px solid rgba(255,255,255,0.3)",
-          transition: "all 0.3s ease",
-        }}
-        onMouseEnter={(e) => {
-          e.target.style.background = "rgba(255,255,255,0.2)"
-          e.target.style.transform = "scale(1.1)"
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.background = "rgba(255,255,255,0.1)"
-          e.target.style.transform = "scale(1)"
-        }}
-      >
-        <i className="bi bi-chevron-right"></i>
-      </button> */}
 
       {/* Content */}
       <Container className="position-relative text-center text-white" style={{ zIndex: 3 }}>
@@ -266,28 +209,7 @@ function HeroSection() {
         />
       </div>
 
-      {/* CSS Animations */}
-      {/* <style jsx>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .btn:focus {
-          box-shadow: none !important;
-        } */}
-
-        
-        {/* section:hover .progress-bar {
-          animation-play-state: paused;
-        }
-      `}</style> */}
+      
     </section>
   )
 }

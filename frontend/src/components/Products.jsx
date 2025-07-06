@@ -175,12 +175,7 @@ const ProductList = () => {
                         variant="outline-primary"
                         size="sm"
                         onClick={() => {
-                          
-                        
-                          
                           navigate(`/sanpham/${product.id}`);
-
-                          
                         }}
                       >
                         <i className="bi bi-eye"></i>

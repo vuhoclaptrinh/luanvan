@@ -182,18 +182,7 @@ function FeaturedCategories() {
         )}
       </Container>
 
-      {/* ============================== */}
-      {/* 💅 Custom CSS nội bộ */}
-      {/* ============================== */}
-      {/* <style jsx>{`
-        .text-shadow {
-          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .category-card:hover .hover-overlay {
-          opacity: 1;
-        }
-      `}</style> */}
+     
     </section>
   )
 }

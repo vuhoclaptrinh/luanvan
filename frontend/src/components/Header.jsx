@@ -103,21 +103,17 @@ function Header({ cartCount = 0}) {
   }
 }
   const [wishlistCount, setWishlistCount] = useState(getWishlistCount())
-useEffect(() => {
-  const updateWishlistCount = () => {
-    setWishlistCount(getWishlistCount())
-  }
 
-  // Khi sự kiện "wishlist-updated" được gọi
-  window.addEventListener("wishlist-updated", updateWishlistCount)
-
-  // Cleanup
-  return () => {
-    window.removeEventListener("wishlist-updated", updateWishlistCount)
-  }
-}, [])
-
-  // Lấy user sessionStorage 
+  useEffect(() => {
+    const updateWishlistCount = () => {
+      setWishlistCount(getWishlistCount())
+    }
+    window.addEventListener("wishlist-updated", updateWishlistCount)
+    return () => {
+      window.removeEventListener("wishlist-updated", updateWishlistCount)
+    }
+  }, [])
+//user
   useEffect(() => {
     const storedUser = sessionStorage.getItem("user")
     if (storedUser) {
@@ -127,15 +123,10 @@ useEffect(() => {
         console.error("Lỗi khi lấy user:", err)
       }
     }
-
-    // Cập nhật số lượng sản phẩm trong giỏ hàng
     setCartItemCount(getCartItemsCount())
-
-    // scroll 
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 100)
     }
-
     //  sự kiện cập nhật giỏ hàng
     const handleStorageChange = (e) => {
       if (e.key === "cart") {
@@ -151,7 +142,6 @@ useEffect(() => {
     axios
       .get("http://127.0.0.1:8000/api/danhmuc")
       .then((res) => {
-        
         const categoriesData = res.data.data || res.data
         setCategories(categoriesData)
       })
@@ -161,17 +151,13 @@ useEffect(() => {
       .finally(() => {
         setLoadingCategories(false)
       })
-
+//loc thoungw hiệu
     setLoadingThuonghieu(true)
     axios
       .get("http://127.0.0.1:8000/api/sanpham")
       .then((res) => {
         const sanphamData = res.data.data || res.data
-
-        // Lọc thương hiệu 
         const uniqueBrands = [...new Set(sanphamData.map((sp) => sp.thuong_hieu))]
-
-        
         setThuonghieu(uniqueBrands)
       })
       .catch((err) => {
@@ -180,7 +166,6 @@ useEffect(() => {
       .finally(() => {
         setLoadingThuonghieu(false)
       })
-
     // Cleanup event listeners
     return () => {
       window.removeEventListener("scroll", handleScroll)
@@ -190,14 +175,10 @@ useEffect(() => {
 
   // cập nhật số lượng sản phẩm
   useEffect(() => {
-    // cập nhật
     const handleCartUpdate = () => {
       setCartItemCount(getCartItemsCount())
     }
-
-    // Đăng ký 
     window.addEventListener("cart-updated", handleCartUpdate)
-
     // Cleanup
     return () => {
       window.removeEventListener("cart-updated", handleCartUpdate)
@@ -342,49 +323,7 @@ useEffect(() => {
     </div>
   )
 }
-//   const renderNavLink = ({ href, label }, index) => {
-//   const isDropdown = label === "Danh mục" || label === "Thương hiệu" // kiểm tra có phải là mục đặc biệt có menu phụ không
 
-//   return (
-//     <div
-//       key={`${href}-${index}`}
-//       className="position-relative mx-2"
-//       onMouseEnter={() => setShowMegaMenu(label)} // hiển thị menu khi hover
-//       onMouseLeave={() => setShowMegaMenu(null)}  // ẩn menu khi rời chuột
-//     >
-//       {/*  Nếu có href: tạo Nav.Link để điều hướng */}
-//       {href ? (
-//         <Nav.Link
-//           as={Link}              // sử dụng Link của react-router thay cho thẻ <a>
-//           to={href}              // đường dẫn cần chuyển đến
-//           className={`position-relative ${isActive(href) ? "fw-bold" : ""}`}
-//         >
-//           {label}                
-
-//           {/* Gạch dưới khi đang ở trang hiện tại */}
-//           {isActive(href) && (
-//             <span
-//               className="position-absolute"
-//               style={{
-//                 height: "2px",
-//                 width: "80%",
-//                 backgroundColor: "#e83e8c",
-//                 bottom: "0",
-//                 left: "10%",
-//               }}
-//             ></span>
-//           )}
-//         </Nav.Link>
-//       ) : (
-//         //  KHÔNG dùng <a> nếu không có href —> dùng <span> thay thế
-//         <span className="nav-link text-dark">{label}</span>
-//       )}
-
-//       {/* menu con hiển thị khi hover (mega menu) */}
-//       {renderMegaMenu(label)}
-//     </div>
-//   )
-// }
 
   return (
     <header>
@@ -583,23 +522,15 @@ useEffect(() => {
                           </div>
                         </div>
                       </div>
-
                       <Dropdown.Item as={Link} to="/profilehome" className="rounded-2 mb-1">
                         <i className="bi bi-person me-2"></i>Hồ sơ cá nhân
                       </Dropdown.Item>
-
                       <Dropdown.Item as={Link} to="/orders" className="rounded-2 mb-1">
                         <i className="bi bi-bag me-2"></i>Đơn hàng của tôi
                       </Dropdown.Item>
-
                       <Dropdown.Item as={Link} to="/wishlist" className="rounded-2 mb-1">
                         <i className="bi bi-heart me-2"></i>Danh sách yêu thích
                       </Dropdown.Item>
-
-                      {/* <Dropdown.Item as={Link} to="/addresses" className="rounded-2 mb-1">
-                        <i className="bi bi-geo-alt me-2"></i>Địa chỉ giao hàng
-                      </Dropdown.Item> */}
-
                       <Dropdown.Divider />
 
                       <Dropdown.Item onClick={handleLogout} className="text-danger rounded-2">
@@ -798,21 +729,7 @@ useEffect(() => {
         </button>
       )}
 
-      {/* CSS cho header */}
-      {/* <style jsx="true">{`
-        .sticky-header {
-          animation: slideDown 0.3s ease-in-out;
-        }
-        
-        @keyframes slideDown {
-          from {
-            transform: translateY(-100%);
-          }
-          to {
-            transform: translateY(0);
-          }
-        }
-      `}</style> */}
+
     </header>
   )
 }

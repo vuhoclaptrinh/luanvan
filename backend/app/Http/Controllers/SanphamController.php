@@ -166,6 +166,12 @@ class SanphamController extends Controller
                     'hinh_phu.*.max' => 'Kích thước mỗi ảnh phụ không được vượt quá 2MB.',
                 ]
             );
+            $dungTichList = array_map(fn($v) => trim(strtolower($v['dung_tich'])), $request->variants);
+            if (count($dungTichList) !== count(array_unique($dungTichList))) {
+                return response()->json([
+                    'message' => 'Các biến thể có dung tích bị trùng lặp. Mỗi dung tích phải là duy nhất.'
+                ], 422);
+            }
 
             $sanpham = new Sanpham($request->only([
                 'ten_san_pham',
@@ -236,6 +242,12 @@ class SanphamController extends Controller
             ], [
                 'ten_san_pham.unique' => 'Tên sản phẩm đã tồn tại.',
             ]);
+            $dungTichList = array_map(fn($v) => trim(strtolower($v['dung_tich'])), $request->variants);
+            if (count($dungTichList) !== count(array_unique($dungTichList))) {
+                return response()->json([
+                    'message' => 'Các biến thể có dung tích bị trùng lặp. Mỗi dung tích phải là duy nhất.'
+                ], 422);
+            }
 
             $sanpham = Sanpham::findOrFail($id);
             $sanpham->fill($request->only([

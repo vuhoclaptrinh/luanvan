@@ -339,6 +339,13 @@ export default function ProductDetail() {
                         )
                       })}
                     </div>
+                    {selectedVariant &&(
+                      <div className="mb-2 text-muted"> Còn lại: {" "}
+                      <span className={displayStock<=5 ?"text-danger" : "fw=semibold"} >
+                        {displayStock}
+                      </span>
+                      {" "} sản phẩm
+                      </div>)}
                   </div>
                 )}
 

@@ -17,7 +17,7 @@ const HomePage = () => {
         <HeroSection />
         <FeaturedCategories />
         <ProductGrid />
-        <Newsletter />
+        {/* <Newsletter /> */}
        
       </main>
       <Footer />
