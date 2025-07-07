@@ -7,12 +7,19 @@ import { useNavigate } from "react-router-dom";
 const getImageUrl = (path) => {
   if (!path) return "/placeholder.svg?height=300&width=300";
   if (path.startsWith("http")) return path;
-  return `http://127.0.0.1:8000/storage/images/${path.replace(/^images\//, "")}`;
+  return `http://127.0.0.1:8000/storage/images/${path.replace(
+    /^images\//,
+    ""
+  )}`;
 };
 
-const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist }) => {
-  
-
+const ProductDetailModal = ({
+  product,
+  show,
+  onHide,
+  addToCart,
+  addToWishlist,
+}) => {
   const navigate = useNavigate();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showReviewPanel, setShowReviewPanel] = useState(false);
@@ -22,9 +29,9 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
   const [quantity, setQuantity] = useState(1);
 
   const handleViewDetail = () => {
-  if (product?.id) {
-    navigate(`/sanpham/${product.id}`);
-  }
+    if (product?.id) {
+      navigate(`/sanpham/${product.id}`);
+    }
   };
   useEffect(() => {
     if (product && show) {
@@ -41,7 +48,9 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
       const fetchReviews = async () => {
         setLoadingReviews(true);
         try {
-          const res = await axios.get(`http://127.0.0.1:8000/api/danhgia/sanpham/${product.id}`);
+          const res = await axios.get(
+            `http://127.0.0.1:8000/api/danhgia/sanpham/${product.id}`
+          );
           setReviews(res.data.data || []);
         } catch (error) {
           setReviews([]);
@@ -54,16 +63,27 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
   }, [showReviewPanel, product?.id]);
   if (!product) return null;
   // Lấy biến thể đã chọn
-  const selectedVariant = Array.isArray(product.variants) && product.variants.length > 0
-    ? product.variants.find(v => v.id === selectedVariantId)
-    : null;
+  const selectedVariant =
+    Array.isArray(product.variants) && product.variants.length > 0
+      ? product.variants.find((v) => v.id === selectedVariantId)
+      : null;
 
   // Giá và tồn kho hiển thị
-  const displayPrice = selectedVariant ? (Number(selectedVariant.gia).toLocaleString('vi-VN') + ' ₫') : (product.gia_format || '');
-  const displayStock = selectedVariant ? selectedVariant.so_luong_ton : product.so_luong_ton;
+  const displayPrice = selectedVariant
+    ? Number(selectedVariant.gia).toLocaleString("vi-VN") + " ₫"
+    : product.gia_format || "";
+  const displayStock = selectedVariant
+    ? selectedVariant.so_luong_ton
+    : product.so_luong_ton;
 
   return (
-    <Modal show={show} onHide={onHide} size="xl" centered className="product-detail-modal">
+    <Modal
+      show={show}
+      onHide={onHide}
+      size="xl"
+      centered
+      className="product-detail-modal"
+    >
       <Modal.Header closeButton>
         <Modal.Title className="fs-5 text-primary">
           <i className="bi bi-eye me-2"></i>
@@ -77,10 +97,16 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
               <Col md={6}>
                 <div className="position-relative mb-3">
                   <img
-                    src={getImageUrl(product.images?.[currentImageIndex] || product.hinh_anh)}
+                    src={getImageUrl(
+                      product.images?.[currentImageIndex] || product.hinh_anh
+                    )}
                     alt={product.ten_san_pham}
                     className="img-fluid rounded"
-                    style={{ width: "100%", height: "350px", objectFit: "contain" }}
+                    style={{
+                      width: "100%",
+                      height: "350px",
+                      objectFit: "contain",
+                    }}
                   />
                   {product.images?.length > 1 && (
                     <>
@@ -103,7 +129,9 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
                         size="sm"
                         className="position-absolute top-50 end-0 translate-middle-y rounded-circle p-2 shadow-sm"
                         onClick={() =>
-                          setCurrentImageIndex((currentImageIndex + 1) % product.images.length)
+                          setCurrentImageIndex(
+                            (currentImageIndex + 1) % product.images.length
+                          )
                         }
                       >
                         <i className="bi bi-chevron-right"></i>
@@ -148,58 +176,73 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
                         <i className="bi bi-award me-1"></i>
                         {product.thuong_hieu}
                       </Badge>
-                      {product.danh_muc_ten && <Badge bg="primary">{product.danh_muc_ten}</Badge>}
+                      {product.danh_muc_ten && (
+                        <Badge bg="primary">{product.danh_muc_ten}</Badge>
+                      )}
                     </div>
                   )}
                   <h3 className="fs-4 mb-3">{product.ten_san_pham}</h3>
                   {/* Chọn biến thể nếu có */}
-                  {Array.isArray(product.variants) && product.variants.length > 0 && (
-                    <div className="mb-3">
-                      <label className="form-label fw-semibold">Dung tích:</label>
-                      <div className="d-flex gap-2 flex-wrap">
-                        {product.variants.map(v => {
-                          const isActive = selectedVariantId === v.id;
-                          const isOut = Number(v.so_luong_ton) <= 0;
-                          return (
-                            <button
-                              key={v.id}
-                              type="button"
-                              className={
-                                `btn btn-outline-primary px-3 py-2${isActive ? ' active border-2 fw-bold' : ''}${isOut ? ' text-decoration-line-through' : ''}`
-                              }
-                              style={{
-                                minWidth: 90,
-                                opacity: isOut ? 0.5 : 1,
-                                pointerEvents: isOut ? "none" : "auto",
-                                borderColor: isActive ? "#0d6efd" : undefined,
-                                background: isActive ? "#e7f1ff" : undefined,
-                                color: isActive ? "red" : "#0d6efd",
-                              }}
-                              disabled={isOut}
-                              onClick={() => {
-                                setSelectedVariantId(v.id);
-                                setQuantity(1);
-                              }}
-                            >
-                              <div>{v.dung_tich}ml</div>
-                              {/* <div className="small text-muted">{Number(v.gia).toLocaleString('vi-VN')} ₫</div> */}
-                            </button>
-                          );
-                        })}
-                      </div>
-                      {selectedVariantId && (
-                        <div className="mb-2 text-muted">
-                          Còn lại:{" "}
-                          <span className={displayStock <= 5 ? "text-danger fw-semibold" : "fw-semibold"}>
-                            {displayStock}
-                          </span>{" "}
-                          sản phẩm
+                  {Array.isArray(product.variants) &&
+                    product.variants.length > 0 && (
+                      <div className="mb-3">
+                        <label className="form-label fw-semibold">
+                          Dung tích:
+                        </label>
+                        <div className="d-flex gap-2 flex-wrap">
+                          {product.variants.map((v) => {
+                            const isActive = selectedVariantId === v.id;
+                            const isOut = Number(v.so_luong_ton) <= 0;
+                            return (
+                              <button
+                                key={v.id}
+                                type="button"
+                                className={`btn btn-outline-primary px-3 py-2${
+                                  isActive ? " active border-2 fw-bold" : ""
+                                }${
+                                  isOut ? " text-decoration-line-through" : ""
+                                }`}
+                                style={{
+                                  minWidth: 90,
+                                  opacity: isOut ? 0.5 : 1,
+                                  pointerEvents: isOut ? "none" : "auto",
+                                  borderColor: isActive ? "#0d6efd" : undefined,
+                                  background: isActive ? "#e7f1ff" : undefined,
+                                  color: isActive ? "red" : "#0d6efd",
+                                }}
+                                disabled={isOut}
+                                onClick={() => {
+                                  setSelectedVariantId(v.id);
+                                  setQuantity(1);
+                                }}
+                              >
+                                <div>{v.dung_tich}ml</div>
+                                {/* <div className="small text-muted">{Number(v.gia).toLocaleString('vi-VN')} ₫</div> */}
+                              </button>
+                            );
+                          })}
                         </div>
-                      )}
-                    </div>
-                  )}
+                        {selectedVariantId && (
+                          <div className="mb-2 text-muted">
+                            Còn lại:{" "}
+                            <span
+                              className={
+                                displayStock <= 5
+                                  ? "text-danger fw-semibold"
+                                  : "fw-semibold"
+                              }
+                            >
+                              {displayStock}
+                            </span>{" "}
+                            sản phẩm
+                          </div>
+                        )}
+                      </div>
+                    )}
                   {/* Hiển thị giá và số lượng tồn theo biến thể đã chọn */}
-                  <div className="fs-3 fw-bold text-primary mb-3">{displayPrice}</div>
+                  <div className="fs-3 fw-bold text-primary mb-3">
+                    {displayPrice}
+                  </div>
                   {/* Chọn số lượng */}
                   <div className="mb-3">
                     <label className="form-label fw-semibold">Số lượng:</label>
@@ -209,7 +252,7 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
                       min={1}
                       max={displayStock || 1}
                       value={quantity}
-                      onChange={e => {
+                      onChange={(e) => {
                         let val = Number(e.target.value);
                         if (val < 1) val = 1;
                         if (val > (displayStock || 1)) val = displayStock || 1;
@@ -218,17 +261,23 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
                       disabled={displayStock <= 0}
                       style={{ width: 120 }}
                     />
-                    {displayStock <= 0 && <div className="text-danger small mt-1">Hết hàng</div>}
+                    {displayStock <= 0 && (
+                      <div className="text-danger small mt-1">Hết hàng</div>
+                    )}
                   </div>
                 </div>
 
                 <div className="mb-4">
-                 
                   <table className="table table-borderless">
                     <tbody>
                       {product.thuong_hieu && (
                         <tr>
-                          <td className="text-muted ps-0" style={{ width: "40%" }}>Thương hiệu:</td>
+                          <td
+                            className="text-muted ps-0"
+                            style={{ width: "40%" }}
+                          >
+                            Thương hiệu:
+                          </td>
                           <td>{product.thuong_hieu}</td>
                         </tr>
                       )}
@@ -274,8 +323,14 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
                         <td>
                           {(() => {
                             let total = 0;
-                            if (Array.isArray(product.variants) && product.variants.length > 0) {
-                              total = product.variants.reduce((sum, v) => sum + (Number(v.so_luong_ton) || 0), 0);
+                            if (
+                              Array.isArray(product.variants) &&
+                              product.variants.length > 0
+                            ) {
+                              total = product.variants.reduce(
+                                (sum, v) => sum + (Number(v.so_luong_ton) || 0),
+                                0
+                              );
                             } else {
                               total = Number(product.so_luong_ton) || 0;
                             }
@@ -325,20 +380,33 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
                     variant="primary"
                     size="lg"
                     onClick={() => {
-                      if (Array.isArray(product.variants) && product.variants.length > 0) {
+                      if (
+                        Array.isArray(product.variants) &&
+                        product.variants.length > 0
+                      ) {
                         if (!selectedVariantId) {
-                          toast.warning('Vui lòng chọn loại/dung tích trước khi thêm vào giỏ hàng!');
+                          toast.warning(
+                            "Vui lòng chọn loại/dung tích trước khi thêm vào giỏ hàng!"
+                          );
                           return;
                         }
-                        addToCart({
-                          ...product,
-                          variant_id: selectedVariantId,
-                          variants: product.variants,
-                          so_luong_ton: selectedVariant ? selectedVariant.so_luong_ton : 0,
-                          gia: selectedVariant ? selectedVariant.gia : 0,
-                          dung_tich: selectedVariant ? selectedVariant.dung_tich : '',
-                          quantity: quantity
-                        });
+                        addToCart(
+                          {
+                            ...product,
+                            variant_id: selectedVariantId,
+                            variants: product.variants,
+                            so_luong_ton: selectedVariant
+                              ? selectedVariant.so_luong_ton
+                              : 0,
+                            gia: selectedVariant ? selectedVariant.gia : 0,
+                            dung_tich: selectedVariant
+                              ? selectedVariant.dung_tich
+                              : "",
+                          },
+                          selectedVariantId,
+                          quantity,
+                          selectedVariant
+                        );
                       } else {
                         addToCart({ ...product, quantity: quantity });
                       }
@@ -348,13 +416,19 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
                     <i className="bi bi-cart-plus me-2"></i>
                     Thêm vào giỏ hàng
                   </Button>
-                  <Button variant="outline-danger" className="w-100" onClick={() => addToWishlist(product)}>
+                  <Button
+                    variant="outline-danger"
+                    className="w-100"
+                    onClick={() => addToWishlist(product)}
+                  >
                     <i className="bi bi-heart me-2"></i>
                     Thêm vào yêu thích
                   </Button>
-                  
+
                   <Button
-                    variant={showReviewPanel ? "outline-danger" : "outline-info"}
+                    variant={
+                      showReviewPanel ? "outline-danger" : "outline-info"
+                    }
                     onClick={() => setShowReviewPanel(!showReviewPanel)}
                   >
                     <i className="bi bi-chat-left-text me-2"></i>
@@ -396,12 +470,16 @@ const ProductDetailModal = ({ product, show, onHide, addToCart, addToWishlist })
                           {Array.from({ length: 5 }, (_, i) => (
                             <i
                               key={i}
-                              className={`bi ${i < rv.so_sao ? "bi-star-fill" : "bi-star"}`}
+                              className={`bi ${
+                                i < rv.so_sao ? "bi-star-fill" : "bi-star"
+                              }`}
                               style={{ marginRight: "2px" }}
                             ></i>
                           ))}
                         </span>
-                        <span className="ms-auto text-muted small">{rv.ngay_danh_gia}</span>
+                        <span className="ms-auto text-muted small">
+                          {rv.ngay_danh_gia}
+                        </span>
                       </div>
                       <div className="text-muted">{rv.noi_dung}</div>
                     </div>

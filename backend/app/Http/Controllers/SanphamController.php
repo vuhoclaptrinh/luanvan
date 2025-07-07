@@ -146,21 +146,16 @@ class SanphamController extends Controller
                     'variants.required' => 'Phải có ít nhất một biến thể sản phẩm.',
                     'variants.array' => 'Biến thể phải là mảng.',
                     'variants.min' => 'Phải có ít nhất một biến thể sản phẩm.',
-
                     'variants.*.dung_tich.required' => 'Dung tích của biến thể không được để trống.',
                     'variants.*.dung_tich.string' => 'Dung tích của biến thể phải là chuỗi.',
                     'variants.*.dung_tich.max' => 'Dung tích của biến thể không được vượt quá 255 ký tự.',
-
                     'variants.*.gia.required' => 'Giá của biến thể không được để trống.',
                     'variants.*.gia.numeric' => 'Giá của biến thể phải là số.',
-
                     'variants.*.so_luong_ton.required' => 'Số lượng tồn của biến thể không được để trống.',
                     'variants.*.so_luong_ton.integer' => 'Số lượng tồn của biến thể phải là số nguyên.',
-
                     'hinh_anh.image' => 'Hình ảnh đại diện phải là định dạng ảnh.',
                     'hinh_anh.mimes' => 'Hình ảnh đại diện chỉ cho phép các định dạng: jpeg, png, jpg, gif, svg.',
                     'hinh_anh.max' => 'Kích thước ảnh đại diện không được vượt quá 2MB.',
-
                     'hinh_phu.*.image' => 'Mỗi hình ảnh phụ phải là một ảnh hợp lệ.',
                     'hinh_phu.*.mimes' => 'Ảnh phụ chỉ cho phép các định dạng: jpeg, png, jpg, gif, svg.',
                     'hinh_phu.*.max' => 'Kích thước mỗi ảnh phụ không được vượt quá 2MB.',

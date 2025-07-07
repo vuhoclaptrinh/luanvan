@@ -23,4 +23,8 @@ class BienThe extends Model
     {
         return $this->belongsTo(Sanpham::class, 'san_pham_id');
     }
+    public function chitietdonhang()
+    {
+        return $this->hasMany(Chitietdonhang::class, 'bien_the_id');
+    }
 }

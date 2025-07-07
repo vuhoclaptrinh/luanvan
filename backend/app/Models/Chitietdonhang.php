@@ -27,4 +27,8 @@ class Chitietdonhang extends Model
     {
         return $this->belongsTo(Sanpham::class, 'san_pham_id');
     }
+    public function bienthe()
+    {
+        return $this->belongsTo(Bienthe::class, 'bien_the_id');
+    }
 }

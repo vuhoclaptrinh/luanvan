@@ -1,11 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Box,
-  Typography,
-  Grid,
-  Paper,
-  CircularProgress,
-} from '@mui/material';
+import React, { useEffect, useState } from "react";
+import { Box, Typography, Grid, Paper, CircularProgress } from "@mui/material";
 
 import {
   BarChart as BarChartIcon,
@@ -15,7 +9,7 @@ import {
   Category as CategoryIcon,
   LocalOffer as LocalOfferIcon,
   StarRate as StarRateIcon,
-} from '@mui/icons-material';
+} from "@mui/icons-material";
 
 import {
   ResponsiveContainer,
@@ -25,11 +19,11 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
-} from 'recharts';
+} from "recharts";
 
-import axios from 'axios';
+import axios from "axios";
 
-const API_BASE = 'http://127.0.0.1:8000/api/';
+const API_BASE = "http://127.0.0.1:8000/api/";
 
 const Thongke = () => {
   const [loading, setLoading] = useState(true);
@@ -43,7 +37,6 @@ const Thongke = () => {
     totalReview: 0,
   });
   const [revenueData, setRevenueData] = useState([]);
- 
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -97,7 +90,7 @@ const Thongke = () => {
 
         setRevenueData(formattedRevenue);
       } catch (error) {
-        console.error('Lỗi khi lấy dữ liệu thống kê:', error);
+        console.error("Lỗi khi lấy dữ liệu thống kê:", error);
       } finally {
         setLoading(false);
       }
@@ -108,38 +101,38 @@ const Thongke = () => {
 
   const statItems = [
     {
-      label: 'Đơn hàng',
+      label: "Đơn hàng",
       value: stats.totalOrder,
       icon: <ShoppingCartIcon color="primary" sx={{ fontSize: 40, mb: 1 }} />,
     },
     {
-      label: 'Sản phẩm',
+      label: "Sản phẩm",
       value: stats.totalProduct,
       icon: <InventoryIcon color="success" sx={{ fontSize: 40, mb: 1 }} />,
     },
     {
-      label: 'Người dùng',
+      label: "Người dùng",
       value: stats.totalUser,
       icon: <GroupIcon color="info" sx={{ fontSize: 40, mb: 1 }} />,
     },
     {
-      label: 'Doanh thu',
-      value: stats.totalRevenue.toLocaleString('vi-VN') + ' ₫',
+      label: "Doanh thu",
+      value: stats.totalRevenue.toLocaleString("vi-VN") + " ₫",
       icon: <BarChartIcon color="error" sx={{ fontSize: 40, mb: 1 }} />,
-      color: 'error.main',
+      color: "error.main",
     },
     {
-      label: 'Danh mục',
+      label: "Danh mục",
       value: stats.totalCategory,
       icon: <CategoryIcon color="warning" sx={{ fontSize: 40, mb: 1 }} />,
     },
     {
-      label: 'Mã giảm giá',
+      label: "Mã giảm giá",
       value: stats.totalCoupon,
       icon: <LocalOfferIcon color="secondary" sx={{ fontSize: 40, mb: 1 }} />,
     },
     {
-      label: 'Đánh giá',
+      label: "Đánh giá",
       value: stats.totalReview,
       icon: <StarRateIcon color="success" sx={{ fontSize: 40, mb: 1 }} />,
     },
@@ -152,7 +145,12 @@ const Thongke = () => {
       </Typography> */}
 
       {loading ? (
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight={200}>
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight={200}
+        >
           <CircularProgress />
         </Box>
       ) : (
@@ -160,13 +158,16 @@ const Thongke = () => {
           <Grid container spacing={3}>
             {statItems.map((item, index) => (
               <Grid item xs={12} sm={6} md={3} key={index}>
-                <Paper elevation={3} sx={{ p: 3, borderRadius: 3, textAlign: 'center' }}>
+                <Paper
+                  elevation={3}
+                  sx={{ p: 3, borderRadius: 3, textAlign: "center" }}
+                >
                   {item.icon}
                   <Typography variant="h6">{item.label}</Typography>
                   <Typography
                     variant="h4"
                     fontWeight="bold"
-                    color={item.color || 'text.primary'}
+                    color={item.color || "text.primary"}
                   >
                     {item.value}
                   </Typography>
@@ -194,14 +195,10 @@ const Thongke = () => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
                 <YAxis
-                  tickFormatter={(value) =>
-                    (value / 1000000).toFixed(1) + 'M'
-                  }
+                  tickFormatter={(value) => (value / 1000000).toFixed(1) + "M"}
                 />
                 <Tooltip
-                  formatter={(value) =>
-                    value.toLocaleString('vi-VN') + ' ₫'
-                  }
+                  formatter={(value) => value.toLocaleString("vi-VN") + " ₫"}
                 />
                 <Bar dataKey="revenue" fill="#1976d2" />
               </BarChart>

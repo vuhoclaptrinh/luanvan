@@ -16,5 +16,5 @@ const WishlistUser = () => {
       </div>
     </>
   );
-}   
-export default WishlistUser;    
+};
+export default WishlistUser;

@@ -76,35 +76,63 @@ class ChitietdonhangController extends Controller
     public function add(Request $request)
     {
         try {
-            $request->validate(
-                [
-                    'don_hang_id' => 'required|exists:donhang,id',
-                    'san_pham_id' => 'required|exists:sanpham,id',
-                    'so_luong' => 'required|integer|min:1',
-                    'gia' => 'required|numeric|min:0',
-                ]
+            $request->validate([
+                'don_hang_id' => 'required|exists:donhang,id',
+                'san_pham_id' => 'required|exists:sanpham,id',
+                'bien_the_id' => 'required|exists:bienthe,id',
+                'so_luong' => 'required|integer|min:1',
+                'gia' => 'required|numeric|min:0',
+            ]);
 
+            // Lấy biến thể sản phẩm
+            $bienthe = \App\Models\Bienthe::find($request->bien_the_id);
 
-            );
-            $chitietdonhang = new Chitietdonhang();
+            if (!$bienthe) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Không tìm thấy biến thể sản phẩm.',
+                ], 404);
+            }
+
+            // Kiểm tra tồn kho
+            if ($bienthe->so_luong_ton < $request->so_luong) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Số lượng tồn kho không đủ.',
+                ], 400);
+            }
+
+            // Trừ tồn kho
+            $bienthe->so_luong_ton -= $request->so_luong;
+            $bienthe->save();
+
+            // Tạo chi tiết đơn hàng
+            $chitietdonhang = new \App\Models\Chitietdonhang();
             $chitietdonhang->don_hang_id = $request->don_hang_id;
             $chitietdonhang->san_pham_id = $request->san_pham_id;
+            $chitietdonhang->bien_the_id = $request->bien_the_id;
             $chitietdonhang->so_luong = $request->so_luong;
             $chitietdonhang->gia = $request->gia;
             $chitietdonhang->save();
 
             return response()->json([
                 'status' => true,
-                'message' => 'Thêm thành công chi tiết đơn hàng',
+                'message' => 'Thêm chi tiết đơn hàng thành công & đã cập nhật tồn kho.',
                 'data' => $chitietdonhang
             ], 201);
+
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Có lỗi xảy ra: ' . $e->getMessage()
+                'message' => 'Có lỗi xảy ra',
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
             ], 500);
         }
+
     }
+
     // update
     public function update(Request $request, $id)
     {

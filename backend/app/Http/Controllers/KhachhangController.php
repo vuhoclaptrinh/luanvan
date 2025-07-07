@@ -184,8 +184,7 @@ class KhachhangController extends Controller
         $khachhang = new Khachhang();
         $khachhang->ho_ten = $request->ho_ten;
         $khachhang->email = $request->email;
-        $khachhang->mat_khau = Hash::make($request->mat_khau); // 🔒 Mã hoá mật khẩu
-
+        $khachhang->mat_khau = Hash::make($request->mat_khau);
         $khachhang->save();
 
         return response()->json([

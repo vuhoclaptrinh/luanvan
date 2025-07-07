@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BienThe;
 use App\Models\Donhang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -67,7 +68,7 @@ class DonhangController extends Controller
         return response()->json([
             'id' => $donhang->id,
             'khach_hang_id' => $donhang->khach_hang_id,
-            'so_dien_thoai' => $donhang->so_dien_thoai,
+            'so_dien_thoai' => (string) $donhang->so_dien_thoai,
             'dia_chi' => $donhang->dia_chi,
             'ten_khach_hang' => optional($donhang->khachhang)->ho_ten,
             'email' => optional($donhang->khachhang)->email,
@@ -136,7 +137,7 @@ class DonhangController extends Controller
             $donhang->so_dien_thoai = $request->so_dien_thoai;
             $donhang->dia_chi = $request->dia_chi;
             $donhang->ngay_dat = $request->ngay_dat ?? Carbon::now('Asia/Ho_Chi_Minh');
-            $donhang->tong_tien = $request->tong_tien;
+
             $donhang->tong_tien = $request->tong_tien;
             $donhang->tong_tien_truoc_giam = $request->tong_tien_truoc_giam;
             $donhang->giam_gia_tien = $request->giam_gia_tien;
@@ -463,7 +464,8 @@ class DonhangController extends Controller
     }
     public function huyDonHang($id)
     {
-        $donhang = DonHang::find($id);
+        $donhang = Donhang::with('chitietdonhang')->find($id);
+
         if (!$donhang) {
             return response()->json(['message' => 'Không tìm thấy đơn hàng'], 404);
         }
@@ -471,10 +473,18 @@ class DonhangController extends Controller
         if (strtolower($donhang->trang_thai) !== 'chờ xử lý') {
             return response()->json(['message' => 'Chỉ được huỷ đơn khi đang chờ xác nhận'], 400);
         }
-
-        $donhang->trang_thai = 'Đã huỷ';
+        foreach ($donhang->chitietdonhang as $item) {
+            if ($item->bien_the_id) {
+                $bienthe = BienThe::find($item->bien_the_id);
+                if ($bienthe) {
+                    $bienthe->so_luong_ton += $item->so_luong;
+                    $bienthe->save();
+                }
+            }
+        }
+        $donhang->trang_thai = 'đã huỷ';
         $donhang->save();
 
-        return response()->json(['message' => 'Đã huỷ đơn hàng thành công']);
+        return response()->json(['message' => 'Đã huỷ đơn hàng và hoàn trả tồn kho thành công']);
     }
 }

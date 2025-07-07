@@ -47,7 +47,7 @@ const LayoutMain = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const userStr = sessionStorage.getItem('user');
+  const userStr = sessionStorage.getItem("user");
   const user = userStr ? JSON.parse(userStr) : null;
   console.log("User hiện tại:", user);
 
@@ -71,72 +71,86 @@ const LayoutMain = () => {
   };
 
   const menuItems = [
-    { 
-      text: "Thống Kê", 
-      icon: <BarChartIcon />, 
+    {
+      text: "Thống Kê",
+      icon: <BarChartIcon />,
       path: "/thongke",
-      description: "Thống Kê"
+      description: "Thống Kê",
     },
-    { 
-      text: "Quản Lý Danh Mục", 
-      icon: <CategoryIcon />, 
+    {
+      text: "Quản Lý Danh Mục",
+      icon: <CategoryIcon />,
       path: "/danhmuc",
-      description: "Quản lý các danh mục sản phẩm"
+      description: "Quản lý các danh mục sản phẩm",
     },
-    { 
-      text: "Quản Lý Sản Phẩm", 
-      icon: <InventoryIcon />, 
+    {
+      text: "Quản Lý Sản Phẩm",
+      icon: <InventoryIcon />,
       path: "/sanpham",
-      description: "Quản lý sản phẩm"
+      description: "Quản lý sản phẩm",
     },
-    // { 
-    //   text: "Quản Lý Biến Thể", 
-    //   icon: <InventoryIcon />, 
+    // {
+    //   text: "Quản Lý Biến Thể",
+    //   icon: <InventoryIcon />,
     //   path: "/bienthe",
     //   description: "Quản lý Biến Thể"
     // },
-    { 
-      text: "Quản Lý Đơn Hàng", 
-      icon: <ShoppingCartIcon />, 
+    {
+      text: "Quản Lý Đơn Hàng",
+      icon: <ShoppingCartIcon />,
       path: "/donhang",
-      description: "Xử lý đơn hàng khách hàng"
+      description: "Xử lý đơn hàng khách hàng",
     },
-    { 
-      text: "Quản Lý Mã Giảm Giá", 
-      icon: <DiscountIcon />, 
+    {
+      text: "Quản Lý Mã Giảm Giá",
+      icon: <DiscountIcon />,
       path: "/magiamgia",
-      description: "Tạo và quản lý khuyến mãi"
+      description: "Tạo và quản lý khuyến mãi",
     },
-    { 
-      text: "Quản Lý Đánh Giá", 
-      icon: <RateReviewIcon />, 
+    {
+      text: "Quản Lý Đánh Giá",
+      icon: <RateReviewIcon />,
       path: "/danhgia",
-      description: "Xem và phản hồi đánh giá"
+      description: "Xem và phản hồi đánh giá",
     },
-    { 
-      text: "Quản Lý Người Dùng", 
-      icon: <GroupIcon />, 
+    {
+      text: "Quản Lý Người Dùng",
+      icon: <GroupIcon />,
       path: "/nguoidung",
-      description: "Quản lý tài khoản người dùng"
+      description: "Quản lý tài khoản người dùng",
     },
   ];
 
   const getPageTitle = () => {
-    const currentItem = menuItems.find(item => item.path === location.pathname);
+    const currentItem = menuItems.find(
+      (item) => item.path === location.pathname
+    );
     return currentItem ? currentItem.text : "Trang Quản Trị";
   };
 
   const drawer = (
-    <Box 
-      sx={{ 
+    <Box
+      sx={{
         height: "auto",
         background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-        color: "white"
+        color: "white",
       }}
     >
       {/* Header */}
-      <Box sx={{ p: 3, textAlign: "center", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
-          <img src={Logo} alt="Logo" width="150" height="150" className="rounded-circle" />
+      <Box
+        sx={{
+          p: 3,
+          textAlign: "center",
+          borderBottom: "1px solid rgba(255,255,255,0.1)",
+        }}
+      >
+        <img
+          src={Logo}
+          alt="Logo"
+          width="150"
+          height="150"
+          className="rounded-circle"
+        />
         <Typography variant="h5" fontWeight="bold" gutterBottom>
           Perfumer Shop
         </Typography>
@@ -147,22 +161,22 @@ const LayoutMain = () => {
 
       {/* User Info */}
       <Box sx={{ p: 2, borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
-        <Paper 
-          sx={{ 
-            p: 2, 
-            bgcolor: "rgba(255,255,255,0.1)", 
+        <Paper
+          sx={{
+            p: 2,
+            bgcolor: "rgba(255,255,255,0.1)",
             backdropFilter: "blur(10px)",
             borderRadius: 2,
-            border: "1px solid rgba(255,255,255,0.2)"
+            border: "1px solid rgba(255,255,255,0.2)",
           }}
         >
           <Box display="flex" alignItems="center">
-            <Avatar 
-              sx={{ 
-                bgcolor: "rgba(255,255,255,0.2)", 
+            <Avatar
+              sx={{
+                bgcolor: "rgba(255,255,255,0.2)",
                 mr: 2,
                 width: 40,
-                height: 40
+                height: 40,
               }}
             >
               <PersonIcon />
@@ -193,19 +207,21 @@ const LayoutMain = () => {
                   px: 2,
                   bgcolor: isActive ? "rgba(255,255,255,0.2)" : "transparent",
                   backdropFilter: isActive ? "blur(10px)" : "none",
-                  border: isActive ? "1px solid rgba(255,255,255,0.3)" : "1px solid transparent",
+                  border: isActive
+                    ? "1px solid rgba(255,255,255,0.3)"
+                    : "1px solid transparent",
                   transition: "all 0.3s ease",
-                  "&:hover": { 
+                  "&:hover": {
                     bgcolor: "rgba(255,255,255,0.15)",
-                    transform: "translateX(8px)"
+                    transform: "translateX(8px)",
                   },
                 }}
               >
-                <ListItemIcon 
-                  sx={{ 
+                <ListItemIcon
+                  sx={{
                     color: "white",
                     minWidth: 40,
-                    opacity: isActive ? 1 : 0.8
+                    opacity: isActive ? 1 : 0.8,
                   }}
                 >
                   {item.icon}
@@ -217,24 +233,24 @@ const LayoutMain = () => {
                     primaryTypographyProps={{
                       fontWeight: isActive ? "bold" : "medium",
                       fontSize: "0.9rem",
-                      color: "white"
+                      color: "white",
                     }}
                     secondaryTypographyProps={{
                       fontSize: "0.75rem",
                       color: "rgba(255,255,255,0.7)",
-                      sx: { mt: 0.5 }
+                      sx: { mt: 0.5 },
                     }}
                   />
                 </Box>
                 {isActive && (
-                  <Box 
-                    sx={{ 
-                      width: 4, 
-                      height: 4, 
-                      borderRadius: "50%", 
+                  <Box
+                    sx={{
+                      width: 4,
+                      height: 4,
+                      borderRadius: "50%",
                       bgcolor: "white",
-                      ml: 1
-                    }} 
+                      ml: 1,
+                    }}
                   />
                 )}
               </ListItemButton>
@@ -268,11 +284,11 @@ const LayoutMain = () => {
             color="inherit"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ 
-              mr: 2, 
+            sx={{
+              mr: 2,
               display: { sm: "none" },
               bgcolor: "rgba(103, 126, 234, 0.1)",
-              "&:hover": { bgcolor: "rgba(103, 126, 234, 0.2)" }
+              "&:hover": { bgcolor: "rgba(103, 126, 234, 0.2)" },
             }}
           >
             <MenuIcon />
@@ -309,8 +325,8 @@ const LayoutMain = () => {
               "&:hover": {
                 bgcolor: "rgba(103, 126, 234, 0.15)",
                 transform: "translateY(-1px)",
-                boxShadow: "0 4px 12px rgba(103, 126, 234, 0.2)"
-              }
+                boxShadow: "0 4px 12px rgba(103, 126, 234, 0.2)",
+              },
             }}
             onClick={handleAccountMenuOpen}
           >
@@ -319,7 +335,7 @@ const LayoutMain = () => {
                 width: 32,
                 height: 32,
                 mr: 1,
-                bgcolor: "primary.main"
+                bgcolor: "primary.main",
               }}
             >
               <PersonIcon fontSize="small" />
@@ -346,8 +362,8 @@ const LayoutMain = () => {
                 mt: 1,
                 borderRadius: 2,
                 boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
-                border: "1px solid rgba(0,0,0,0.08)"
-              }
+                border: "1px solid rgba(0,0,0,0.08)",
+              },
             }}
           >
             <MenuItem
@@ -361,7 +377,10 @@ const LayoutMain = () => {
               Hồ sơ cá nhân
             </MenuItem>
             <Divider />
-            <MenuItem onClick={handleLogout} sx={{ py: 1.5, px: 2, color: "error.main" }}>
+            <MenuItem
+              onClick={handleLogout}
+              sx={{ py: 1.5, px: 2, color: "error.main" }}
+            >
               <LogoutIcon sx={{ mr: 2, fontSize: 20 }} />
               Đăng xuất
             </MenuItem>
@@ -385,7 +404,7 @@ const LayoutMain = () => {
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: drawerWidth,
-              border: "none"
+              border: "none",
             },
           }}
         >
@@ -399,7 +418,7 @@ const LayoutMain = () => {
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: drawerWidth,
-              border: "none"
+              border: "none",
             },
           }}
           open
@@ -418,7 +437,7 @@ const LayoutMain = () => {
           overflow: "hidden",
           display: "flex",
           flexDirection: "column",
-          bgcolor: "#f8fafc"
+          bgcolor: "#f8fafc",
         }}
       >
         <Toolbar sx={{ minHeight: 70 }} />

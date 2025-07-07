@@ -1,83 +1,109 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
-import axios from "axios"
-import { Container, Row, Col, Card, Button, Badge, Alert } from "react-bootstrap"
-import { ShoppingBag, Calendar, ArrowRight, Clock, Package } from "lucide-react"
-import Header from "../../components/Header"
-import "./Detailcart.css"
-import { Search, Filter, SortDesc, SortAsc } from "lucide-react"
-import { Form, Dropdown, InputGroup } from "react-bootstrap"
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  Badge,
+  Alert,
+} from "react-bootstrap";
+import {
+  ShoppingBag,
+  Calendar,
+  ArrowRight,
+  Clock,
+  Package,
+} from "lucide-react";
+import Header from "../../components/Header";
+import "./Detailcart.css";
+import { Search, Filter, SortDesc, SortAsc } from "lucide-react";
+import { Form, Dropdown, InputGroup } from "react-bootstrap";
 
 const Detailcart = () => {
-  const [orders, setOrders] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
-  const navigate = useNavigate()
-  const [searchTerm, setSearchTerm] = useState("")
-  const [sortOrder, setSortOrder] = useState("newest") 
-  const [statusFilter, setStatusFilter] = useState("all") 
-  const [filteredOrders, setFilteredOrders] = useState([])
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortOrder, setSortOrder] = useState("newest");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [filteredOrders, setFilteredOrders] = useState([]);
 
   useEffect(() => {
-    const user = JSON.parse(sessionStorage.getItem("user"))
+    const user = JSON.parse(sessionStorage.getItem("user"));
 
     if (!user) {
-      navigate("/login", { state: { from: "/orders" } })
-      return
+      navigate("/login", { state: { from: "/orders" } });
+      return;
     }
 
     const fetchOrders = async () => {
       try {
-        const res = await axios.get(`http://127.0.0.1:8000/api/donhang/khachhang/${user.id}`)
+        const res = await axios.get(
+          `http://127.0.0.1:8000/api/donhang/khachhang/${user.id}`
+        );
         if (res.data.status) {
-          setOrders(res.data.data)
+          setOrders(res.data.data);
         } else {
-          setError("Không thể tải đơn hàng.")
+          setError("Không thể tải đơn hàng.");
         }
       } catch (err) {
-        setError("Lỗi tải dữ liệu: " + err.message)
+        setError("Lỗi tải dữ liệu: " + err.message);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchOrders()
-  }, [navigate])
+    fetchOrders();
+  }, [navigate]);
 
   useEffect(() => {
-    let filtered = [...orders]
+    let filtered = [...orders];
 
     // Search functionality
     if (searchTerm.trim()) {
       filtered = filtered.filter(
         (order) =>
           order.id.toString().includes(searchTerm.toLowerCase()) ||
-          order.ten_khach_hang?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          order.ho_ten_nguoi_nhan?.toLowerCase().includes(searchTerm.toLowerCase()),
-      )
+          order.ten_khach_hang
+            ?.toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          order.ho_ten_nguoi_nhan
+            ?.toLowerCase()
+            .includes(searchTerm.toLowerCase())
+      );
     }
 
     // Status filter
     if (statusFilter !== "all") {
-      filtered = filtered.filter((order) => order.trang_thai?.toLowerCase() === statusFilter.toLowerCase())
+      filtered = filtered.filter(
+        (order) =>
+          order.trang_thai?.toLowerCase() === statusFilter.toLowerCase()
+      );
     }
 
     // Sort by date
     filtered.sort((a, b) => {
-      const dateA = new Date(a.ngay_dat)
-      const dateB = new Date(b.ngay_dat)
-      return sortOrder === "newest" ? dateB - dateA : dateA - dateB
-    })
+      const dateA = new Date(a.ngay_dat);
+      const dateB = new Date(b.ngay_dat);
+      return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
+    });
 
-    setFilteredOrders(filtered)
-  }, [orders, searchTerm, sortOrder, statusFilter])
+    setFilteredOrders(filtered);
+  }, [orders, searchTerm, sortOrder, statusFilter]);
 
   // Format price with VND
   const formatPrice = (price) => {
-    return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(price)
-  }
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(price);
+  };
 
   // Format date
   const formatDate = (dateString) => {
@@ -85,28 +111,28 @@ const Detailcart = () => {
       year: "numeric",
       month: "long",
       day: "numeric",
-    })
-  }
+    });
+  };
 
   // Get status badge variant
   const getStatusVariant = (status) => {
     switch (status?.toLowerCase()) {
       case "chưa thanh toán":
-        return "warning"
+        return "warning";
       case "đã thanh toán":
-        return "success"
-      case "đang xử lý":
-        return "info"
+        return "success";
+      case "chờ xử lý":
+        return "info";
       case "đang giao":
-        return "primary"
+        return "primary";
       case "đã giao":
-        return "success"
+        return "success";
       case "đã huỷ":
-        return "danger"
+        return "danger";
       default:
-        return "secondary"
+        return "secondary";
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -119,7 +145,7 @@ const Detailcart = () => {
           <p>Đang tải danh sách đơn hàng...</p>
         </div>
       </>
-    )
+    );
   }
 
   return (
@@ -130,7 +156,9 @@ const Detailcart = () => {
         <Container>
           <div className="hero-content">
             <h1 className="order-list-title">Đơn hàng của bạn</h1>
-            <p className="order-list-subtitle">Quản lý và theo dõi tất cả đơn hàng của bạn</p>
+            <p className="order-list-subtitle">
+              Quản lý và theo dõi tất cả đơn hàng của bạn
+            </p>
           </div>
         </Container>
       </div>
@@ -148,14 +176,22 @@ const Detailcart = () => {
               <div className="empty-icon">
                 <ShoppingBag size={60} strokeWidth={1.5} />
               </div>
-              <h2>{orders.length === 0 ? "Bạn chưa có đơn hàng nào" : "Không tìm thấy đơn hàng nào"}</h2>
+              <h2>
+                {orders.length === 0
+                  ? "Bạn chưa có đơn hàng nào"
+                  : "Không tìm thấy đơn hàng nào"}
+              </h2>
               <p>
                 {orders.length === 0
                   ? "Hãy khám phá các sản phẩm của chúng tôi và đặt hàng ngay!"
                   : "Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc"}
               </p>
               {orders.length === 0 && (
-                <Button variant="primary" className="shop-now-button" onClick={() => navigate("/products")}>
+                <Button
+                  variant="primary"
+                  className="shop-now-button"
+                  onClick={() => navigate("/products")}
+                >
                   Mua sắm ngay
                 </Button>
               )}
@@ -189,25 +225,44 @@ const Detailcart = () => {
 
                 {/* Status Filter */}
                 <Dropdown className="status-filter">
-                  <Dropdown.Toggle variant="outline-secondary" className="filter-btn">
+                  <Dropdown.Toggle
+                    variant="outline-secondary"
+                    className="filter-btn"
+                  >
                     <Filter size={16} className="me-1" />
-                    {statusFilter === "all" ? "Tất cả trạng thái" : statusFilter}
+                    {statusFilter === "all"
+                      ? "Tất cả trạng thái"
+                      : statusFilter}
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
-                    <Dropdown.Item onClick={() => setStatusFilter("all")}>Tất cả trạng thái</Dropdown.Item>
+                    <Dropdown.Item onClick={() => setStatusFilter("all")}>
+                      Tất cả trạng thái
+                    </Dropdown.Item>
                     <Dropdown.Divider />
-                    
-                    <Dropdown.Item onClick={() => setStatusFilter("đang xử lý")}>Chờ xử lý</Dropdown.Item>
-                    <Dropdown.Item onClick={() => setStatusFilter("đang giao")}>Đang giao</Dropdown.Item>
-                    <Dropdown.Item onClick={() => setStatusFilter("đã giao")}>Đã giao</Dropdown.Item>
-                    <Dropdown.Item onClick={() => setStatusFilter("đã huỷ")}>Đã huỷ</Dropdown.Item>
 
+                    <Dropdown.Item
+                      onClick={() => setStatusFilter("đang xử lý")}
+                    >
+                      Chờ xử lý
+                    </Dropdown.Item>
+                    <Dropdown.Item onClick={() => setStatusFilter("đang giao")}>
+                      Đang giao
+                    </Dropdown.Item>
+                    <Dropdown.Item onClick={() => setStatusFilter("đã giao")}>
+                      Đã giao
+                    </Dropdown.Item>
+                    <Dropdown.Item onClick={() => setStatusFilter("đã huỷ")}>
+                      Đã huỷ
+                    </Dropdown.Item>
                   </Dropdown.Menu>
                 </Dropdown>
 
                 {/* Sort Order */}
                 <Dropdown className="sort-filter">
-                  <Dropdown.Toggle variant="outline-secondary" className="filter-btn">
+                  <Dropdown.Toggle
+                    variant="outline-secondary"
+                    className="filter-btn"
+                  >
                     {sortOrder === "newest" ? (
                       <SortDesc size={16} className="me-1" />
                     ) : (
@@ -237,7 +292,11 @@ const Detailcart = () => {
                       <div className="order-header">
                         <div className="order-id">
                           <h5>Đơn hàng #{order.id}</h5>
-                          <Badge bg={getStatusVariant(order.trang_thai)} className="status-badge" text="light" >
+                          <Badge
+                            bg={getStatusVariant(order.trang_thai)}
+                            className="status-badge"
+                            text="light"
+                          >
                             {order.trang_thai}
                           </Badge>
                         </div>
@@ -250,11 +309,15 @@ const Detailcart = () => {
                       <div className="order-info">
                         <div className="info-row">
                           <div className="info-label">Người nhận:</div>
-                          <div className="info-value">{order.ten_khach_hang || order.ho_ten_nguoi_nhan}</div>
+                          <div className="info-value">
+                            {order.ten_khach_hang || order.ho_ten_nguoi_nhan}
+                          </div>
                         </div>
                         <div className="info-row">
                           <div className="info-label">Tổng tiền:</div>
-                          <div className="info-value price">{formatPrice(order.tong_tien)}</div>
+                          <div className="info-value price">
+                            {formatPrice(order.tong_tien)}
+                          </div>
                         </div>
                       </div>
 
@@ -281,7 +344,7 @@ const Detailcart = () => {
         )}
       </Container>
     </div>
-  )
-}
+  );
+};
 
-export default Detailcart
+export default Detailcart;

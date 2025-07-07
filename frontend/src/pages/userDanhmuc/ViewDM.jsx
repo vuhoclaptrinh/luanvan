@@ -1,152 +1,178 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import axios from "axios"
-import { Row, Col, Container, Modal, Button, Badge, Spinner, Form } from "react-bootstrap"
-import { FilterAlt, GridView, ViewList } from "@mui/icons-material"
-import ProductGrid from "../userSanpham/ProductGrid"
+import { useState, useEffect } from "react";
+import axios from "axios";
+import {
+  Row,
+  Col,
+  Container,
+  Modal,
+  Button,
+  Badge,
+  Spinner,
+  Form,
+} from "react-bootstrap";
+import { FilterAlt, GridView, ViewList } from "@mui/icons-material";
+import ProductGrid from "../userSanpham/ProductGrid";
 
-import FilterSidebar from "../userSanpham/FilterSidebar"
-import "./styles.css"
-import { addToCart } from "../userCart/addcart"
-import { useParams } from "react-router-dom"
+import FilterSidebar from "../userSanpham/FilterSidebar";
+import "./styles.css";
+import { addToCart } from "../userCart/addcart";
+import { useParams } from "react-router-dom";
 //import { addtowwishlist } from "../userWishlist/Addwishlist"
-import { addToWishlist } from "../userWishlist/Addwishlist"
-import ProductDetailModal from "../../components/ProductDetail"
+import { addToWishlist } from "../userWishlist/Addwishlist";
+import ProductDetailModal from "../../components/ProductDetail";
 
 const getImageUrl = (path) => {
-  if (!path) return "/placeholder.svg?height=300&width=300"
-  if (path.startsWith("http")) return path
-  return `http://127.0.0.1:8000/storage/images/${path.replace(/^images\//, "")}`
-}
+  if (!path) return "/placeholder.svg?height=300&width=300";
+  if (path.startsWith("http")) return path;
+  return `http://127.0.0.1:8000/storage/images/${path.replace(
+    /^images\//,
+    ""
+  )}`;
+};
 
 const ViewDM = () => {
-  const { id } = useParams()
-  const [categoryInfo, setCategoryInfo] = useState(null)
-  const [products, setProducts] = useState([])
-  const [filteredProducts, setFilteredProducts] = useState([])
-  const [selectedProduct, setSelectedProduct] = useState(null)
-  const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [visibleCount, setVisibleCount] = useState(9)
-  const [categories, setCategories] = useState([])
-  const [brands, setBrands] = useState([])
-  const [viewMode, setViewMode] = useState("grid")
-  const [sortOption, setSortOption] = useState("default")
-  const [mobileFiltersVisible, setMobileFiltersVisible] = useState(false)
-  
+  const { id } = useParams();
+  const [categoryInfo, setCategoryInfo] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [_, setCurrentImageIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [visibleCount, setVisibleCount] = useState(9);
+  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [viewMode, setViewMode] = useState("grid");
+  const [sortOption, setSortOption] = useState("default");
+  const [mobileFiltersVisible, setMobileFiltersVisible] = useState(false);
 
   // Filter states
-  const [selectedCategories, setSelectedCategories] = useState([])
-  const [selectedBrands, setSelectedBrands] = useState([])
-  const [priceRange, setPriceRange] = useState([0, 10000000])
-  const [maxPrice, setMaxPrice] = useState(10000000)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [inStockOnly, setInStockOnly] = useState(false)
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedBrands, setSelectedBrands] = useState([]);
+  const [priceRange, setPriceRange] = useState([0, 10000000]);
+  const [maxPrice, setMaxPrice] = useState(10000000);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [inStockOnly, setInStockOnly] = useState(false);
 
   useEffect(() => {
-  const fetchCategoryAndProducts = async () => {
-    setLoading(true);
+    const fetchCategoryAndProducts = async () => {
+      setLoading(true);
 
-    try {
-      // B1: Lấy thông tin danh mục và danh sách sản phẩm cơ bản
-      const categoryResponse = await axios.get(`http://127.0.0.1:8000/api/danhmuc/${id}`);
-      const categoryData = categoryResponse.data;
-      const basicProducts = categoryData.sanphams || [];
+      try {
+        // B1: Lấy thông tin danh mục và danh sách sản phẩm cơ bản
+        const categoryResponse = await axios.get(
+          `http://127.0.0.1:8000/api/danhmuc/${id}`
+        );
+        const categoryData = categoryResponse.data;
+        const basicProducts = categoryData.sanphams || [];
 
-      setCategoryInfo({
-        id: categoryData.id,
-        ten_danh_muc: categoryData.ten_danh_muc,
-        mo_ta: categoryData.mo_ta,
-        created_at: categoryData.created_at,
-        updated_at: categoryData.updated_at,
-      });
+        setCategoryInfo({
+          id: categoryData.id,
+          ten_danh_muc: categoryData.ten_danh_muc,
+          mo_ta: categoryData.mo_ta,
+          created_at: categoryData.created_at,
+          updated_at: categoryData.updated_at,
+        });
 
-      if (basicProducts.length === 0) {
-        setProducts([]);
-        setFilteredProducts([]);
-        return;
+        if (basicProducts.length === 0) {
+          setProducts([]);
+          setFilteredProducts([]);
+          return;
+        }
+
+        // B2: Lấy thông tin chi tiết tất cả sản phẩm
+        const productIds = basicProducts.map((p) => p.id);
+        const allProductsResponse = await axios.get(
+          "http://127.0.0.1:8000/api/sanpham"
+        );
+        const allProducts = allProductsResponse.data.data || [];
+
+        const detailedProducts = allProducts.filter((product) =>
+          productIds.includes(product.id)
+        );
+
+        setProducts(detailedProducts);
+        setFilteredProducts(detailedProducts);
+
+        // B3: Xử lý lọc danh mục, thương hiệu, giá
+        const uniqueCategories = [
+          ...new Set(
+            detailedProducts.map((p) => p.danh_muc_ten).filter(Boolean)
+          ),
+        ];
+        const uniqueBrands = [
+          ...new Set(
+            detailedProducts.map((p) => p.thuong_hieu).filter(Boolean)
+          ),
+        ];
+
+        const prices = detailedProducts
+          .map((p) => {
+            const price =
+              Number.parseFloat(p.gia_format?.replace(/[^\d]/g, "")) || 0;
+            return price;
+          })
+          .filter((price) => price > 0);
+
+        const highestPrice = prices.length > 0 ? Math.max(...prices) : 10000000;
+
+        setMaxPrice(highestPrice);
+        setPriceRange([0, highestPrice]);
+        setCategories(uniqueCategories);
+        setBrands(uniqueBrands);
+      } catch (err) {
+        console.error("Lỗi tải dữ liệu:", err);
+        if (err.response?.status === 404) {
+          setError("Không tìm thấy danh mục này.");
+        } else if (err.response?.data?.messsage) {
+          setError(err.response.data.messsage);
+        } else {
+          setError("Không thể tải dữ liệu danh mục.");
+        }
+      } finally {
+        setLoading(false);
       }
+    };
 
-      // B2: Lấy thông tin chi tiết tất cả sản phẩm
-      const productIds = basicProducts.map((p) => p.id);
-      const allProductsResponse = await axios.get("http://127.0.0.1:8000/api/sanpham");
-      const allProducts = allProductsResponse.data.data || [];
-
-      const detailedProducts = allProducts.filter((product) => productIds.includes(product.id));
-
-      setProducts(detailedProducts);
-      setFilteredProducts(detailedProducts);
-
-      // B3: Xử lý lọc danh mục, thương hiệu, giá
-      const uniqueCategories = [...new Set(detailedProducts.map((p) => p.danh_muc_ten).filter(Boolean))];
-      const uniqueBrands = [...new Set(detailedProducts.map((p) => p.thuong_hieu).filter(Boolean))];
-
-      const prices = detailedProducts
-        .map((p) => {
-          const price = Number.parseFloat(p.gia_format?.replace(/[^\d]/g, "")) || 0;
-          return price;
-        })
-        .filter((price) => price > 0);
-
-      const highestPrice = prices.length > 0 ? Math.max(...prices) : 10000000;
-
-      setMaxPrice(highestPrice);
-      setPriceRange([0, highestPrice]);
-      setCategories(uniqueCategories);
-      setBrands(uniqueBrands);
-    } catch (err) {
-      console.error("Lỗi tải dữ liệu:", err);
-      if (err.response?.status === 404) {
-        setError("Không tìm thấy danh mục này.");
-      } else if (err.response?.data?.messsage) {
-        setError(err.response.data.messsage);
-      } else {
-        setError("Không thể tải dữ liệu danh mục.");
-      }
-    } finally {
-      setLoading(false);
+    if (id) {
+      fetchCategoryAndProducts();
     }
-  };
-
-  if (id) {
-    fetchCategoryAndProducts();
-  }
-}, [id]);
-
- 
+  }, [id]);
 
   // Apply filters
   useEffect(() => {
-    let result = [...products]
+    let result = [...products];
 
     // Filter by search query
     if (searchQuery) {
-      const query = searchQuery.toLowerCase()
+      const query = searchQuery.toLowerCase();
       result = result.filter(
         (p) =>
           p.ten_san_pham?.toLowerCase().includes(query) ||
           p.mo_ta?.toLowerCase().includes(query) ||
-          p.thuong_hieu?.toLowerCase().includes(query),
-      )
+          p.thuong_hieu?.toLowerCase().includes(query)
+      );
     }
 
     // Filter by categories
     if (selectedCategories.length > 0) {
-      result = result.filter((p) => selectedCategories.includes(p.danh_muc_ten))
+      result = result.filter((p) =>
+        selectedCategories.includes(p.danh_muc_ten)
+      );
     }
 
     // Filter by brands
     if (selectedBrands.length > 0) {
-      result = result.filter((p) => selectedBrands.includes(p.thuong_hieu))
+      result = result.filter((p) => selectedBrands.includes(p.thuong_hieu));
     }
 
     // Filter by price range
     result = result.filter((p) => {
-      const price = Number.parseFloat(p.gia_format?.replace(/[^\d]/g, "")) || 0
-      return price >= priceRange[0] && price <= priceRange[1]
-    })
+      const price = Number.parseFloat(p.gia_format?.replace(/[^\d]/g, "")) || 0;
+      return price >= priceRange[0] && price <= priceRange[1];
+    });
     const getMinPrice = (product) => {
       if (Array.isArray(product.variants) && product.variants.length > 0) {
         const prices = product.variants
@@ -159,15 +185,15 @@ const ViewDM = () => {
     };
 
     // Filter by stock
-      if (inStockOnly) {
-    result = result.filter((p) => {
-      if (Array.isArray(p.variants) && p.variants.length > 0) {
-        // Nếu có biến thể, chỉ giữ sản phẩm có ít nhất 1 biến thể còn hàng
-        return p.variants.some(v => Number(v.so_luong_ton) > 0);
-      }
-      // Nếu không có biến thể, dùng so_luong_ton gốc
-      return Number(p.so_luong_ton) > 0;
-    });
+    if (inStockOnly) {
+      result = result.filter((p) => {
+        if (Array.isArray(p.variants) && p.variants.length > 0) {
+          // Nếu có biến thể, chỉ giữ sản phẩm có ít nhất 1 biến thể còn hàng
+          return p.variants.some((v) => Number(v.so_luong_ton) > 0);
+        }
+        // Nếu không có biến thể, dùng so_luong_ton gốc
+        return Number(p.so_luong_ton) > 0;
+      });
     }
     // Apply sorting
     switch (sortOption) {
@@ -186,58 +212,73 @@ const ViewDM = () => {
         });
         break;
       case "name-asc":
-        result.sort((a, b) => (a.ten_san_pham || "").localeCompare(b.ten_san_pham || ""))
-        break
+        result.sort((a, b) =>
+          (a.ten_san_pham || "").localeCompare(b.ten_san_pham || "")
+        );
+        break;
       case "name-desc":
-        result.sort((a, b) => (b.ten_san_pham || "").localeCompare(a.ten_san_pham || ""))
-        break
+        result.sort((a, b) =>
+          (b.ten_san_pham || "").localeCompare(a.ten_san_pham || "")
+        );
+        break;
       case "newest":
-        result.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-        break
+        result.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        break;
       case "popular":
         // Sort by stock quantity (higher stock = more popular)
-        result.sort((a, b) => (b.so_luong_ton || 0) - (a.so_luong_ton || 0))
-        break
+        result.sort((a, b) => (b.so_luong_ton || 0) - (a.so_luong_ton || 0));
+        break;
       default:
         // Default sorting
-        break
+        break;
     }
 
-    setFilteredProducts(result)
-    console.log(`Filtered results: ${result.length} products`)
-  }, [products, selectedCategories, selectedBrands, priceRange, inStockOnly, searchQuery, sortOption])
+    setFilteredProducts(result);
+    console.log(`Filtered results: ${result.length} products`);
+  }, [
+    products,
+    selectedCategories,
+    selectedBrands,
+    priceRange,
+    inStockOnly,
+    searchQuery,
+    sortOption,
+  ]);
 
   const handleCardClick = (product) => {
-    setSelectedProduct(product)
-    setCurrentImageIndex(0)
-  }
-
-  
+    setSelectedProduct(product);
+    setCurrentImageIndex(0);
+  };
 
   const handleShowMore = () => {
-    setVisibleCount((prevCount) => Math.min(prevCount + 9, filteredProducts.length))
-  }
+    setVisibleCount((prevCount) =>
+      Math.min(prevCount + 9, filteredProducts.length)
+    );
+  };
 
   const resetFilters = () => {
-    setSelectedCategories([])
-    setSelectedBrands([])
-    setPriceRange([0, maxPrice])
-    setInStockOnly(false)
-    setSearchQuery("")
-    setSortOption("default")
-    setVisibleCount(9)
-  }
+    setSelectedCategories([]);
+    setSelectedBrands([]);
+    setPriceRange([0, maxPrice]);
+    setInStockOnly(false);
+    setSearchQuery("");
+    setSortOption("default");
+    setVisibleCount(9);
+  };
 
   const toggleMobileFilters = () => {
-    setMobileFiltersVisible(!mobileFiltersVisible)
-  }
-
-  
+    setMobileFiltersVisible(!mobileFiltersVisible);
+  };
 
   if (loading) {
     return (
       <Container className="text-center py-5">
-        <Spinner animation="border" role="status" variant="primary" style={{ width: "3rem", height: "3rem" }}>
+        <Spinner
+          animation="border"
+          role="status"
+          variant="primary"
+          style={{ width: "3rem", height: "3rem" }}
+        >
           <span className="visually-hidden">Đang tải...</span>
         </Spinner>
         <div className="mt-3">
@@ -245,7 +286,7 @@ const ViewDM = () => {
           <small className="text-muted">Vui lòng đợi trong giây lát</small>
         </div>
       </Container>
-    )
+    );
   }
 
   if (error) {
@@ -260,13 +301,16 @@ const ViewDM = () => {
             <i className="bi bi-arrow-clockwise me-1"></i>
             Thử lại
           </Button>
-          <Button variant="outline-secondary" onClick={() => window.history.back()}>
+          <Button
+            variant="outline-secondary"
+            onClick={() => window.history.back()}
+          >
             <i className="bi bi-arrow-left me-1"></i>
             Quay lại
           </Button>
         </div>
       </Container>
-    )
+    );
   }
 
   return (
@@ -301,35 +345,40 @@ const ViewDM = () => {
           <div
             className="brand-header text-white p-4 rounded"
             style={{
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            position: "relative",
-            overflow: "hidden",
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              position: "relative",
+              overflow: "hidden",
             }}
           >
-            <div className="position-relative z-2"      >
-              <h1 className="display-4 fw-bold mb-3">{categoryInfo.ten_danh_muc}</h1>
-              {categoryInfo.mo_ta && <p className="lead mb-3 opacity-90">{categoryInfo.mo_ta}</p>}
+            <div className="position-relative z-2">
+              <h1 className="display-4 fw-bold mb-3">
+                {categoryInfo.ten_danh_muc}
+              </h1>
+              {categoryInfo.mo_ta && (
+                <p className="lead mb-3 opacity-90">{categoryInfo.mo_ta}</p>
+              )}
               <div className="d-flex justify-content-center gap-3">
                 <Badge bg="light" text="dark" className="fs-6 px-3 py-2">
                   <i className="bi bi-box-seam me-1"></i>
                   {products.length} sản phẩm
                 </Badge>
                 <Badge bg="success" className="fs-6 px-3 py-2">
-                <i className="bi bi-check-circle me-1"></i>
-                {
-                  products.filter((p) => {
-                    if (Array.isArray(p.variants) && p.variants.length > 0) {
-                      return p.variants.some(v => Number(v.so_luong_ton) > 0)
-                    }
-                    return Number(p.so_luong_ton) > 0
-                  }).length
-                }{" "}
-                còn hàng
-              </Badge>
+                  <i className="bi bi-check-circle me-1"></i>
+                  {
+                    products.filter((p) => {
+                      if (Array.isArray(p.variants) && p.variants.length > 0) {
+                        return p.variants.some(
+                          (v) => Number(v.so_luong_ton) > 0
+                        );
+                      }
+                      return Number(p.so_luong_ton) > 0;
+                    }).length
+                  }{" "}
+                  còn hàng
+                </Badge>
               </div>
             </div>
             {/* Decorative elements */}
-            
           </div>
         </Container>
       )}
@@ -342,7 +391,11 @@ const ViewDM = () => {
               <div className="bg-white p-3 rounded shadow-sm">
                 <div className="d-flex justify-content-between align-items-center flex-wrap">
                   <div className="d-flex align-items-center mb-2 mb-md-0">
-                    <Button variant="outline-primary" className="me-3 d-md-none" onClick={toggleMobileFilters}>
+                    <Button
+                      variant="outline-primary"
+                      className="me-3 d-md-none"
+                      onClick={toggleMobileFilters}
+                    >
                       <FilterAlt fontSize="small" className="me-1" />
                       Bộ lọc
                     </Button>
@@ -352,7 +405,9 @@ const ViewDM = () => {
                         {filteredProducts.length} sản phẩm
                       </h5>
                       {filteredProducts.length !== products.length && (
-                        <small className="text-muted">(từ tổng số {products.length} sản phẩm)</small>
+                        <small className="text-muted">
+                          (từ tổng số {products.length} sản phẩm)
+                        </small>
                       )}
                     </div>
                   </div>
@@ -361,7 +416,9 @@ const ViewDM = () => {
                     {/* View Mode Toggle */}
                     <div className="btn-group d-none d-md-flex" role="group">
                       <Button
-                        variant={viewMode === "grid" ? "primary" : "outline-primary"}
+                        variant={
+                          viewMode === "grid" ? "primary" : "outline-primary"
+                        }
                         size="sm"
                         onClick={() => setViewMode("grid")}
                         title="Xem dạng lưới"
@@ -369,7 +426,9 @@ const ViewDM = () => {
                         <GridView fontSize="small" />
                       </Button>
                       <Button
-                        variant={viewMode === "list" ? "primary" : "outline-primary"}
+                        variant={
+                          viewMode === "list" ? "primary" : "outline-primary"
+                        }
                         size="sm"
                         onClick={() => setViewMode("list")}
                         title="Xem dạng danh sách"
@@ -423,7 +482,11 @@ const ViewDM = () => {
             </Col>
 
             {/* Mobile Filter Overlay */}
-            <div className={`mobile-filters-overlay ${mobileFiltersVisible ? "show" : ""}`}>
+            <div
+              className={`mobile-filters-overlay ${
+                mobileFiltersVisible ? "show" : ""
+              }`}
+            >
               <FilterSidebar
                 categories={categories}
                 brands={brands}
@@ -450,8 +513,13 @@ const ViewDM = () => {
                 <div className="text-center py-5 bg-white rounded shadow-sm">
                   <i className="bi bi-box display-1 text-muted"></i>
                   <h4 className="mt-3">Danh mục này chưa có sản phẩm</h4>
-                  <p className="text-muted">Vui lòng quay lại sau hoặc xem các danh mục khác</p>
-                  <Button variant="primary" onClick={() => window.history.back()}>
+                  <p className="text-muted">
+                    Vui lòng quay lại sau hoặc xem các danh mục khác
+                  </p>
+                  <Button
+                    variant="primary"
+                    onClick={() => window.history.back()}
+                  >
                     <i className="bi bi-arrow-left me-1"></i>
                     Quay lại
                   </Button>
@@ -470,15 +538,17 @@ const ViewDM = () => {
             </Col>
           </Row>
 
-          <ProductDetailModal product={selectedProduct}
+          <ProductDetailModal
+            product={selectedProduct}
             show={selectedProduct !== null}
             onHide={() => setSelectedProduct(null)}
             addToCart={addToCart}
-            addToWishlist={addToWishlist}/>
+            addToWishlist={addToWishlist}
+          />
         </Container>
       </section>
     </>
-  )
-}
+  );
+};
 
-export default ViewDM
+export default ViewDM;

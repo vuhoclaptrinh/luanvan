@@ -1,8 +1,20 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useParams, useNavigate } from "react-router-dom"
-import { Container, Row, Col, Button, Card, Badge, Tabs, Tab, Table, Spinner, Alert } from "react-bootstrap"
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  Container,
+  Row,
+  Col,
+  Button,
+  Card,
+  Badge,
+  Tabs,
+  Tab,
+  Table,
+  Spinner,
+  Alert,
+} from "react-bootstrap";
 import {
   Star,
   Heart,
@@ -16,154 +28,172 @@ import {
   Minus,
   ArrowLeft,
   ZoomIn,
-} from "lucide-react"
-import { toast } from "react-hot-toast"
-import { addToCart } from "../userCart/Addcart"
-import { addToWishlist } from "../userWishlist/Addwishlist"
+} from "lucide-react";
+import { toast } from "react-hot-toast";
+import { addToCart } from "../userCart/Addcart";
+import { addToWishlist } from "../userWishlist/Addwishlist";
 
 // Utility function for image URLs
 const getImageUrl = (path) => {
   if (typeof path !== "string" || path.trim() === "") {
-    return "/placeholder.svg?height=300&width=300"
+    return "/placeholder.svg?height=300&width=300";
   }
-  if (path.startsWith("http")) return path
-  return `http://127.0.0.1:8000/storage/images/${path.replace(/^images\//, "")}`
-}
+  if (path.startsWith("http")) return path;
+  return `http://127.0.0.1:8000/storage/images/${path.replace(
+    /^images\//,
+    ""
+  )}`;
+};
 
 export default function ProductDetail() {
-  const { id } = useParams()
-  const navigate = useNavigate()
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-  const [product, setProduct] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const [selectedVariantId, setSelectedVariantId] = useState(null)
-  const [quantity, setQuantity] = useState(1)
-  const [reviews, setReviews] = useState([])
-  const [loadingReviews, setLoadingReviews] = useState(false)
-  const [relatedProducts, setRelatedProducts] = useState([])
-  const [loadingRelated, setLoadingRelated] = useState(false)
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [selectedVariantId, setSelectedVariantId] = useState(null);
+  const [quantity, setQuantity] = useState(1);
+  const [reviews, setReviews] = useState([]);
+  const [loadingReviews, setLoadingReviews] = useState(false);
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const [loadingRelated, setLoadingRelated] = useState(false);
 
   // Fetch product data from API
   useEffect(() => {
     const fetchProduct = async () => {
-      if (!id) return
+      if (!id) return;
 
-      setLoading(true)
+      setLoading(true);
       try {
-        const res = await fetch(`http://127.0.0.1:8000/api/sanpham/${id}`)
-        const data = await res.json()
-        setProduct(data.data)
+        const res = await fetch(`http://127.0.0.1:8000/api/sanpham/${id}`);
+        const data = await res.json();
+        setProduct(data.data);
       } catch (err) {
-        console.error("Không thể tải sản phẩm:", err)
-        toast.error("Không thể tải sản phẩm")
+        console.error("Không thể tải sản phẩm:", err);
+        toast.error("Không thể tải sản phẩm");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchProduct()
-  }, [id])
+    fetchProduct();
+  }, [id]);
 
   // Fetch related products
   useEffect(() => {
     const fetchRelatedProducts = async () => {
-      if (!product?.thuong_hieu) return
+      if (!product?.thuong_hieu) return;
 
-      setLoadingRelated(true)
+      setLoadingRelated(true);
       try {
         const res = await fetch(`http://127.0.0.1:8000/api/sanpham`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
-        })
-        const data = await res.json()
+        });
+        const data = await res.json();
 
         // Filter products by brand and exclude current product
         const filtered = (data.data || [])
-          .filter((item) => item.thuong_hieu === product.thuong_hieu && item.id !== product.id)
-          .slice(0, 6) // Limit to 6 products
+          .filter(
+            (item) =>
+              item.thuong_hieu === product.thuong_hieu && item.id !== product.id
+          )
+          .slice(0, 6); // Limit to 6 products
 
-        setRelatedProducts(filtered)
+        setRelatedProducts(filtered);
       } catch (error) {
-        console.error("Lỗi khi lấy sản phẩm liên quan:", error)
-        setRelatedProducts([])
+        console.error("Lỗi khi lấy sản phẩm liên quan:", error);
+        setRelatedProducts([]);
       } finally {
-        setLoadingRelated(false)
+        setLoadingRelated(false);
       }
-    }
+    };
 
     if (product) {
-      fetchRelatedProducts()
+      fetchRelatedProducts();
     }
-  }, [product])
+  }, [product]);
 
   // Fetch reviews
   useEffect(() => {
     const fetchReviews = async () => {
-      if (!product?.id) return
+      if (!product?.id) return;
 
-      setLoadingReviews(true)
+      setLoadingReviews(true);
       try {
-        const res = await fetch(`http://127.0.0.1:8000/api/danhgia/sanpham/${product.id}`)
-        const data = await res.json()
-        setReviews(data.data || [])
+        const res = await fetch(
+          `http://127.0.0.1:8000/api/danhgia/sanpham/${product.id}`
+        );
+        const data = await res.json();
+        setReviews(data.data || []);
       } catch (error) {
-        console.error("Error fetching reviews:", error)
-        setReviews([])
+        console.error("Error fetching reviews:", error);
+        setReviews([]);
       } finally {
-        setLoadingReviews(false)
+        setLoadingReviews(false);
       }
-    }
+    };
 
-    fetchReviews()
-  }, [product?.id])
+    fetchReviews();
+  }, [product?.id]);
 
-  const selectedVariant = product?.variants?.find((v) => v.id === selectedVariantId)
+  const selectedVariant = product?.variants?.find(
+    (v) => v.id === selectedVariantId
+  );
   const displayPrice = selectedVariant
     ? `${Number(selectedVariant.gia).toLocaleString("vi-VN")} ₫`
-    : product?.gia_format || ""
-  const displayStock = selectedVariant ? selectedVariant.so_luong_ton : product?.so_luong_ton || 0
+    : product?.gia_format || "";
+  const displayStock = selectedVariant
+    ? selectedVariant.so_luong_ton
+    : product?.so_luong_ton || 0;
 
   const handleQuantityChange = (change) => {
-    setQuantity((prev) => Math.max(1, Math.min(prev + change, displayStock)))
-  }
+    setQuantity((prev) => Math.max(1, Math.min(prev + change, displayStock)));
+  };
 
   const handleAddToCart = () => {
-      addToCart(product, selectedVariantId, quantity, selectedVariant)
-  }
+    addToCart(product, selectedVariantId, quantity, selectedVariant);
+  };
 
   const handleAddToWishlist = () => {
-     addToWishlist(product)
-  }
+    addToWishlist(product);
+  };
 
   const handleGoBack = () => {
-    navigate(-1)
-  }
+    navigate(-1);
+  };
 
   const handleGoHome = () => {
-    navigate("/home")
-  }
+    navigate("/home");
+  };
 
   const handleRelatedProductClick = (productId) => {
-    navigate(`/sanpham/${productId}`)
-  }
+    navigate(`/sanpham/${productId}`);
+  };
 
   if (loading) {
     return (
-      <Container fluid className="min-vh-100 d-flex align-items-center justify-content-center">
+      <Container
+        fluid
+        className="min-vh-100 d-flex align-items-center justify-content-center"
+      >
         <div className="text-center">
           <Spinner animation="border" size="lg" />
           <p className="mt-3">Đang tải sản phẩm...</p>
         </div>
       </Container>
-    )
+    );
   }
 
   if (!product) {
     return (
-      <Container fluid className="min-vh-100 d-flex align-items-center justify-content-center">
+      <Container
+        fluid
+        className="min-vh-100 d-flex align-items-center justify-content-center"
+      >
         <div className="text-center">
           <h2 className="mb-4">Không tìm thấy sản phẩm</h2>
           <div className="d-flex gap-2 justify-content-center">
@@ -177,12 +207,12 @@ export default function ProductDetail() {
           </div>
         </div>
       </Container>
-    )
+    );
   }
 
   const totalStock = product.variants?.length
     ? product.variants.reduce((sum, v) => sum + (v.so_luong_ton || 0), 0)
-    : product.so_luong_ton || 0
+    : product.so_luong_ton || 0;
 
   return (
     <div className="min-vh-100 bg-light">
@@ -215,14 +245,18 @@ export default function ProductDetail() {
               <Card.Body className="p-4">
                 <div className="position-relative text-center mb-3">
                   {(() => {
-                    const currentImage = product.images?.[currentImageIndex]
+                    const currentImage = product.images?.[currentImageIndex];
                     const currentImagePath =
-                      typeof currentImage === "string" ? currentImage : (currentImage?.image_path ?? product.hinh_anh)
+                      typeof currentImage === "string"
+                        ? currentImage
+                        : currentImage?.image_path ?? product.hinh_anh;
 
                     return (
                       <div className="position-relative">
                         <img
-                          src={getImageUrl(currentImagePath) || "/placeholder.svg"}
+                          src={
+                            getImageUrl(currentImagePath) || "/placeholder.svg"
+                          }
                           alt={product.ten_san_pham}
                           className="img-fluid rounded border"
                           style={{
@@ -238,7 +272,7 @@ export default function ProductDetail() {
                           <ZoomIn className="text-white" size={32} />
                         </div>
                       </div>
-                    )
+                    );
                   })()}
 
                   {product.images?.length > 1 && (
@@ -249,7 +283,9 @@ export default function ProductDetail() {
                         className="position-absolute top-50 start-0 translate-middle-y rounded-circle p-2 shadow-sm"
                         onClick={() =>
                           setCurrentImageIndex(
-                            currentImageIndex === 0 ? product.images.length - 1 : currentImageIndex - 1,
+                            currentImageIndex === 0
+                              ? product.images.length - 1
+                              : currentImageIndex - 1
                           )
                         }
                       >
@@ -259,7 +295,11 @@ export default function ProductDetail() {
                         variant="light"
                         size="sm"
                         className="position-absolute top-50 end-0 translate-middle-y rounded-circle p-2 shadow-sm"
-                        onClick={() => setCurrentImageIndex((currentImageIndex + 1) % product.images.length)}
+                        onClick={() =>
+                          setCurrentImageIndex(
+                            (currentImageIndex + 1) % product.images.length
+                          )
+                        }
                       >
                         <ChevronRight size={16} />
                       </Button>
@@ -275,10 +315,14 @@ export default function ProductDetail() {
                     {product.images.map((img, index) => (
                       <Col key={index} xs={3}>
                         <img
-                          src={getImageUrl(img.image_path) || "/placeholder.svg"}
+                          src={
+                            getImageUrl(img.image_path) || "/placeholder.svg"
+                          }
                           alt={`Thumbnail ${index + 1}`}
                           className={`img-thumbnail rounded shadow-sm w-100 ${
-                            index === currentImageIndex ? "border-primary border-2" : "border"
+                            index === currentImageIndex
+                              ? "border-primary border-2"
+                              : "border"
                           }`}
                           style={{
                             height: "60px",
@@ -303,11 +347,16 @@ export default function ProductDetail() {
             <Card className="shadow-sm">
               <Card.Body className="p-4">
                 <div className="d-flex align-items-center gap-2 mb-3">
-                  <Badge bg="secondary" className="d-flex align-items-center gap-1">
+                  <Badge
+                    bg="secondary"
+                    className="d-flex align-items-center gap-1"
+                  >
                     <Award size={12} />
                     {product.thuong_hieu}
                   </Badge>
-                  {product.danh_muc_ten && <Badge>{product.danh_muc_ten}</Badge>}
+                  {product.danh_muc_ten && (
+                    <Badge>{product.danh_muc_ten}</Badge>
+                  )}
                 </div>
 
                 <h1 className="h3 mb-4">{product.ten_san_pham}</h1>
@@ -318,8 +367,8 @@ export default function ProductDetail() {
                     <label className="form-label fw-semibold">Dung tích:</label>
                     <div className="d-flex flex-wrap justify-content-center gap-2">
                       {product.variants.map((variant) => {
-                        const isSelected = selectedVariantId === variant.id
-                        const isOutOfStock = variant.so_luong_ton <= 0
+                        const isSelected = selectedVariantId === variant.id;
+                        const isOutOfStock = variant.so_luong_ton <= 0;
 
                         return (
                           <Button
@@ -328,29 +377,40 @@ export default function ProductDetail() {
                             size="sm"
                             disabled={isOutOfStock}
                             onClick={() => {
-                              setSelectedVariantId(variant.id)
-                              setQuantity(1)
+                              setSelectedVariantId(variant.id);
+                              setQuantity(1);
                             }}
-                            className={`${isOutOfStock ? "text-decoration-line-through" : ""}`}
+                            className={`${
+                              isOutOfStock ? "text-decoration-line-through" : ""
+                            }`}
                             style={{ opacity: isOutOfStock ? 0.5 : 1 }}
                           >
                             {variant.dung_tich} ml
                           </Button>
-                        )
+                        );
                       })}
                     </div>
-                    {selectedVariant &&(
-                      <div className="mb-2 text-muted"> Còn lại: {" "}
-                      <span className={displayStock<=5 ?"text-danger" : "fw=semibold"} >
-                        {displayStock}
-                      </span>
-                      {" "} sản phẩm
-                      </div>)}
+                    {selectedVariant && (
+                      <div className="mb-2 text-muted">
+                        {" "}
+                        Còn lại:{" "}
+                        <span
+                          className={
+                            displayStock <= 5 ? "text-danger" : "fw=semibold"
+                          }
+                        >
+                          {displayStock}
+                        </span>{" "}
+                        sản phẩm
+                      </div>
+                    )}
                   </div>
                 )}
 
                 {/* Price */}
-                <div className="h2 text-danger fw-bold mb-4">{displayPrice}</div>
+                <div className="h2 text-danger fw-bold mb-4">
+                  {displayPrice}
+                </div>
 
                 {/* Quantity Selection */}
                 <div className="mb-4">
@@ -364,7 +424,10 @@ export default function ProductDetail() {
                     >
                       <Minus size={16} />
                     </Button>
-                    <span className="px-3 py-2 border rounded text-center" style={{ minWidth: "60px" }}>
+                    <span
+                      className="px-3 py-2 border rounded text-center"
+                      style={{ minWidth: "60px" }}
+                    >
                       {quantity}
                     </span>
                     <Button
@@ -376,17 +439,28 @@ export default function ProductDetail() {
                       <Plus size={16} />
                     </Button>
                   </div>
-                  {displayStock <= 0 && <small className="text-danger">Chọn dung tích</small>}
+                  {displayStock <= 0 && (
+                    <small className="text-danger">Chọn dung tích</small>
+                  )}
                 </div>
 
                 {/* Action Buttons */}
                 <div className="d-grid gap-2">
-                  <Button variant="primary" size="lg" onClick={handleAddToCart} disabled={displayStock <= 0}>
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    onClick={handleAddToCart}
+                    disabled={displayStock <= 0}
+                  >
                     <ShoppingCart className="me-2" size={20} />
                     Thêm vào giỏ hàng
                   </Button>
 
-                  <Button variant="outline-danger" className="w-100" onClick={handleAddToWishlist}>
+                  <Button
+                    variant="outline-danger"
+                    className="w-100"
+                    onClick={handleAddToWishlist}
+                  >
                     <Heart className="me-2" size={16} />
                     Yêu thích
                   </Button>
@@ -399,14 +473,21 @@ export default function ProductDetail() {
         {/* Product Details */}
         <Card className="mb-4 shadow-sm">
           <Card.Body>
-            <Tabs defaultActiveKey="specifications" id="product-tabs" className="mb-3">
+            <Tabs
+              defaultActiveKey="specifications"
+              id="product-tabs"
+              className="mb-3"
+            >
               <Tab eventKey="specifications" title="Thông Tin Sản Phẩm">
                 <div className="table-responsive">
                   <Table borderless>
                     <tbody>
                       {product.thuong_hieu && (
                         <tr>
-                          <td className="fw-semibold text-muted" style={{ width: "30%" }}>
+                          <td
+                            className="fw-semibold text-muted"
+                            style={{ width: "30%" }}
+                          >
                             Thương hiệu
                           </td>
                           <td>{product.thuong_hieu}</td>
@@ -426,19 +507,25 @@ export default function ProductDetail() {
                       )}
                       {product.nam_phat_hanh && (
                         <tr>
-                          <td className="fw-semibold text-muted">Năm phát hành</td>
+                          <td className="fw-semibold text-muted">
+                            Năm phát hành
+                          </td>
                           <td>{product.nam_phat_hanh}</td>
                         </tr>
                       )}
                       {product.do_luu_huong && (
                         <tr>
-                          <td className="fw-semibold text-muted">Độ lưu hương</td>
+                          <td className="fw-semibold text-muted">
+                            Độ lưu hương
+                          </td>
                           <td>{product.do_luu_huong}</td>
                         </tr>
                       )}
                       {product.do_toa_huong && (
                         <tr>
-                          <td className="fw-semibold text-muted">Độ tỏa hương</td>
+                          <td className="fw-semibold text-muted">
+                            Độ tỏa hương
+                          </td>
                           <td>{product.do_toa_huong}</td>
                         </tr>
                       )}
@@ -477,9 +564,14 @@ export default function ProductDetail() {
 
               <Tab eventKey="description" title="Bài viết mô tả">
                 {product.mo_ta ? (
-                  <div className="text-muted" dangerouslySetInnerHTML={{ __html: product.mo_ta }} />
+                  <div
+                    className="text-muted"
+                    dangerouslySetInnerHTML={{ __html: product.mo_ta }}
+                  />
                 ) : (
-                  <p className="text-muted text-center py-5">Chưa có mô tả cho sản phẩm này.</p>
+                  <p className="text-muted text-center py-5">
+                    Chưa có mô tả cho sản phẩm này.
+                  </p>
                 )}
               </Tab>
 
@@ -490,26 +582,40 @@ export default function ProductDetail() {
                       <Spinner animation="border" />
                     </div>
                   ) : reviews.length === 0 ? (
-                    <div className="text-center text-muted py-5">Chưa có đánh giá nào cho sản phẩm này.</div>
+                    <div className="text-center text-muted py-5">
+                      Chưa có đánh giá nào cho sản phẩm này.
+                    </div>
                   ) : (
                     <div className="d-flex flex-column gap-3">
                       {reviews.map((review) => (
                         <Card key={review.id} className="border-light">
                           <Card.Body>
                             <div className="d-flex align-items-center justify-content-between mb-2">
-                              <span className="fw-semibold">{review.ten_khach_hang}</span>
+                              <span className="fw-semibold">
+                                {review.ten_khach_hang}
+                              </span>
                               <div className="d-flex align-items-center gap-2">
                                 <div className="d-flex">
                                   {Array.from({ length: 5 }, (_, i) => (
                                     <Star
                                       key={i}
                                       size={16}
-                                      className={i < review.so_sao ? "text-warning" : "text-muted"}
-                                      fill={i < review.so_sao ? "currentColor" : "none"}
+                                      className={
+                                        i < review.so_sao
+                                          ? "text-warning"
+                                          : "text-muted"
+                                      }
+                                      fill={
+                                        i < review.so_sao
+                                          ? "currentColor"
+                                          : "none"
+                                      }
                                     />
                                   ))}
                                 </div>
-                                <small className="text-muted">{review.ngay_danh_gia}</small>
+                                <small className="text-muted">
+                                  {review.ngay_danh_gia}
+                                </small>
                               </div>
                             </div>
                             <p className="text-muted mb-0">{review.noi_dung}</p>
@@ -537,7 +643,9 @@ export default function ProductDetail() {
               {loadingRelated ? (
                 <div className="text-center py-5">
                   <Spinner animation="border" />
-                  <p className="mt-2 text-muted">Đang tải sản phẩm liên quan...</p>
+                  <p className="mt-2 text-muted">
+                    Đang tải sản phẩm liên quan...
+                  </p>
                 </div>
               ) : (
                 <div className="position-relative">
@@ -552,7 +660,11 @@ export default function ProductDetail() {
                     id="related-products-scroll"
                   >
                     {relatedProducts.map((item) => (
-                      <div key={item.id} className="flex-shrink-0" style={{ width: "250px" }}>
+                      <div
+                        key={item.id}
+                        className="flex-shrink-0"
+                        style={{ width: "250px" }}
+                      >
                         <Card
                           className="h-100 shadow-sm border-0 hover-shadow"
                           style={{
@@ -564,17 +676,22 @@ export default function ProductDetail() {
                             window.scrollTo({ top: 0, behavior: "smooth" });
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = "translateY(-2px)"
-                            e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)"
+                            e.currentTarget.style.transform =
+                              "translateY(-2px)";
+                            e.currentTarget.style.boxShadow =
+                              "0 4px 12px rgba(0,0,0,0.15)";
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = "translateY(0)"
-                            e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.12)"
+                            e.currentTarget.style.transform = "translateY(0)";
+                            e.currentTarget.style.boxShadow =
+                              "0 1px 3px rgba(0,0,0,0.12)";
                           }}
                         >
                           <div className="position-relative overflow-hidden">
                             <img
-                              src={getImageUrl(item.hinh_anh) || "/placeholder.svg"}
+                              src={
+                                getImageUrl(item.hinh_anh) || "/placeholder.svg"
+                              }
                               alt={item.ten_san_pham}
                               className="card-img-top"
                               style={{
@@ -583,10 +700,10 @@ export default function ProductDetail() {
                                 transition: "transform 0.3s",
                               }}
                               onMouseEnter={(e) => {
-                                e.target.style.transform = "scale(1.05)"
+                                e.target.style.transform = "scale(1.05)";
                               }}
                               onMouseLeave={(e) => {
-                                e.target.style.transform = "scale(1)"
+                                e.target.style.transform = "scale(1)";
                               }}
                             />
                           </div>
@@ -605,8 +722,12 @@ export default function ProductDetail() {
                             >
                               {item.ten_san_pham}
                             </h6>
-                            
-                            {item.thuong_hieu && <small className="text-muted d-block">{item.thuong_hieu}</small>}
+
+                            {item.thuong_hieu && (
+                              <small className="text-muted d-block">
+                                {item.thuong_hieu}
+                              </small>
+                            )}
                           </Card.Body>
                         </Card>
                       </div>
@@ -624,8 +745,10 @@ export default function ProductDetail() {
                       marginLeft: "-20px",
                     }}
                     onClick={() => {
-                      const container = document.getElementById("related-products-scroll")
-                      container.scrollBy({ left: -250, behavior: "smooth" })
+                      const container = document.getElementById(
+                        "related-products-scroll"
+                      );
+                      container.scrollBy({ left: -250, behavior: "smooth" });
                     }}
                   >
                     <ChevronLeft size={20} />
@@ -641,8 +764,10 @@ export default function ProductDetail() {
                       marginRight: "-20px",
                     }}
                     onClick={() => {
-                      const container = document.getElementById("related-products-scroll")
-                      container.scrollBy({ left: 250, behavior: "smooth" })
+                      const container = document.getElementById(
+                        "related-products-scroll"
+                      );
+                      container.scrollBy({ left: 250, behavior: "smooth" });
                     }}
                   >
                     <ChevronRight size={20} />
@@ -661,5 +786,5 @@ export default function ProductDetail() {
         )}
       </Container>
     </div>
-  )
+  );
 }

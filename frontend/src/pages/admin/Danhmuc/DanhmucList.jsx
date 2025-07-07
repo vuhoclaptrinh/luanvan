@@ -1,27 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Box, Button, Typography, Stack } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { Box, Button, Typography, Stack } from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Add as AddIcon,
   Visibility as VisibilityIcon,
-} from '@mui/icons-material';
-import { enqueueSnackbar } from 'notistack';
+} from "@mui/icons-material";
+import { enqueueSnackbar } from "notistack";
 
-import ConfirmDeleteDialog from '../../../components/cfdelete';
-import DanhmucAdd from './DanhmucAdd';
-import DanhmucEdit from './DanhmucEdit';
-import DanhmucView from './DanhmucView';
+import ConfirmDeleteDialog from "../../../components/cfdelete";
+import DanhmucAdd from "./DanhmucAdd";
+import DanhmucEdit from "./DanhmucEdit";
+import DanhmucView from "./DanhmucView";
 
-const API_BASE = 'http://127.0.0.1:8000/api/';
+const API_BASE = "http://127.0.0.1:8000/api/";
 
 const DanhmucList = () => {
   // State
   const [danhmuc, setDanhmuc] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10,
+  });
   // hành động mở dialog
   const [editOpen, setEditOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
@@ -39,15 +42,14 @@ const DanhmucList = () => {
       if (res.data?.data && Array.isArray(res.data.data)) {
         setDanhmuc(res.data.data);
       } else {
-        console.error('Dữ liệu danh mục không đúng định dạng:', res.data);
+        console.error("Dữ liệu danh mục không đúng định dạng:", res.data);
       }
     } catch (error) {
-      console.error('Lỗi khi lấy danh mục:', error);
+      console.error("Lỗi khi lấy danh mục:", error);
     } finally {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchDanhMuc();
   }, []);
@@ -88,73 +90,98 @@ const DanhmucList = () => {
   const handleConfirmDelete = async () => {
     try {
       await axios.delete(`${API_BASE}danhmuc/${deleteId}`);
-      enqueueSnackbar('Xoá danh mục thành công!', { variant: 'success' });
+      enqueueSnackbar("Xoá danh mục thành công!", { variant: "success" });
       setDanhmuc((prev) => prev.filter((dm) => dm.id !== deleteId));
     } catch (error) {
       if (error.response?.status === 409) {
-        enqueueSnackbar(error.response.data.message || 'Không thể xoá do ràng buộc dữ liệu do tồn tại sản phẩm', {
-          variant: 'error',
-        });
+        enqueueSnackbar(
+          error.response.data.message ||
+            "Không thể xoá do ràng buộc dữ liệu do tồn tại sản phẩm",
+          {
+            variant: "error",
+          }
+        );
       } else {
-        enqueueSnackbar('Lỗi khi xoá danh mục', { variant: 'error' });
+        enqueueSnackbar("Lỗi khi xoá danh mục", { variant: "error" });
       }
     } finally {
       setOpenConfirm(false);
       setDeleteId(null);
     }
   };
+
   const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString('vi-VN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleDateString("vi-VN", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   // DataGrid Columns
   const columns = [
-    { field: 'id', headerName: 'ID', width: 90 },
-    { field: 'ten_danh_muc', headerName: 'Tên danh mục', flex: 1, minWidth: 150 },
-    { field: 'mo_ta', headerName: 'Mô tả', flex: 1, minWidth: 200 },
-    { 
-      field: 'created_at', 
-      headerName: 'Ngày tạo', 
-      width: 160,
-      renderCell: (params) => (
-        <Typography variant="caption" color="text.secondary">
-          {formatDate(params.value)}
-        </Typography>
-      )
+    { field: "id", headerName: "ID", width: 90 },
+    {
+      field: "ten_danh_muc",
+      headerName: "Tên danh mục",
+      flex: 1,
+      minWidth: 150,
     },
-     { 
-      field: 'updated_at', 
-      headerName: 'Ngày cập nhật', 
+    { field: "mo_ta", headerName: "Mô tả", flex: 1, minWidth: 200 },
+    {
+      field: "created_at",
+      headerName: "Ngày tạo",
       width: 160,
       renderCell: (params) => (
         <Typography variant="caption" color="text.secondary">
           {formatDate(params.value)}
         </Typography>
-      )
+      ),
     },
     {
-      field: 'actions',
-      headerName: 'Thao tác',
-      type: 'actions',
+      field: "updated_at",
+      headerName: "Ngày cập nhật",
+      width: 160,
+      renderCell: (params) => (
+        <Typography variant="caption" color="text.secondary">
+          {formatDate(params.value)}
+        </Typography>
+      ),
+    },
+    {
+      field: "actions",
+      headerName: "Thao tác",
+      type: "actions",
       width: 250,
       sortable: false,
       filterable: false,
       renderCell: (params) => (
         <Stack direction="row" spacing={1}>
-          <Button size="small" variant="outlined" color="info" onClick={() => handleView(params.row)}>
+          <Button
+            size="small"
+            variant="outlined"
+            color="info"
+            onClick={() => handleView(params.row)}
+          >
             <VisibilityIcon />
           </Button>
-          <Button size="small" variant="outlined" color="warning" onClick={() => handleEdit(params.row)}>
+          <Button
+            size="small"
+            variant="outlined"
+            color="warning"
+            onClick={() => handleEdit(params.row)}
+          >
             <EditIcon />
           </Button>
-          <Button size="small" variant="outlined" color="error" onClick={() => handleDelete(params.row.id)}>
+          <Button
+            size="small"
+            variant="outlined"
+            color="error"
+            onClick={() => handleDelete(params.row.id)}
+          >
             <DeleteIcon fontSize="small" />
           </Button>
         </Stack>
@@ -164,29 +191,35 @@ const DanhmucList = () => {
 
   return (
     <Box>
-       <Typography
-              variant="h4"
-              fontWeight="bold"
-              mb={2}
-              color="primary.main"
-              textAlign="center"
-            >
-              Danh Sách Danh Mục
-            </Typography>
+      <Typography
+        variant="h4"
+        fontWeight="bold"
+        mb={2}
+        color="primary.main"
+        textAlign="center"
+      >
+        Danh Sách Danh Mục
+      </Typography>
 
-      <Stack direction="row" spacing={2} alignItems="center" mb={2} flexWrap="wrap">
+      <Stack
+        direction="row"
+        spacing={2}
+        alignItems="center"
+        mb={2}
+        flexWrap="wrap"
+      >
         <Box sx={{ flexGrow: 1 }} />
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => setAddOpen(true)}
-          sx={{ whiteSpace: 'nowrap' }}
+          sx={{ whiteSpace: "nowrap" }}
         >
           Thêm danh mục
         </Button>
       </Stack>
 
-      <Box sx={{ width: '100%', overflowX: 'auto' }}>
+      <Box sx={{ width: "100%", overflowX: "auto" }}>
         <DataGrid
           rows={danhmuc}
           columns={columns}
@@ -200,9 +233,22 @@ const DanhmucList = () => {
       </Box>
 
       {/* Dialogs */}
-      <DanhmucAdd open={addOpen} onClose={handleCloseAdd} onUpdate={fetchDanhMuc} />
-      <DanhmucEdit open={editOpen} onClose={handleCloseEdit} DanhmucId={selectedDanhmucId} onUpdate={fetchDanhMuc} />
-      <DanhmucView open={viewOpen} onClose={handleCloseView} DanhmucId={selectedDanhmucId} />
+      <DanhmucAdd
+        open={addOpen}
+        onClose={handleCloseAdd}
+        onUpdate={fetchDanhMuc}
+      />
+      <DanhmucEdit
+        open={editOpen}
+        onClose={handleCloseEdit}
+        DanhmucId={selectedDanhmucId}
+        onUpdate={fetchDanhMuc}
+      />
+      <DanhmucView
+        open={viewOpen}
+        onClose={handleCloseView}
+        DanhmucId={selectedDanhmucId}
+      />
       <ConfirmDeleteDialog
         open={openConfirm}
         onClose={() => setOpenConfirm(false)}

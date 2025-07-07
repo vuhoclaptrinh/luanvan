@@ -22,7 +22,7 @@ const ProductGrid = ({
   const [selectedStars, setSelectedStars] = useState({});
   const [daMuaMap, setDaMuaMap] = useState({});
   const [reviewedMap, setReviewedMap] = useState({});
-  const [reviewCounts, setReviewCounts] = useState({});
+  const [_, setReviewCounts] = useState({});
   const navigate = useNavigate();
 
   // const [daDanhGiaMap, setDaDanhGiaMap] = useState({});
@@ -64,6 +64,7 @@ const ProductGrid = ({
           newRatings[product.id] = data.trung_binh || 0;
           newCounts[product.id] = data.so_luong || 0;
         } catch (error) {
+          console.log(error.message);
           newRatings[product.id] = 0;
           newCounts[product.id] = 0;
         }
@@ -86,6 +87,7 @@ const ProductGrid = ({
           const data = await res.json();
           newReviewed[product.id] = data.da_danh_gia || false;
         } catch (err) {
+          console.log(err);
           newReviewed[product.id] = false;
         }
       })
@@ -362,14 +364,7 @@ const ProductGrid = ({
                         Dung tích: {product.dung_tich}
                       </small>
                     )}
-                    <div className="d-flex justify-content-between align-items-center">
-                      <span
-                        className={`${
-                          viewMode === "list" ? "fs-5" : "fs-6"
-                        } fw-bold text-primary`}
-                      >
-                        {product.gia_format}
-                      </span>
+                    <div className="d-flex justify-content-center align-items-center mt-5">
                       <Button
                         variant="outline-primary"
                         size="sm"

@@ -1,4 +1,3 @@
-
 import React from "react";
 import Footer from "../../components/Footer";
 import Header from "../../components/header";
@@ -14,16 +13,14 @@ const SanphamUser = () => {
   return (
     <>
       <div className="d-flex flex-column min-vh-100">
-      <Header />
-      <main className="flex-grow-1">
-        
-        
-        <ViewSP />
-        
-        {/* <BackToTop/> */}
-      </main>
-      <Footer />
-    </div>
+        <Header />
+        <main className="flex-grow-1">
+          <ViewSP />
+
+          {/* <BackToTop/> */}
+        </main>
+        <Footer />
+      </div>
     </>
   );
 };

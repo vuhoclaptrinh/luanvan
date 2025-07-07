@@ -1,133 +1,151 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
-import { Container, Row, Col, Card, Form, Button, Alert, Nav, InputGroup } from "react-bootstrap"
-import { Eye, EyeOff, User, Mail, Lock, LogIn, UserPlus, ArrowLeft } from "lucide-react"
-import { toast } from "react-toastify"
-import axios from "axios"
-import Logo from "../assets/img/logo.jpg"
-import "./Login.css"
+import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Form,
+  Button,
+  Alert,
+  Nav,
+  InputGroup,
+} from "react-bootstrap";
+import {
+  Eye,
+  EyeOff,
+  User,
+  Mail,
+  Lock,
+  LogIn,
+  UserPlus,
+  ArrowLeft,
+} from "lucide-react";
+import { toast } from "react-toastify";
+import axios from "axios";
+import Logo from "../assets/img/logo.jpg";
+import "./Login.css";
 
 const LoginRegister = () => {
-  const [activeTab, setActiveTab] = useState("login")
+  const [activeTab, setActiveTab] = useState("login");
+  //nhận dữ liệu
   const [formData, setFormData] = useState({
     email: "",
     mat_khau: "",
     confirm_password: "",
     ho_ten: "",
-  })
-  const [error, setError] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [validated, setValidated] = useState(false)
-
-  const navigate = useNavigate()
-  const location = useLocation()
-  const from = location.state?.from || "/home"
-
+  });
+  //xử lý load
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [validated, setValidated] = useState(false);
+  // điều hương
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from || "/home";
+  // trang đăng ký đăng nhập
   const handleTabChange = (tab) => {
-    setActiveTab(tab)
-    setError("")
-    setFormData({ email: "", mat_khau: "", confirm_password: "", ho_ten: "" })
-    setShowPassword(false)
-    setValidated(false)
-  }
-
+    setActiveTab(tab);
+    setError("");
+    setFormData({ email: "", mat_khau: "", confirm_password: "", ho_ten: "" });
+    setShowPassword(false);
+    setValidated(false);
+  };
+  //nhận dữ liệu
   const handleInputChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
+  // login
   const handleLogin = async (e) => {
-    e.preventDefault()
-    const form = e.currentTarget
-    setValidated(true)
-
+    e.preventDefault();
+    const form = e.currentTarget;
+    setValidated(true);
     if (form.checkValidity() === false) {
-      e.stopPropagation()
-      return
+      e.stopPropagation();
+      return;
     }
-
-    setError("")
-    setLoading(true)
-
+    setError("");
+    setLoading(true);
     try {
       const response = await axios.post("http://127.0.0.1:8000/api/login", {
         email: formData.email,
         mat_khau: formData.mat_khau,
-      })
-
-      const user = response.data.user
+      });
+      const user = response.data.user;
       if (user) {
-        sessionStorage.setItem("user", JSON.stringify(user))
-        toast.success("Đăng nhập thành công!")
+        sessionStorage.setItem("user", JSON.stringify(user));
+        toast.success("Đăng nhập thành công!");
 
         if (user.role === 1) {
-          navigate("/thongke")
-          toast.info("Chào mừng Admin!")
+          navigate("/thongke");
+          toast.info("Chào mừng Admin!");
         } else {
-          navigate(from)
-          toast.info("Chào mừng bạn quay trở lại!")
+          navigate(from);
+          toast.info("Chào mừng bạn quay trở lại!");
         }
       } else {
-        setError("Đăng nhập thất bại!")
+        setError("Đăng nhập thất bại!");
       }
     } catch (error) {
-      console.error(error)
-      setError("Email hoặc mật khẩu không đúng!")
+      console.error(error);
+      setError("Email hoặc mật khẩu không đúng!");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
-
+  };
+  //đăng ký
   const handleRegister = async (e) => {
-    e.preventDefault()
-    const form = e.currentTarget
-    setValidated(true)
-
+    e.preventDefault();
+    const form = e.currentTarget;
+    setValidated(true);
     if (form.checkValidity() === false) {
-      e.stopPropagation()
-      return
+      e.stopPropagation();
+      return;
     }
-
-    setError("")
-    setLoading(true)
+    setError("");
+    setLoading(true);
     if (formData.mat_khau !== formData.confirm_password) {
       setError("Mật khẩu xác nhận không khớp.");
       setLoading(false);
       return;
     }
-
     try {
-      const response = await axios.post("http://127.0.0.1:8000/api/khachhang/register", {
-        ho_ten: formData.ho_ten,
-        email: formData.email,
-        mat_khau: formData.mat_khau,
-      })
-
-      toast.success("Đăng ký thành công! Vui lòng đăng nhập.")
-      setActiveTab("login")
-      setFormData({ email: formData.email, mat_khau: "", ho_ten: "" })
-      setValidated(false)
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/khachhang/register",
+        {
+          ho_ten: formData.ho_ten,
+          email: formData.email,
+          mat_khau: formData.mat_khau,
+        }
+      );
+      console.log(response);
+      toast.success("Đăng ký thành công! Vui lòng đăng nhập.");
+      setActiveTab("login");
+      setFormData({ email: formData.email, mat_khau: "", ho_ten: "" });
+      setValidated(false);
     } catch (error) {
-      console.error(error)
+      console.error(error);
       if (error.response?.data?.message) {
-        setError(error.response.data.message)
+        setError(error.response.data.message);
       } else {
-        setError("Có lỗi xảy ra khi đăng ký!")
+        setError("Có lỗi xảy ra khi đăng ký!");
       }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword)
-  }
+    setShowPassword(!showPassword);
+  };
 
   return (
     <div className="auth-page">
@@ -142,7 +160,11 @@ const LoginRegister = () => {
               {/* Header */}
               <div className="auth-header">
                 <div className="auth-logo">
-                  <img src={Logo || "/placeholder.svg"} alt="PerfumeShop Logo" className="logo-image" />
+                  <img
+                    src={Logo || "/placeholder.svg"}
+                    alt="PerfumeShop Logo"
+                    className="logo-image"
+                  />
                 </div>
                 <h1 className="auth-title">PerfumeShop</h1>
                 <p className="auth-subtitle">Hệ thống nước hoa cao cấp</p>
@@ -184,7 +206,12 @@ const LoginRegister = () => {
 
                 {/* Login Form */}
                 {activeTab === "login" && (
-                  <Form noValidate validated={validated} onSubmit={handleLogin} className="auth-form">
+                  <Form
+                    noValidate
+                    validated={validated}
+                    onSubmit={handleLogin}
+                    className="auth-form"
+                  >
                     <Form.Group className="mb-3">
                       <Form.Label>Email</Form.Label>
                       <InputGroup>
@@ -199,7 +226,9 @@ const LoginRegister = () => {
                           placeholder="Nhập email của bạn"
                           required
                         />
-                        <Form.Control.Feedback type="invalid">Vui lòng nhập email hợp lệ.</Form.Control.Feedback>
+                        <Form.Control.Feedback type="invalid">
+                          Vui lòng nhập email hợp lệ.
+                        </Form.Control.Feedback>
                       </InputGroup>
                     </Form.Group>
 
@@ -225,21 +254,37 @@ const LoginRegister = () => {
                           }}
                           className="password-toggle"
                         >
-                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                          {showPassword ? (
+                            <EyeOff size={18} />
+                          ) : (
+                            <Eye size={18} />
+                          )}
                         </Button>
-                        <Form.Control.Feedback type="invalid">Vui lòng nhập mật khẩu.</Form.Control.Feedback>
+                        <Form.Control.Feedback type="invalid">
+                          Vui lòng nhập mật khẩu.
+                        </Form.Control.Feedback>
                       </InputGroup>
                     </Form.Group>
                     <div className="text-end mb-3">
-                    <Button variant="link" className="p-0 text-primary" onClick={() => navigate("/forgot-password")}>
-                      Quên mật khẩu?
-                    </Button>
-                  </div>
-
-                    <Button type="submit" className="auth-submit-btn" disabled={loading}>
+                      <Button
+                        variant="link"
+                        className="p-0 text-primary"
+                        onClick={() => navigate("/forgot-password")}
+                      >
+                        Quên mật khẩu?
+                      </Button>
+                    </div>
+                    <Button
+                      type="submit"
+                      className="auth-submit-btn"
+                      disabled={loading}
+                    >
                       {loading ? (
                         <>
-                          <div className="spinner-border spinner-border-sm me-2" role="status">
+                          <div
+                            className="spinner-border spinner-border-sm me-2"
+                            role="status"
+                          >
                             <span className="visually-hidden">Loading...</span>
                           </div>
                           Đang đăng nhập...
@@ -254,9 +299,14 @@ const LoginRegister = () => {
                   </Form>
                 )}
 
-                {/* Register Form */}
+                {/*Đăng ký */}
                 {activeTab === "register" && (
-                  <Form noValidate validated={validated} onSubmit={handleRegister} className="auth-form">
+                  <Form
+                    noValidate
+                    validated={validated}
+                    onSubmit={handleRegister}
+                    className="auth-form"
+                  >
                     <Form.Group className="mb-3">
                       <Form.Label>Họ tên</Form.Label>
                       <InputGroup>
@@ -271,7 +321,9 @@ const LoginRegister = () => {
                           placeholder="Nhập họ tên của bạn"
                           required
                         />
-                        <Form.Control.Feedback type="invalid">Vui lòng nhập họ tên.</Form.Control.Feedback>
+                        <Form.Control.Feedback type="invalid">
+                          Vui lòng nhập họ tên.
+                        </Form.Control.Feedback>
                       </InputGroup>
                     </Form.Group>
 
@@ -289,7 +341,9 @@ const LoginRegister = () => {
                           placeholder="Nhập email của bạn"
                           required
                         />
-                        <Form.Control.Feedback type="invalid">Vui lòng nhập email hợp lệ.</Form.Control.Feedback>
+                        <Form.Control.Feedback type="invalid">
+                          Vui lòng nhập email hợp lệ.
+                        </Form.Control.Feedback>
                       </InputGroup>
                     </Form.Group>
 
@@ -313,9 +367,15 @@ const LoginRegister = () => {
                           onClick={togglePasswordVisibility}
                           className="password-toggle"
                         >
-                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                          {showPassword ? (
+                            <EyeOff size={18} />
+                          ) : (
+                            <Eye size={18} />
+                          )}
                         </Button>
-                        <Form.Control.Feedback type="invalid">Mật khẩu phải có ít nhất 6 ký tự.</Form.Control.Feedback>
+                        <Form.Control.Feedback type="invalid">
+                          Mật khẩu phải có ít nhất 6 ký tự.
+                        </Form.Control.Feedback>
                       </InputGroup>
                     </Form.Group>
 
@@ -332,24 +392,39 @@ const LoginRegister = () => {
                           onChange={handleInputChange}
                           placeholder="Nhập lại mật khẩu"
                           required
-                          isInvalid={validated && formData.confirm_password !== formData.mat_khau}
+                          isInvalid={
+                            validated &&
+                            formData.confirm_password !== formData.mat_khau
+                          }
                         />
                         <Button
                           variant="outline-secondary"
                           onClick={togglePasswordVisibility}
                           className="password-toggle"
                         >
-                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                          {showPassword ? (
+                            <EyeOff size={18} />
+                          ) : (
+                            <Eye size={18} />
+                          )}
                         </Button>
-                        <Form.Control.Feedback type="invalid">Mật khẩu xác nhận không khớp.</Form.Control.Feedback>
+                        <Form.Control.Feedback type="invalid">
+                          Mật khẩu xác nhận không khớp.
+                        </Form.Control.Feedback>
                       </InputGroup>
                     </Form.Group>
 
-
-                    <Button type="submit" className="auth-submit-btn" disabled={loading}>
+                    <Button
+                      type="submit"
+                      className="auth-submit-btn"
+                      disabled={loading}
+                    >
                       {loading ? (
                         <>
-                          <div className="spinner-border spinner-border-sm me-2" role="status">
+                          <div
+                            className="spinner-border spinner-border-sm me-2"
+                            role="status"
+                          >
                             <span className="visually-hidden">Loading...</span>
                           </div>
                           Đang đăng ký...
@@ -370,8 +445,14 @@ const LoginRegister = () => {
                 <div className="auth-divider">
                   <span>© 2025 PerfumeShop</span>
                 </div>
-                <p className="auth-footer-text">Hệ thống nước hoa chuyên nghiệp</p>
-                <Button variant="link" className="back-to-home" onClick={() => navigate("/home")}>
+                <p className="auth-footer-text">
+                  Hệ thống nước hoa chuyên nghiệp
+                </p>
+                <Button
+                  variant="link"
+                  className="back-to-home"
+                  onClick={() => navigate("/home")}
+                >
                   <ArrowLeft size={16} className="me-1" />
                   Quay về trang chủ
                 </Button>
@@ -381,7 +462,7 @@ const LoginRegister = () => {
         </Row>
       </Container>
     </div>
-  )
-}
+  );
+};
 
-export default LoginRegister
+export default LoginRegister;

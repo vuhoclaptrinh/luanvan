@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   Card,
   CardContent,
@@ -10,17 +10,17 @@ import {
   Grid,
   Divider,
   Paper,
-} from '@mui/material';
+} from "@mui/material";
 
 // Import icon MUI
-import EmailIcon from '@mui/icons-material/Email';
-import PhoneIcon from '@mui/icons-material/Phone';
-import HomeIcon from '@mui/icons-material/Home';
+import EmailIcon from "@mui/icons-material/Email";
+import PhoneIcon from "@mui/icons-material/Phone";
+import HomeIcon from "@mui/icons-material/Home";
 
-const API_BASE = 'http://127.0.0.1:8000/api/';
+const API_BASE = "http://127.0.0.1:8000/api/";
 
 const Profile = () => {
-  const userStr = sessionStorage.getItem('user');
+  const userStr = sessionStorage.getItem("user");
   const sessionUser = userStr ? JSON.parse(userStr) : null;
 
   const [nguoiDung, setNguoiDung] = useState(null);
@@ -33,10 +33,12 @@ const Profile = () => {
       try {
         const res = await axios.get(`${API_BASE}khachhang`);
         const dsNguoiDung = res.data.data;
-        const foundUser = dsNguoiDung.find((nd) => nd.email === sessionUser.email);
+        const foundUser = dsNguoiDung.find(
+          (nd) => nd.email === sessionUser.email
+        );
         setNguoiDung(foundUser || null);
       } catch (error) {
-        console.error('Lỗi khi lấy thông tin người dùng:', error);
+        console.error("Lỗi khi lấy thông tin người dùng:", error);
       } finally {
         setLoading(false);
       }
@@ -68,7 +70,13 @@ const Profile = () => {
         {/* Header */}
         <Box display="flex" flexDirection="column" alignItems="center" mb={3}>
           <Avatar
-            sx={{ bgcolor: 'primary.main', width: 72, height: 72, mb: 1.5, fontSize: 28 }}
+            sx={{
+              bgcolor: "primary.main",
+              width: 72,
+              height: 72,
+              mb: 1.5,
+              fontSize: 28,
+            }}
           >
             {nguoiDung.ho_ten?.charAt(0).toUpperCase()}
           </Avatar>
@@ -76,7 +84,7 @@ const Profile = () => {
             {nguoiDung.ho_ten}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {nguoiDung.role === 1 ? 'Quản trị viên' : 'Người dùng thường'}
+            {nguoiDung.role === 1 ? "Quản trị viên" : "Người dùng thường"}
           </Typography>
         </Box>
 
@@ -90,7 +98,7 @@ const Profile = () => {
               <Typography variant="subtitle2" color="text.secondary">
                 Email
               </Typography>
-              <Typography>{nguoiDung.email || 'Chưa cập nhật'}</Typography>
+              <Typography>{nguoiDung.email || "Chưa cập nhật"}</Typography>
             </Box>
           </Grid>
           <Grid item xs={12} display="flex" alignItems="center" gap={1}>
@@ -99,7 +107,9 @@ const Profile = () => {
               <Typography variant="subtitle2" color="text.secondary">
                 Số điện thoại
               </Typography>
-              <Typography>{nguoiDung.so_dien_thoai || 'Chưa cập nhật'}</Typography>
+              <Typography>
+                {nguoiDung.so_dien_thoai || "Chưa cập nhật"}
+              </Typography>
             </Box>
           </Grid>
           <Grid item xs={12} display="flex" alignItems="center" gap={1}>
@@ -108,7 +118,7 @@ const Profile = () => {
               <Typography variant="subtitle2" color="text.secondary">
                 Địa chỉ
               </Typography>
-              <Typography>{nguoiDung.dia_chi || 'Chưa cập nhật'}</Typography>
+              <Typography>{nguoiDung.dia_chi || "Chưa cập nhật"}</Typography>
             </Box>
           </Grid>
         </Grid>

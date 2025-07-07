@@ -35,14 +35,13 @@ const ViewSP = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [_, setCurrentImageIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [visibleCount, setVisibleCount] = useState(8);
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
-  // const [showFilters, setShowFilters] = useState(true)
-  const [viewMode, setViewMode] = useState("grid"); // grid or list
+  const [viewMode, setViewMode] = useState("grid");
   const [sortOption, setSortOption] = useState("default");
   const [mobileFiltersVisible, setMobileFiltersVisible] = useState(false);
 

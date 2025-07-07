@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -11,28 +11,26 @@ import {
   Paper,
   Grid,
   Stack,
-} from '@mui/material';
+} from "@mui/material";
 
-import axios from 'axios';
+import axios from "axios";
 
-import CategoryIcon from '@mui/icons-material/Category';
-//import Inventory2Icon from '@mui/icons-material/Inventory2';
+import CategoryIcon from "@mui/icons-material/Category";
 
-const API_BASE = 'http://127.0.0.1:8000/api/';
+const API_BASE = "http://127.0.0.1:8000/api/";
 
 const InfoRow = ({ label, value }) => (
   <Box display="flex" mb={1}>
-    <Typography sx={{ width: 130, fontWeight: '600', color: 'text.secondary' }}>
+    <Typography sx={{ width: 130, fontWeight: "600", color: "text.secondary" }}>
       {label}:
     </Typography>
-    <Typography sx={{ wordBreak: 'break-word' }}>{value}</Typography>
+    <Typography sx={{ wordBreak: "break-word" }}>{value}</Typography>
   </Box>
 );
 
 const DanhmucView = ({ open, onClose, DanhmucId }) => {
   const [danhmuc, setDanhmuc] = useState(null);
   const [loading, setLoading] = useState(false);
-
   useEffect(() => {
     if (open && DanhmucId) {
       setLoading(true);
@@ -54,11 +52,11 @@ const DanhmucView = ({ open, onClose, DanhmucId }) => {
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle
         sx={{
-          backgroundColor: '#1976d2',
-          color: 'white',
-          fontWeight: 'bold',
-          display: 'flex',
-          alignItems: 'center',
+          backgroundColor: "#1976d2",
+          color: "white",
+          fontWeight: "bold",
+          display: "flex",
+          alignItems: "center",
           gap: 1,
           fontSize: 20,
         }}
@@ -67,13 +65,21 @@ const DanhmucView = ({ open, onClose, DanhmucId }) => {
         Chi tiết danh mục
       </DialogTitle>
 
-      <DialogContent dividers sx={{ backgroundColor: '#f9f9f9' }}>
+      <DialogContent dividers sx={{ backgroundColor: "#f9f9f9" }}>
         {loading ? (
-          <Box display="flex" justifyContent="center" alignItems="center" height={180}>
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            height={180}
+          >
             <CircularProgress />
           </Box>
         ) : danhmuc ? (
-          <Paper elevation={3} sx={{ p: 3, borderRadius: 2, backgroundColor: 'white' }}>
+          <Paper
+            elevation={3}
+            sx={{ p: 3, borderRadius: 2, backgroundColor: "white" }}
+          >
             <Grid container spacing={3}>
               <Grid item xs={12} md={7}>
                 <Typography variant="h5" fontWeight="bold" gutterBottom>
@@ -82,13 +88,17 @@ const DanhmucView = ({ open, onClose, DanhmucId }) => {
 
                 <Box>
                   <InfoRow label="ID" value={danhmuc.id} />
-                  <InfoRow label="Mô tả" value={danhmuc.mo_ta || 'N/A'} />
+                  <InfoRow label="Mô tả" value={danhmuc.mo_ta || "N/A"} />
                 </Box>
 
                 {danhmuc.sanphams?.length > 0 && (
                   <Box mt={4}>
-                    <Stack direction="row" alignItems="center" spacing={1} mb={1}>
-                      
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      spacing={1}
+                      mb={1}
+                    >
                       <Typography variant="subtitle1" fontWeight="bold">
                         Sản phẩm thuộc danh mục ({danhmuc.sanphams.length})
                       </Typography>
@@ -103,14 +113,22 @@ const DanhmucView = ({ open, onClose, DanhmucId }) => {
                         px={1}
                         py={0.75}
                         sx={{
-                          borderBottom: '1px solid #e0e0e0',
-                          alignItems: 'center',
+                          borderBottom: "1px solid #e0e0e0",
+                          alignItems: "center",
                         }}
                       >
-                        <Typography sx={{ width: 80, fontWeight: '600', color: 'text.secondary' }}>
+                        <Typography
+                          sx={{
+                            width: 80,
+                            fontWeight: "600",
+                            color: "text.secondary",
+                          }}
+                        >
                           ID: {sp.id}
                         </Typography>
-                        <Typography sx={{ fontWeight: '500' }}>{sp.ten_san_pham}</Typography>
+                        <Typography sx={{ fontWeight: "500" }}>
+                          {sp.ten_san_pham}
+                        </Typography>
                       </Box>
                     ))}
                   </Box>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -7,16 +7,16 @@ import {
   TextField,
   Button,
   Stack,
-} from '@mui/material';
-import axios from 'axios';
-import { enqueueSnackbar } from 'notistack';
+} from "@mui/material";
+import axios from "axios";
+import { enqueueSnackbar } from "notistack";
 
-const API = 'http://127.0.0.1:8000/api/danhmuc';
+const API = "http://127.0.0.1:8000/api/danhmuc";
 
 const DanhmucEdit = ({ open, onClose, DanhmucId, onUpdate }) => {
   const [formData, setFormData] = useState({
-    ten_danh_muc: '',
-    mo_ta: '',
+    ten_danh_muc: "",
+    mo_ta: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -24,17 +24,20 @@ const DanhmucEdit = ({ open, onClose, DanhmucId, onUpdate }) => {
   // Lấy dữ liệu danh mục khi dialog mở
   useEffect(() => {
     if (open && DanhmucId) {
-      axios.get(`${API}/${DanhmucId}`)
+      axios
+        .get(`${API}/${DanhmucId}`)
         .then((res) => {
           const dm = res.data?.data || res.data;
           setFormData({
-            ten_danh_muc: dm.ten_danh_muc || '',
-            mo_ta: dm.mo_ta || '',
+            ten_danh_muc: dm.ten_danh_muc || "",
+            mo_ta: dm.mo_ta || "",
           });
         })
         .catch((err) => {
-          console.error('Lỗi khi tải danh mục:', err);
-          enqueueSnackbar('Không thể tải dữ liệu danh mục!', { variant: 'error' });
+          console.error("Lỗi khi tải danh mục:", err);
+          enqueueSnackbar("Không thể tải dữ liệu danh mục!", {
+            variant: "error",
+          });
         });
     }
   }, [DanhmucId, open]);
@@ -42,7 +45,7 @@ const DanhmucEdit = ({ open, onClose, DanhmucId, onUpdate }) => {
   // Reset form khi đóng dialog
   useEffect(() => {
     if (!open) {
-      setFormData({ ten_danh_muc: '', mo_ta: '' });
+      setFormData({ ten_danh_muc: "", mo_ta: "" });
       setLoading(false);
     }
   }, [open]);
@@ -54,7 +57,9 @@ const DanhmucEdit = ({ open, onClose, DanhmucId, onUpdate }) => {
 
   const handleSubmit = async () => {
     if (!formData.ten_danh_muc.trim()) {
-      enqueueSnackbar('Tên danh mục không được để trống!', { variant: 'warning' });
+      enqueueSnackbar("Tên danh mục không được để trống!", {
+        variant: "warning",
+      });
       return;
     }
 
@@ -62,15 +67,15 @@ const DanhmucEdit = ({ open, onClose, DanhmucId, onUpdate }) => {
     try {
       const res = await axios.put(`${API}/${DanhmucId}`, formData);
       if (res.status === 200) {
-        enqueueSnackbar('Cập nhật thành công!', { variant: 'success' });
-        onUpdate();   // cập nhật lại danh sách
-        onClose();    // đóng dialog
+        enqueueSnackbar("Cập nhật thành công!", { variant: "success" });
+        onUpdate();
+        onClose();
       } else {
-        enqueueSnackbar('Cập nhật thất bại!', { variant: 'error' });
+        enqueueSnackbar("Cập nhật thất bại!", { variant: "error" });
       }
     } catch (err) {
-      console.error('Lỗi khi cập nhật:', err);
-      enqueueSnackbar('Cập nhật danh mục thất bại!', { variant: 'error' });
+      console.error("Lỗi khi cập nhật:", err);
+      enqueueSnackbar("Cập nhật danh mục thất bại!", { variant: "error" });
     } finally {
       setLoading(false);
     }
@@ -104,12 +109,8 @@ const DanhmucEdit = ({ open, onClose, DanhmucId, onUpdate }) => {
         <Button onClick={onClose} color="inherit">
           Hủy
         </Button>
-        <Button
-          onClick={handleSubmit}
-          variant="contained"
-          disabled={loading}
-        >
-          {loading ? 'Đang lưu...' : 'Lưu'}
+        <Button onClick={handleSubmit} variant="contained" disabled={loading}>
+          {loading ? "Đang lưu..." : "Lưu"}
         </Button>
       </DialogActions>
     </Dialog>
