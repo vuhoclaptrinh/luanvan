@@ -24,7 +24,7 @@ class DonhangController extends Controller
                     'so_dien_thoai' => $item->so_dien_thoai,
                     'dia_chi' => $item->dia_chi,
                     'ten_khach_hang' => optional($item->khachhang)->ho_ten,
-                    'ngay_dat' => Carbon::parse($item->ngay_dat)->format('Y-m-d'),
+                    'ngay_dat' => Carbon::parse($item->ngay_dat)->format('d-m-Y'),
 
                     'tong_tien_truoc_giam' => $item->tong_tien_truoc_giam,
                     'tong_tien_truoc_giam_fomat' => number_format($item->tong_tien_truoc_giam, 0, ',', '.') . ' ₫',
@@ -487,4 +487,6 @@ class DonhangController extends Controller
 
         return response()->json(['message' => 'Đã huỷ đơn hàng và hoàn trả tồn kho thành công']);
     }
+
+
 }

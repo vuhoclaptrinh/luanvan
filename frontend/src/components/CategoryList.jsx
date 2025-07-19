@@ -1,11 +1,10 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import axios from "axios"
-import { Container, Row, Col, Card, Spinner, Badge } from "react-bootstrap"
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { Container, Row, Col, Card, Spinner, Badge } from "react-bootstrap";
 
-const API_BASE = "http://127.0.0.1:8000/api/"
-
+const API_BASE = "http://127.0.0.1:8000/api/";
 
 const categoryColors = [
   "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
@@ -16,57 +15,54 @@ const categoryColors = [
   "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
   "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)",
   "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
-]
-
+];
 
 const getCategoryIcon = (name) => {
-  const lower = name.toLowerCase()
-  if (lower.includes("nam")) return "👨"
-  if (lower.includes("nữ")) return "👩"
-  if (lower.includes("unisex")) return "👫"
-  if (lower.includes("mini")) return "🧴"
-  if (lower.includes("cao cấp")) return "💎"
-  if (lower.includes("trẻ em")) return "👶"
-  return "🌸"
-}
+  const lower = name.toLowerCase();
+  if (lower.includes("nam")) return "👨";
+  if (lower.includes("nữ")) return "👩";
+  if (lower.includes("unisex")) return "👫";
+  if (lower.includes("mini")) return "🧴";
+  if (lower.includes("cao cấp")) return "💎";
+  if (lower.includes("trẻ em")) return "👶";
+  return "🧴";
+};
 
 function FeaturedCategories() {
-
-  //  State
-  const [categories, setCategories] = useState([])
-  const [loading, setLoading] = useState(false)
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
   //  Lấy danh sách danh mục + số lượng sản phẩm
   useEffect(() => {
     const fetchCategories = async () => {
-      setLoading(true)
+      setLoading(true);
       try {
-        const res = await axios.get(`${API_BASE}danhmuc`)
-        const danhmucs = res.data?.data || []
+        const res = await axios.get(`${API_BASE}danhmuc`);
+        const danhmucs = res.data?.data || [];
 
         const detailedData = await Promise.all(
           danhmucs.map(async (dm, i) => {
-            const detail = await axios.get(`${API_BASE}danhmuc/${dm.id}`)
-            const count = detail.data?.sanphams?.length || 0
+            const detail = await axios.get(`${API_BASE}danhmuc/${dm.id}`);
+            const count = detail.data?.sanphams?.length || 0;
             return {
               id: dm.id,
               name: dm.ten_danh_muc,
               count,
               gradient: categoryColors[i % categoryColors.length],
               icon: getCategoryIcon(dm.ten_danh_muc),
-            }
+            };
           })
-        )
+        );
 
-        setCategories(detailedData)
+        setCategories(detailedData);
       } catch (err) {
-        console.error("Lỗi khi tải danh mục:", err)
+        console.error("Lỗi khi tải danh mục:", err);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchCategories()
-  }, [])
+    fetchCategories();
+  }, []);
 
   return (
     <section className="py-5 bg-light">
@@ -82,9 +78,9 @@ function FeaturedCategories() {
           <div className="d-flex justify-content-center mt-3">
             <div
               style={{
-                width: "60px",
+                width: "100px",
                 height: "4px",
-                background: "linear-gradient(to right, #e83e8c, #6f42c1)",
+                background: "blue",
                 borderRadius: "2px",
               }}
             ></div>
@@ -93,7 +89,11 @@ function FeaturedCategories() {
         {/*  Loading */}
         {loading ? (
           <div className="text-center py-5">
-            <Spinner animation="border" variant="primary" style={{ width: "3rem", height: "3rem" }} />
+            <Spinner
+              animation="border"
+              variant="primary"
+              style={{ width: "3rem", height: "3rem" }}
+            />
             <p className="mt-3 text-muted">Đang tải danh mục...</p>
           </div>
         ) : (
@@ -110,12 +110,14 @@ function FeaturedCategories() {
                     transition: "all 0.3s ease",
                   }}
                   onMouseOver={(e) => {
-                    e.currentTarget.style.transform = "translateY(-6px)"
-                    e.currentTarget.style.boxShadow = "0 12px 24px rgba(0,0,0,0.15)"
+                    e.currentTarget.style.transform = "translateY(-6px)";
+                    e.currentTarget.style.boxShadow =
+                      "0 12px 24px rgba(0,0,0,0.15)";
                   }}
                   onMouseOut={(e) => {
-                    e.currentTarget.style.transform = "translateY(0)"
-                    e.currentTarget.style.boxShadow = "0 0.125rem 0.25rem rgba(0,0,0,0.075)"
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow =
+                      "0 0.125rem 0.25rem rgba(0,0,0,0.075)";
                   }}
                 >
                   <div
@@ -128,7 +130,13 @@ function FeaturedCategories() {
                       justifyContent: "center",
                     }}
                   >
-                    <div className="mb-3" style={{ fontSize: "3rem", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.2))" }}>
+                    <div
+                      className="mb-3"
+                      style={{
+                        fontSize: "3rem",
+                        filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.2))",
+                      }}
+                    >
                       {cat.icon}
                     </div>
                     <h4 className="fw-bold mb-2 text-shadow">{cat.name}</h4>
@@ -158,7 +166,9 @@ function FeaturedCategories() {
               <Col md={8}>
                 <div className="d-flex justify-content-around align-items-center flex-wrap">
                   <div className="text-center mb-3">
-                    <div className="fs-2 fw-bold text-primary">{categories.length}</div>
+                    <div className="fs-2 fw-bold text-primary">
+                      {categories.length}
+                    </div>
                     <small className="text-muted">Danh mục</small>
                   </div>
                   <div className="text-center mb-3">
@@ -181,10 +191,8 @@ function FeaturedCategories() {
           </div>
         )}
       </Container>
-
-     
     </section>
-  )
+  );
 }
 
-export default FeaturedCategories
+export default FeaturedCategories;

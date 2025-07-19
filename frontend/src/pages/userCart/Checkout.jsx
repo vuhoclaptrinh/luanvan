@@ -310,7 +310,6 @@ const Checkout = () => {
 
     setSubmitting(true);
 
-    // chuyển code địa chỉ sang tên
     const getProvinceName = (code) =>
       provinces.find((p) => p.code === Number(code))?.name || "";
 
@@ -320,18 +319,57 @@ const Checkout = () => {
     const getWardName = (code) =>
       wards.find((w) => w.code === Number(code))?.name || "";
 
-    try {
-      // Kết hợp địa chỉ
-      const fullAddress = [
-        formData.dia_chi,
-        getWardName(formData.ward),
-        getDistrictName(formData.district),
-        getProvinceName(formData.city),
-      ]
-        .filter(Boolean)
-        .join(", ");
+    const fullAddress = [
+      formData.dia_chi,
+      getWardName(formData.ward),
+      getDistrictName(formData.district),
+      getProvinceName(formData.city),
+    ]
+      .filter(Boolean)
+      .join(", ");
 
-      // Gửi đơn hàng chính
+    try {
+      // Nếu chọn VNPAY
+      if (formData.paymentMethod === "vnpay") {
+        const orderPayload = {
+          khach_hang_id: user.id,
+          ngay_dat: new Date().toISOString().split("T")[0],
+          tong_tien: total,
+          tong_tien_truoc_giam: subtotal,
+          giam_gia_tien: discount,
+          phi_van_chuyen: shippingcost,
+          ten_phuong_thuc_van_chuyen: shipping.name,
+          trang_thai: "chờ thanh toán",
+          ma_giam_gia_id: couponId || null,
+          ho_ten_nguoi_nhan: formData.ho_ten,
+          email_nguoi_nhan: formData.email,
+          so_dien_thoai: formData.so_dien_thoai,
+          dia_chi: fullAddress,
+          ghi_chu: formData.notes || "",
+          paymentMethod: "vnpay",
+          chi_tiet: cart.map((item) => ({
+            san_pham_id: item.id,
+            bien_the_id: item.bien_the_id,
+            so_luong: item.quantity,
+            gia: item.gia,
+          })),
+        };
+
+        // Lưu tạm đơn hàng
+        localStorage.setItem("vnpay_order_data", JSON.stringify(orderPayload));
+
+        // Gọi API tạo URL thanh toán
+        const res = await axios.post(
+          "http://127.0.0.1:8000/api/create-payment",
+          { amount: total }
+        );
+
+        // Chuyển hướng tới trang thanh toán VNPAY
+        window.location.href = res.data.payment_url;
+        return; // ⛔ Dừng không tạo đơn hàng phía dưới
+      }
+
+      // Ngược lại là COD
       const res = await axios.post("http://127.0.0.1:8000/api/donhang", {
         khach_hang_id: user.id,
         ngay_dat: new Date().toISOString().split("T")[0],
@@ -347,12 +385,12 @@ const Checkout = () => {
         so_dien_thoai: formData.so_dien_thoai,
         dia_chi: fullAddress,
         ghi_chu: formData.notes || "",
-        paymentMethod: formData.paymentMethod,
+        paymentMethod: "cod",
       });
 
       const donhang = res.data.data;
 
-      // Gửi chi tiết từng sản phẩm
+      // Gửi chi tiết sản phẩm
       for (const item of cart) {
         const payload = {
           don_hang_id: donhang.id,
@@ -361,8 +399,6 @@ const Checkout = () => {
           so_luong: item.quantity,
           gia: item.gia,
         };
-
-        console.log("▶️ Gửi chi tiết đơn hàng:", payload);
 
         try {
           await axios.post("http://127.0.0.1:8000/api/chitietdonhang", payload);
@@ -377,7 +413,7 @@ const Checkout = () => {
         }
       }
 
-      // Xoá giỏ hàng, báo thành công
+      // ✅ Thành công COD
       sessionStorage.removeItem("cart");
       window.dispatchEvent(new Event("cart-updated"));
       setOrderId(donhang.id);
@@ -652,23 +688,21 @@ const Checkout = () => {
                     </div>
 
                     <div
-                      className={`payment-method-option disabled`}
-                      style={{ opacity: 0.6, cursor: "not-allowed" }}
-                      title="Phương thức chuyển khoản ngân hàng đang được bảo trì"
+                      className={`payment-method-option ${
+                        formData.paymentMethod === "vnpay" ? "selected" : ""
+                      }`}
                       onClick={() =>
-                        alert(
-                          "Phương thức chuyển khoản ngân hàng đang được bảo trì."
-                        )
+                        setFormData({ ...formData, paymentMethod: "vnpay" })
                       }
                     >
                       <Form.Check
                         type="radio"
-                        id="bank-transfer"
+                        id="vnpay"
                         name="paymentMethod"
-                        value="bank-transfer"
-                        label="Chuyển khoản ngân hàng"
-                        checked={formData.paymentMethod === "bank-transfer"}
-                        disabled
+                        value="vnpay"
+                        label="Thanh toán qua VNPAY"
+                        checked={formData.paymentMethod === "vnpay"}
+                        onChange={handleInputChange}
                         className="payment-radio"
                       />
                       <div className="payment-icon bank-icon">

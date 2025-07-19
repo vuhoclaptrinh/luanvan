@@ -358,13 +358,6 @@ const ProductDetailModal = ({
                   </table>
                 </div>
 
-                {/* {product.mo_ta && (
-                  <div className="mb-4">
-                    <h5 className="fs-6 fw-bold mb-2">Mô tả sản phẩm:</h5>
-                    <p className="text-muted">{product.mo_ta}</p>
-                  </div>
-                )} */}
-
                 <div className="d-grid gap-2">
                   <Button
                     variant="dark"

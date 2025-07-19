@@ -52,7 +52,7 @@ const SanphamAdd = ({ open, onClose, onUpdate }) => {
     const { name, value } = e.target;
     setFormdata((prev) => ({ ...prev, [name]: value }));
   };
-
+  // add biến thể
   const handleVariantChange = (index, field, value) => {
     const newVariants = [...variants];
     newVariants[index][field] = value;
@@ -76,6 +76,12 @@ const SanphamAdd = ({ open, onClose, onUpdate }) => {
 
   const handleMultiFileChange = (e) => {
     setAnhPhu(Array.from(e.target.files));
+  };
+
+  // fomat giá
+  const formatCurrency = (value) => {
+    if (!value) return "";
+    return new Intl.NumberFormat("vi-VN").format(value);
   };
 
   const handleSubmit = async () => {
@@ -128,9 +134,7 @@ const SanphamAdd = ({ open, onClose, onUpdate }) => {
         Object.values(res.data.errors).forEach((msgs) => {
           msgs.forEach((msg) => enqueueSnackbar(msg, { variant: "error" }));
         });
-      }
-      // Laravel bắt lỗi thủ công trong try-catch
-      else if (res?.data?.error) {
+      } else if (res?.data?.error) {
         enqueueSnackbar(res.data.error, { variant: "error" });
       } else if (res?.data?.message) {
         enqueueSnackbar(res.data.message, { variant: "error" });
@@ -218,9 +222,13 @@ const SanphamAdd = ({ open, onClose, onUpdate }) => {
               />
               <TextField
                 label="Giá"
-                value={variant.gia}
+                value={formatCurrency(variant.gia)}
                 onChange={(e) =>
-                  handleVariantChange(index, "gia", e.target.value)
+                  handleVariantChange(
+                    index,
+                    "gia",
+                    e.target.value.replace(/[^\d]/g, "")
+                  )
                 }
                 fullWidth
               />

@@ -1,11 +1,9 @@
-
-import { useState, useEffect } from "react"
-import { Container, Row, Col, Button } from "react-bootstrap"
+import { useState, useEffect } from "react";
+import { Container, Row, Col, Button } from "react-bootstrap";
 
 function HeroSection() {
-  const [currentSlide, setCurrentSlide] = useState(0)
+  const [currentSlide, setCurrentSlide] = useState(0);
 
-  // Danh sách hình ảnh cho carousel
   const heroImages = [
     {
       src: "src/assets/img/logost.png",
@@ -15,36 +13,35 @@ function HeroSection() {
         "Bộ sưu tập nước hoa chính hãng từ các thương hiệu nổi tiếng thế giới. Tìm kiếm hương thơm hoàn hảo cho phong cách của bạn.",
     },
     {
-
       src: "src/assets/img/logo.png",
       title: "Hương thơm quyến rũ",
       subtitle: "Dành cho phái đẹp",
-      description: "Khám phá những mùi hương nữ tính, quyến rũ và đầy mê hoặc từ các thương hiệu danh tiếng.",
+      description:
+        "Khám phá những mùi hương nữ tính, quyến rũ và đầy mê hoặc từ các thương hiệu danh tiếng.",
     },
     {
       src: "src/assets/img/credd.jpg",
       title: "Phong cách nam tính",
       subtitle: "Mạnh mẽ & cuốn hút",
-      description: "Bộ sưu tập nước hoa nam với hương thơm mạnh mẽ, nam tính và đầy cuốn hút.",
+      description:
+        "Bộ sưu tập nước hoa nam với hương thơm mạnh mẽ, nam tính và đầy cuốn hút.",
     },
-  ]
+  ];
 
-  // Auto slide every 5 seconds
+  // thời gian chuyển trang
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroImages.length)
-    }, 5000)
+      setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+    }, 5000);
 
-    return () => clearInterval(interval)
-  }, [heroImages.length])
-
-
+    return () => clearInterval(interval);
+  }, [heroImages.length]);
 
   const goToSlide = (index) => {
-    setCurrentSlide(index)
-  }
+    setCurrentSlide(index);
+  };
 
-  const currentImage = heroImages[currentSlide]
+  const currentImage = heroImages[currentSlide];
 
   return (
     <section
@@ -55,7 +52,7 @@ function HeroSection() {
         overflow: "hidden",
       }}
     >
-      {/* Background Images */}
+      {/* chuỷen ảnh */}
       {heroImages.map((image, index) => (
         <div
           key={index}
@@ -80,10 +77,11 @@ function HeroSection() {
         }}
       />
 
-
-
-      {/* Content */}
-      <Container className="position-relative text-center text-white" style={{ zIndex: 3 }}>
+      {/* nội dung */}
+      <Container
+        className="position-relative text-center text-white"
+        style={{ zIndex: 3 }}
+      >
         <Row className="justify-content-center">
           <Col md={10} lg={8}>
             <h1
@@ -99,7 +97,9 @@ function HeroSection() {
                   background: "linear-gradient(to right, #ff8a8a, #da8cff)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
-                  animation: `fadeInUp 1s ease-out ${currentSlide * 0.1 + 0.2}s both`,
+                  animation: `fadeInUp 1s ease-out ${
+                    currentSlide * 0.1 + 0.2
+                  }s both`,
                 }}
               >
                 {currentImage.subtitle}
@@ -108,7 +108,9 @@ function HeroSection() {
             <p
               className="lead mb-4"
               style={{
-                animation: `fadeInUp 1s ease-out ${currentSlide * 0.1 + 0.4}s both`,
+                animation: `fadeInUp 1s ease-out ${
+                  currentSlide * 0.1 + 0.4
+                }s both`,
               }}
             >
               {currentImage.description}
@@ -116,7 +118,9 @@ function HeroSection() {
             <div
               className="d-flex flex-column flex-sm-row justify-content-center gap-3"
               style={{
-                animation: `fadeInUp 1s ease-out ${currentSlide * 0.1 + 0.6}s both`,
+                animation: `fadeInUp 1s ease-out ${
+                  currentSlide * 0.1 + 0.6
+                }s both`,
               }}
             >
               <Button
@@ -128,12 +132,13 @@ function HeroSection() {
                   transition: "all 0.3s ease",
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.transform = "translateY(-2px)"
-                  e.target.style.boxShadow = "0 8px 25px rgba(232, 62, 140, 0.3)"
+                  e.target.style.transform = "translateY(-2px)";
+                  e.target.style.boxShadow =
+                    "0 8px 25px rgba(232, 62, 140, 0.3)";
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.transform = "translateY(0)"
-                  e.target.style.boxShadow = "none"
+                  e.target.style.transform = "translateY(0)";
+                  e.target.style.boxShadow = "none";
                 }}
               >
                 Khám phá ngay
@@ -146,12 +151,12 @@ function HeroSection() {
                   transition: "all 0.3s ease",
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.transform = "translateY(-2px)"
-                  e.target.style.backgroundColor = "rgba(255,255,255,0.1)"
+                  e.target.style.transform = "translateY(-2px)";
+                  e.target.style.backgroundColor = "rgba(255,255,255,0.1)";
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.transform = "translateY(0)"
-                  e.target.style.backgroundColor = "transparent"
+                  e.target.style.transform = "translateY(0)";
+                  e.target.style.backgroundColor = "transparent";
                 }}
               >
                 Xem bộ sưu tập
@@ -161,8 +166,11 @@ function HeroSection() {
         </Row>
       </Container>
 
-      {/* Slide Indicators */}
-      <div className="position-absolute bottom-0 start-50 translate-middle-x d-flex gap-2 mb-4" style={{ zIndex: 4 }}>
+      {/* chấm chuển ảnh */}
+      <div
+        className="position-absolute bottom-0 start-50 translate-middle-x d-flex gap-2 mb-4"
+        style={{ zIndex: 4 }}
+      >
         {heroImages.map((_, index) => (
           <button
             key={index}
@@ -178,40 +186,19 @@ function HeroSection() {
             }}
             onMouseEnter={(e) => {
               if (index !== currentSlide) {
-                e.target.style.background = "rgba(255,255,255,0.7)"
+                e.target.style.background = "rgba(255,255,255,0.7)";
               }
             }}
             onMouseLeave={(e) => {
               if (index !== currentSlide) {
-                e.target.style.background = "transparent"
+                e.target.style.background = "transparent";
               }
             }}
           />
         ))}
       </div>
-
-      {/* Progress Bar */}
-      <div
-        className="position-absolute bottom-0 start-0 w-100"
-        style={{
-          height: "4px",
-          background: "rgba(255,255,255,0.2)",
-          zIndex: 4,
-        }}
-      >
-        <div
-          style={{
-            height: "100%",
-            background: "linear-gradient(to right, #e83e8c, #6f42c1)",
-            width: `${((currentSlide + 1) / heroImages.length) * 100}%`,
-            transition: "width 0.3s ease",
-          }}
-        />
-      </div>
-
-      
     </section>
-  )
+  );
 }
 
-export default HeroSection
+export default HeroSection;

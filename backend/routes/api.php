@@ -103,6 +103,9 @@ Route::get('/danhgia/khachhang/{id}', [DanhgiaController::class, 'getByKhachHang
 Route::get('/danhgia/trungbinh/{sanPhamId}', [DanhGiaController::class, 'getTrungBinhSoSao']);
 Route::get('/danhgia/kiemtra-da-mua/{khachHangId}/{sanPhamId}', [DanhGiaController::class, 'checkDaMua']);
 Route::get('/danhgia/da-danh-gia/{khachHangId}/{sanPhamId}', [DanhGiaController::class, 'daDanhGia']);
+
+//-----------------------------------------------------------------------------------------------------
+
 //DON HÀNG
 //GET
 Route::get('/donhang', [DonhangController::class, 'get']);
@@ -126,8 +129,13 @@ Route::get('/doanhthutheothang/{year?}', [DonhangController::class, 'getDoanhThu
 Route::post('/donhang/{id}/create-ghtk', [DonhangController::class, 'createGHTK']);
 Route::put('/donhang/{id}/huy', [DonHangController::class, 'huyDonHang']);
 
+// Route::post('/donhang/thanh-toan-momo', [DonhangController::class, 'createPayment']);
+// Route::post('/donhang/momo-ipn', [DonhangController::class, 'momoIpn']);
 
+Route::post('/create-payment', [\App\Http\Controllers\VnpayController::class, 'createPayment']);
+Route::get('/vnpay-return', [\App\Http\Controllers\VnpayController::class, 'vnpayReturn']);
 
+//-----------------------------------------------------------------------------------------------------
 //CHI TIẾT ĐƠN HÀNG
 //Đánh giá
 //GET

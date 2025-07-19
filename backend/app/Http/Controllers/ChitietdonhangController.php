@@ -107,7 +107,7 @@ class ChitietdonhangController extends Controller
             $bienthe->save();
 
             // Tạo chi tiết đơn hàng
-            $chitietdonhang = new \App\Models\Chitietdonhang();
+            $chitietdonhang = new Chitietdonhang();
             $chitietdonhang->don_hang_id = $request->don_hang_id;
             $chitietdonhang->san_pham_id = $request->san_pham_id;
             $chitietdonhang->bien_the_id = $request->bien_the_id;

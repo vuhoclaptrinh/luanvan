@@ -1,53 +1,61 @@
-"use client"
-import { useState, useEffect } from "react"
-import { Navbar, Nav, Container, Badge, Offcanvas, Dropdown, Row, Col, Button } from "react-bootstrap"
-import { Link, useNavigate, useLocation } from "react-router-dom"
-import { Box, Avatar, Tooltip } from "@mui/material"
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart"
-import FavoriteIcon from "@mui/icons-material/Favorite"
-import MenuIcon from "@mui/icons-material/Menu"
-import LocalShippingIcon from "@mui/icons-material/LocalShipping"
-import SupportAgentIcon from "@mui/icons-material/SupportAgent"
-import Logo from "../assets/img/logo.jpg"
-import axios from "axios"
+"use client";
+import { useState, useEffect } from "react";
+import {
+  Navbar,
+  Nav,
+  Container,
+  Badge,
+  Offcanvas,
+  Dropdown,
+  Row,
+  Col,
+  Button,
+} from "react-bootstrap";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Box, Avatar, Tooltip } from "@mui/material";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import MenuIcon from "@mui/icons-material/Menu";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import SupportAgentIcon from "@mui/icons-material/SupportAgent";
+import Logo from "../assets/img/logo.jpg";
+import axios from "axios";
 
-// Navigation 
+// Navigation
 const LEFT_NAV_LINKS = [
   { href: "/home", label: "Trang chủ" },
   { href: "/products", label: "Sản phẩm" },
   { label: "Danh mục" },
-  {  label: "Thương hiệu" },
-]
+  { label: "Thương hiệu" },
+];
 
 const RIGHT_NAV_LINKS = [
   { href: "/about", label: "Về chúng tôi" },
   { href: "/contact", label: "Liên hệ" },
-]
+];
 
 // menu mobile
-const ALL_NAV_LINKS = [...LEFT_NAV_LINKS, ...RIGHT_NAV_LINKS]
-
+const ALL_NAV_LINKS = [...LEFT_NAV_LINKS, ...RIGHT_NAV_LINKS];
 
 const getFullName = (user) => {
-  if (!user) return ""
+  if (!user) return "";
 
-  if (user.ho_ten) return user.ho_ten
+  if (user.ho_ten) return user.ho_ten;
 
-  const firstName = user.first_name || ""
-  const lastName = user.last_name || ""
-  return `${firstName} ${lastName}`.trim()
-}
-
+  const firstName = user.first_name || "";
+  const lastName = user.last_name || "";
+  return `${firstName} ${lastName}`.trim();
+};
 
 const getInitials = (user) => {
-  if (!user) return "U"
+  if (!user) return "U";
 
-  const fullName = user.ho_ten || getFullName(user)
-  return fullName.charAt(0).toUpperCase()
-}
+  const fullName = user.ho_ten || getFullName(user);
+  return fullName.charAt(0).toUpperCase();
+};
 
 const getAvatarColor = (user) => {
-  if (!user) return "#6f42c1"
+  if (!user) return "#6f42c1";
 
   const colors = [
     "#e83e8c", // pink
@@ -55,146 +63,146 @@ const getAvatarColor = (user) => {
     "#007bff", // blue
     "#20c997", // teal
     "#fd7e14", // orange
-  ]
+  ];
 
-  const name = user.ho_ten || getFullName(user)
-  const index = name.length % colors.length
-  return colors[index]
-}
+  const name = user.ho_ten || getFullName(user);
+  const index = name.length % colors.length;
+  return colors[index];
+};
 
-function Header({ cartCount = 0}) {
-  const [showOffcanvas, setShowOffcanvas] = useState(false)
-  const [user, setUser] = useState(null)
-  const [showMegaMenu, setShowMegaMenu] = useState(null)
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [cartItemCount, setCartItemCount] = useState(cartCount)
+function Header({ cartCount = 0 }) {
+  const [showOffcanvas, setShowOffcanvas] = useState(false);
+  const [user, setUser] = useState(null);
+  const [showMegaMenu, setShowMegaMenu] = useState(null);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [cartItemCount, setCartItemCount] = useState(cartCount);
 
   // Thêm state cho danh mục
-  const [categories, setCategories] = useState([])
-  const [loadingCategories, setLoadingCategories] = useState(false)
-  const navigate = useNavigate()
-  const location = useLocation()
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
   // Thêm state cho thuonghieu
-  const [thuonghieu, setThuonghieu] = useState([])
-  const [loadingThuonghieu, setLoadingThuonghieu] = useState(false)
-
-
+  const [thuonghieu, setThuonghieu] = useState([]);
+  const [loadingThuonghieu, setLoadingThuonghieu] = useState(false);
 
   //  lấy số lượng sản phẩm trong giỏ hàng
   const getCartItemsCount = () => {
     try {
-      const cartItems = JSON.parse(sessionStorage.getItem("cart")) || []
+      const cartItems = JSON.parse(sessionStorage.getItem("cart")) || [];
 
-       return cartItems.reduce((total, item) => total + item.quantity, 0) //tổng tất cả sản phẩm
+      return cartItems.reduce((total, item) => total + item.quantity, 0); //tổng tất cả sản phẩm
       //return cartItems.length
-    } catch (error) { 
-      console.error("Lỗi khi đọc giỏ hàng:", error) 
-      return 0
+    } catch (error) {
+      console.error("Lỗi khi đọc giỏ hàng:", error);
+      return 0;
     }
-  }
+  };
   //wishlist
   const getWishlistCount = () => {
-  try {
-    const wishlist = JSON.parse(sessionStorage.getItem("wishlist")) || []
-    return wishlist.length
-  } catch (err) {
-    console.error("Lỗi khi đọc wishlist:", err)
-    return 0
-  }
-}
-  const [wishlistCount, setWishlistCount] = useState(getWishlistCount())
+    try {
+      const wishlist = JSON.parse(sessionStorage.getItem("wishlist")) || [];
+      return wishlist.length;
+    } catch (err) {
+      console.error("Lỗi khi đọc wishlist:", err);
+      return 0;
+    }
+  };
+  const [wishlistCount, setWishlistCount] = useState(getWishlistCount());
 
   useEffect(() => {
     const updateWishlistCount = () => {
-      setWishlistCount(getWishlistCount())
-    }
-    window.addEventListener("wishlist-updated", updateWishlistCount)
+      setWishlistCount(getWishlistCount());
+    };
+    window.addEventListener("wishlist-updated", updateWishlistCount);
     return () => {
-      window.removeEventListener("wishlist-updated", updateWishlistCount)
-    }
-  }, [])
-//user
+      window.removeEventListener("wishlist-updated", updateWishlistCount);
+    };
+  }, []);
+  //user
   useEffect(() => {
-    const storedUser = sessionStorage.getItem("user")
+    const storedUser = sessionStorage.getItem("user");
     if (storedUser) {
       try {
-        setUser(JSON.parse(storedUser))
+        setUser(JSON.parse(storedUser));
       } catch (err) {
-        console.error("Lỗi khi lấy user:", err)
+        console.error("Lỗi khi lấy user:", err);
       }
     }
-    setCartItemCount(getCartItemsCount())
+    setCartItemCount(getCartItemsCount());
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 100)
-    }
+      setIsScrolled(window.scrollY > 100);
+    };
     //  sự kiện cập nhật giỏ hàng
     const handleStorageChange = (e) => {
       if (e.key === "cart") {
-        setCartItemCount(getCartItemsCount())
+        setCartItemCount(getCartItemsCount());
       }
-    }
+    };
 
-    window.addEventListener("scroll", handleScroll)
-    window.addEventListener("storage", handleStorageChange)
+    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("storage", handleStorageChange);
 
-    // Fetch danh mục 
-    setLoadingCategories(true)
+    // Fetch danh mục
+    setLoadingCategories(true);
     axios
       .get("http://127.0.0.1:8000/api/danhmuc")
       .then((res) => {
-        const categoriesData = res.data.data || res.data
-        setCategories(categoriesData)
+        const categoriesData = res.data.data || res.data;
+        setCategories(categoriesData);
       })
       .catch((err) => {
-        console.error("Lỗi khi lấy danh mục:", err)
+        console.error("Lỗi khi lấy danh mục:", err);
       })
       .finally(() => {
-        setLoadingCategories(false)
-      })
-//loc thoungw hiệu
-    setLoadingThuonghieu(true)
+        setLoadingCategories(false);
+      });
+    //loc thoungw hiệu
+    setLoadingThuonghieu(true);
     axios
       .get("http://127.0.0.1:8000/api/sanpham")
       .then((res) => {
-        const sanphamData = res.data.data || res.data
-        const uniqueBrands = [...new Set(sanphamData.map((sp) => sp.thuong_hieu))]
-        setThuonghieu(uniqueBrands)
+        const sanphamData = res.data.data || res.data;
+        const uniqueBrands = [
+          ...new Set(sanphamData.map((sp) => sp.thuong_hieu)),
+        ];
+        setThuonghieu(uniqueBrands);
       })
       .catch((err) => {
-        console.error("Lỗi khi lấy thương hiệu của sản phẩm:", err)
+        console.error("Lỗi khi lấy thương hiệu của sản phẩm:", err);
       })
       .finally(() => {
-        setLoadingThuonghieu(false)
-      })
+        setLoadingThuonghieu(false);
+      });
     // Cleanup event listeners
     return () => {
-      window.removeEventListener("scroll", handleScroll)
-      window.removeEventListener("storage", handleStorageChange)
-    }
-  }, [])
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
 
   // cập nhật số lượng sản phẩm
   useEffect(() => {
     const handleCartUpdate = () => {
-      setCartItemCount(getCartItemsCount())
-    }
-    window.addEventListener("cart-updated", handleCartUpdate)
+      setCartItemCount(getCartItemsCount());
+    };
+    window.addEventListener("cart-updated", handleCartUpdate);
     // Cleanup
     return () => {
-      window.removeEventListener("cart-updated", handleCartUpdate)
-    }
-  }, [])
+      window.removeEventListener("cart-updated", handleCartUpdate);
+    };
+  }, []);
 
   const handleLogout = () => {
-    sessionStorage.removeItem("user")
-    sessionStorage.removeItem("token")
-    setUser(null)
-    navigate("/home")
-  }
+    sessionStorage.removeItem("user");
+    sessionStorage.removeItem("token");
+    setUser(null);
+    navigate("/home");
+  };
 
   const isActive = (path) => {
-    return location.pathname === path
-  }
+    return location.pathname === path;
+  };
 
   // Hàm render mega menu
   const renderMegaMenu = (label) => {
@@ -213,7 +221,10 @@ function Header({ cartCount = 0}) {
           <h6 className="fw-bold mb-3">Danh mục phổ biến</h6>
           {loadingCategories ? (
             <div className="text-center py-3">
-              <div className="spinner-border spinner-border-sm text-primary" role="status">
+              <div
+                className="spinner-border spinner-border-sm text-primary"
+                role="status"
+              >
                 <span className="visually-hidden">Đang tải...</span>
               </div>
             </div>
@@ -235,7 +246,7 @@ function Header({ cartCount = 0}) {
             <p className="text-muted small">Không có danh mục nào.</p>
           )}
         </div>
-      )
+      );
     }
 
     if (label === "Thương hiệu" && showMegaMenu === "Thương hiệu") {
@@ -253,7 +264,10 @@ function Header({ cartCount = 0}) {
           <h6 className="fw-bold mb-3">Thương hiệu phổ biến</h6>
           {loadingThuonghieu ? (
             <div className="text-center py-3">
-              <div className="spinner-border spinner-border-sm text-primary" role="status">
+              <div
+                className="spinner-border spinner-border-sm text-primary"
+                role="status"
+              >
                 <span className="visually-hidden">Đang tải...</span>
               </div>
             </div>
@@ -275,101 +289,57 @@ function Header({ cartCount = 0}) {
             <p className="text-muted small">Không có thương hiệu nào.</p>
           )}
         </div>
-      )
+      );
     }
 
-    return null
-  }
+    return null;
+  };
 
   //Hàm render nav link
   const renderNavLink = ({ href, label }, index) => {
-  const isDropdown = label === "Danh mục" || label === "Thương hiệu"
-  const isHovering = showMegaMenu === label
+    const isDropdown = label === "Danh mục" || label === "Thương hiệu";
+    const isHovering = showMegaMenu === label;
 
-  return (
-    <div
-      key={`${href}-${index}`}
-      className="position-relative mx-2"
-      onMouseEnter={() => isDropdown && setShowMegaMenu(label)}
-      onMouseLeave={() => isDropdown && setShowMegaMenu(null)}
-    >
-      {/* Link chính */}
-      {href ? (
-        <Nav.Link
-          as={Link}
-          to={href}
-          className={`position-relative ${isActive(href) ? "fw-bold" : ""}`}
-        >
-          {label}
-          {isActive(href) && (
-            <span
-              className="position-absolute"
-              style={{
-                height: "2px",
-                width: "80%",
-                backgroundColor: "#e83e8c",
-                bottom: "0",
-                left: "10%",
-              }}
-            ></span>
-          )}
-        </Nav.Link>
-      ) : (
-        <span className="nav-link text-dark">{label}</span>
-      )}
+    return (
+      <div
+        key={`${href}-${index}`}
+        className="position-relative mx-2"
+        onMouseEnter={() => isDropdown && setShowMegaMenu(label)}
+        onMouseLeave={() => isDropdown && setShowMegaMenu(null)}
+      >
+        {/* Link chính */}
+        {href ? (
+          <Nav.Link
+            as={Link}
+            to={href}
+            className={`position-relative ${isActive(href) ? "fw-bold" : ""}`}
+          >
+            {label}
+            {isActive(href) && (
+              <span
+                className="position-absolute"
+                style={{
+                  height: "2px",
+                  width: "80%",
+                  backgroundColor: "#e83e8c",
+                  bottom: "0",
+                  left: "10%",
+                }}
+              ></span>
+            )}
+          </Nav.Link>
+        ) : (
+          <span className="nav-link text-dark">{label}</span>
+        )}
 
-      {/* Mega menu tách riêng bên ngoài thẻ Link */}
-      {isDropdown && isHovering && renderMegaMenu(label)}
-    </div>
-  )
-}
-
+        {/* Mega menu tách riêng bên ngoài thẻ Link */}
+        {isDropdown && isHovering && renderMegaMenu(label)}
+      </div>
+    );
+  };
 
   return (
     <header>
-      {/* Top Bar */}
-      <div
-        className={`py-2 d-none d-lg-block ${isScrolled ? "d-lg-none" : ""}`}
-        style={{
-          background: "linear-gradient(to right, #6f42c1, #e83e8c)",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-        }}
-      >
-        <Container>
-          <Row className="align-items-center">
-            <Col md={6}>
-              <div className="d-flex align-items-center">
-                <div className="d-flex align-items-center me-4" style={{ opacity: 0.9 }}>
-                  <LocalShippingIcon fontSize="small" className="me-1" />
-                  <small className="fw-medium">Voucher cho đơn hàng từ 500.000đ</small>
-                </div>  
-                <div className="d-flex align-items-center me-4"  style={{ opacity: 0.9 }}>
-                  <i className="bi bi-clock me-1"></i>
-                  <small className="fw-medium">Giao hàng trong 24h</small>
-                </div>
-                <div className="d-flex align-items-center me-4" style={{ opacity: 0.9 }}>
-                 <i className="bi bi-box me-1"></i>
-                <small>Đổi trả trong 7 ngày</small>
-              </div>
-              </div>
-            </Col>
-            <Col md={6}>
-              <div className="d-flex justify-content-end align-items-center">
-                
-               <div className="d-flex align-items-center me-4" style={{ opacity: 0.9 }}>
-                  <i className="bi bi-cash-coin me-1"></i>
-                  <small className="fw-medium">Thanh toán khi nhận hàng</small>
-                </div>
-                <div className="me-4 d-flex align-items-center" style={{ opacity: 0.9 }}>
-                  <SupportAgentIcon fontSize="small" className="me-1" />
-                   <small>Hỗ trợ: 0965765861   (8h - 22h)</small> 
-                </div>  
-              </div>
-            </Col>
-          </Row>
-        </Container>
-      </div>
-
       {/* Main Navbar */}
       <Navbar
         className={`py-3 ${isScrolled ? "sticky-header shadow-sm" : ""}`}
@@ -388,16 +358,26 @@ function Header({ cartCount = 0}) {
           <div className="d-flex justify-content-between align-items-center w-100">
             {/* Mobile menu button (left) */}
             <div className="d-lg-none">
-              <Button variant="link" className="text-dark p-1" onClick={() => setShowOffcanvas(true)}>
+              <Button
+                variant="link"
+                className="text-dark p-1"
+                onClick={() => setShowOffcanvas(true)}
+              >
                 <MenuIcon />
               </Button>
             </div>
 
-            {/* Left navigation links (desktop) */}
-            <Nav className="d-none d-lg-flex">{LEFT_NAV_LINKS.map((link, index) => renderNavLink(link, index))}</Nav>
+            {/* link trái) */}
+            <Nav className="d-none d-lg-flex">
+              {LEFT_NAV_LINKS.map((link, index) => renderNavLink(link, index))}
+            </Nav>
 
-            {/* Logo (centered) */}
-            <Navbar.Brand as={Link} to="/home" className="mx-auto d-flex align-items-center">
+            {/* Logo */}
+            <Navbar.Brand
+              as={Link}
+              to="/home"
+              className="mx-auto d-flex align-items-center"
+            >
               <img
                 src={Logo || "/placeholder.svg"}
                 alt="PerfumeShop Logo"
@@ -430,16 +410,23 @@ function Header({ cartCount = 0}) {
               </div>
             </Navbar.Brand>
 
-            {/* Right navigation links and actions (desktop) */}
+            {/* link phải*/}
             <div className="d-none d-lg-flex align-items-center">
               {/* Right navigation links */}
-              <Nav className="me-3">{RIGHT_NAV_LINKS.map((link, index) => renderNavLink(link, index))}</Nav>
+              <Nav className="me-3">
+                {RIGHT_NAV_LINKS.map((link, index) =>
+                  renderNavLink(link, index)
+                )}
+              </Nav>
 
               {/* User actions */}
               <div className="d-flex align-items-center">
                 {/* Wishlist */}
                 <Tooltip title="Yêu thích">
-                  <Link to="/wishlist" className="text-dark position-relative me-3 p-1">
+                  <Link
+                    to="/wishlist"
+                    className="text-dark position-relative me-3 p-1"
+                  >
                     <FavoriteIcon />
                     {wishlistCount > 0 && (
                       <Badge
@@ -456,7 +443,10 @@ function Header({ cartCount = 0}) {
 
                 {/* Cart */}
                 <Tooltip title="Giỏ hàng">
-                  <Link to="/cart" className="text-dark position-relative me-3 p-1">
+                  <Link
+                    to="/cart"
+                    className="text-dark position-relative me-3 p-1"
+                  >
                     <ShoppingCartIcon />
                     {cartItemCount > 0 && (
                       <Badge
@@ -518,30 +508,50 @@ function Header({ cartCount = 0}) {
                           </Avatar>
                           <div>
                             <div className="fw-medium">{getFullName(user)}</div>
-                            <small className="text-muted">{user.email || "user@example.com"}</small>
+                            <small className="text-muted">
+                              {user.email || "user@example.com"}
+                            </small>
                           </div>
                         </div>
                       </div>
-                      <Dropdown.Item as={Link} to="/profilehome" className="rounded-2 mb-1">
+                      <Dropdown.Item
+                        as={Link}
+                        to="/profilehome"
+                        className="rounded-2 mb-1"
+                      >
                         <i className="bi bi-person me-2"></i>Hồ sơ cá nhân
                       </Dropdown.Item>
-                      <Dropdown.Item as={Link} to="/orders" className="rounded-2 mb-1">
+                      <Dropdown.Item
+                        as={Link}
+                        to="/orders"
+                        className="rounded-2 mb-1"
+                      >
                         <i className="bi bi-bag me-2"></i>Đơn hàng của tôi
                       </Dropdown.Item>
-                      <Dropdown.Item as={Link} to="/wishlist" className="rounded-2 mb-1">
+                      <Dropdown.Item
+                        as={Link}
+                        to="/wishlist"
+                        className="rounded-2 mb-1"
+                      >
                         <i className="bi bi-heart me-2"></i>Danh sách yêu thích
                       </Dropdown.Item>
                       <Dropdown.Divider />
 
-                      <Dropdown.Item onClick={handleLogout} className="text-danger rounded-2">
+                      <Dropdown.Item
+                        onClick={handleLogout}
+                        className="text-danger rounded-2"
+                      >
                         <i className="bi bi-box-arrow-right me-2"></i>Đăng xuất
                       </Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>
                 ) : (
                   <div className="d-flex">
-                    <Link to="/login" className="btn btn-sm btn-outline-primary me-2">
-                      Đăng nhập 
+                    <Link
+                      to="/login"
+                      className="btn btn-sm btn-outline-primary me-2"
+                    >
+                      Đăng nhập
                     </Link>
                     <Link to="/login" className="btn btn-sm btn-primary">
                       Đăng ký
@@ -553,7 +563,10 @@ function Header({ cartCount = 0}) {
 
             {/* Mobile icons (right) */}
             <div className="d-flex align-items-center d-lg-none">
-              <Link to="/wishlist" className="text-dark position-relative me-2 p-1">
+              <Link
+                to="/wishlist"
+                className="text-dark position-relative me-2 p-1"
+              >
                 <FavoriteIcon />
                 {wishlistCount > 0 && (
                   <Badge
@@ -586,10 +599,20 @@ function Header({ cartCount = 0}) {
       </Navbar>
 
       {/* Offcanvas Mobile Menu */}
-      <Offcanvas show={showOffcanvas} onHide={() => setShowOffcanvas(false)} placement="end">
+      <Offcanvas
+        show={showOffcanvas}
+        onHide={() => setShowOffcanvas(false)}
+        placement="end"
+      >
         <Offcanvas.Header closeButton className="border-bottom">
           <Offcanvas.Title className="d-flex align-items-center">
-            <img src={Logo || "/placeholder.svg"} alt="Logo" width="30" height="30" className="rounded-circle me-2" />
+            <img
+              src={Logo || "/placeholder.svg"}
+              alt="Logo"
+              width="30"
+              height="30"
+              className="rounded-circle me-2"
+            />
             <span className="fw-bold">PerfumeShop</span>
           </Offcanvas.Title>
         </Offcanvas.Header>
@@ -611,7 +634,9 @@ function Header({ cartCount = 0}) {
                 </Avatar>
                 <div>
                   <div className="fw-medium">{getFullName(user)}</div>
-                  <small className="text-muted">{user.email || "user@example.com"}</small>
+                  <small className="text-muted">
+                    {user.email || "user@example.com"}
+                  </small>
                 </div>
               </div>
             </div>
@@ -634,7 +659,9 @@ function Header({ cartCount = 0}) {
                   key={href}
                   as={Link}
                   to={href}
-                  className={`py-3 px-3 border-bottom ${isActive(href) ? "fw-bold" : ""}`}
+                  className={`py-3 px-3 border-bottom ${
+                    isActive(href) ? "fw-bold" : ""
+                  }`}
                   onClick={() => setShowOffcanvas(false)}
                 >
                   {label}
@@ -652,21 +679,44 @@ function Header({ cartCount = 0}) {
               {/* <Nav.Link as={Link} to="/track-order" className="px-0 py-2" onClick={() => setShowOffcanvas(false)}>
                 <i className="bi bi-truck me-2"></i>Theo dõi đơn hàng
               </Nav.Link> */}
-              <Nav.Link as={Link} to="/wishlist" className="px-0 py-2" onClick={() => setShowOffcanvas(false)}>
+              <Nav.Link
+                as={Link}
+                to="/wishlist"
+                className="px-0 py-2"
+                onClick={() => setShowOffcanvas(false)}
+              >
                 <i className="bi bi-heart me-2"></i>Danh sách yêu thích
               </Nav.Link>
-              <Nav.Link as={Link} to="/cart" className="px-0 py-2" onClick={() => setShowOffcanvas(false)}>
+              <Nav.Link
+                as={Link}
+                to="/cart"
+                className="px-0 py-2"
+                onClick={() => setShowOffcanvas(false)}
+              >
                 <i className="bi bi-bag me-2"></i>Giỏ hàng
               </Nav.Link>
               {user && (
                 <>
-                  <Nav.Link as={Link} to="/profile" className="px-0 py-2" onClick={() => setShowOffcanvas(false)}>
+                  <Nav.Link
+                    as={Link}
+                    to="/profile"
+                    className="px-0 py-2"
+                    onClick={() => setShowOffcanvas(false)}
+                  >
                     <i className="bi bi-person me-2"></i>Hồ sơ cá nhân
                   </Nav.Link>
-                  <Nav.Link as={Link} to="/orders" className="px-0 py-2" onClick={() => setShowOffcanvas(false)}>
+                  <Nav.Link
+                    as={Link}
+                    to="/orders"
+                    className="px-0 py-2"
+                    onClick={() => setShowOffcanvas(false)}
+                  >
                     <i className="bi bi-receipt me-2"></i>Đơn hàng của tôi
                   </Nav.Link>
-                  <Nav.Link onClick={handleLogout} className="px-0 py-2 text-danger">
+                  <Nav.Link
+                    onClick={handleLogout}
+                    className="px-0 py-2 text-danger"
+                  >
                     <i className="bi bi-box-arrow-right me-2"></i>Đăng xuất
                   </Nav.Link>
                 </>
@@ -676,7 +726,10 @@ function Header({ cartCount = 0}) {
 
           {/* Contact Info */}
           <div className="p-3 bg-light mt-auto">
-            <h6 className="text-uppercase text-muted mb-3" style={{ fontSize: "0.8rem", letterSpacing: "1px" }}>
+            <h6
+              className="text-uppercase text-muted mb-3"
+              style={{ fontSize: "0.8rem", letterSpacing: "1px" }}
+            >
               Liên hệ
             </h6>
             <div className="mb-2">
@@ -687,18 +740,30 @@ function Header({ cartCount = 0}) {
             </div>
             <div className="mb-2">
               <i className="bi bi-envelope me-2"></i>
-              <a href="mailto:info@perfumeshop.com" className="text-decoration-none">
+              <a
+                href="mailto:info@perfumeshop.com"
+                className="text-decoration-none"
+              >
                 info@perfumeshop.com
               </a>
             </div>
             <div className="d-flex gap-2 mt-3">
-              <a href="#" className="btn btn-sm btn-outline-dark rounded-circle">
+              <a
+                href="#"
+                className="btn btn-sm btn-outline-dark rounded-circle"
+              >
                 <i className="bi bi-facebook"></i>
               </a>
-              <a href="#" className="btn btn-sm btn-outline-dark rounded-circle">
+              <a
+                href="#"
+                className="btn btn-sm btn-outline-dark rounded-circle"
+              >
                 <i className="bi bi-instagram"></i>
               </a>
-              <a href="#" className="btn btn-sm btn-outline-dark rounded-circle">
+              <a
+                href="#"
+                className="btn btn-sm btn-outline-dark rounded-circle"
+              >
                 <i className="bi bi-tiktok"></i>
               </a>
             </div>
@@ -720,7 +785,7 @@ function Header({ cartCount = 0}) {
             alignItems: "center",
             justifyContent: "center",
             boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
-            background: "linear-gradient(to right, #e83e8c, #6f42c1)",
+            background: "gray",
             border: "none",
           }}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
@@ -728,10 +793,8 @@ function Header({ cartCount = 0}) {
           <i className="bi bi-arrow-up"></i>
         </button>
       )}
-
-
     </header>
-  )
+  );
 }
 
-export default Header
+export default Header;

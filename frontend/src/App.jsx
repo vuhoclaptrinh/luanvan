@@ -54,6 +54,7 @@ import Wishlist from "./pages/userWishlist/Wishlist";
 import WishlistUser from "./pages/userWishlist/WishlistUser";
 import DetailSanpham from "./pages/DetaiSanpham/DetailSanpham";
 import DetailSanphamUser from "./pages/DetaiSanpham/DetailSanphamUser";
+import VnpayReturn from "./pages/userCart/Vnpayreturn";
 
 //test cho thai đoi tu thong ke qua
 
@@ -118,6 +119,8 @@ function App() {
             <Route path="/profilehome" element={<ProfilePage />} />
             <Route path="/wishlist" element={<WishlistUser />} />
             <Route path="/sanpham/:id" element={<DetailSanphamUser />} />
+            <Route path="/vnpay-return" element={<VnpayReturn />} />
+            {/* http://localhost:5173/checkout?vnp_ResponseCode=00 */}
             {/* <Route path="/wishlist/:id" element={<Wishlist />} /> */}
 
             {/* Protected Routes */}

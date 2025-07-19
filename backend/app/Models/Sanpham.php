@@ -26,7 +26,7 @@ class Sanpham extends Model
         'nam_phat_hanh',
         'do_luu_huong',
         'do_toa_huong',
-        // Thêm các cột khác trong bảng
+
     ];
 
     //thuộc 1 danh mục
@@ -43,7 +43,7 @@ class Sanpham extends Model
     public function getHinhAnhUrlAttribute()
     {
         if ($this->hinh_anh) {
-            return asset('storage/' . $this->hinh_anh); // tạo URL đầy đủ
+            return asset('storage/' . $this->hinh_anh);
         }
         return null;
     }

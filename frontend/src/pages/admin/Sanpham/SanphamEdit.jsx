@@ -1,48 +1,55 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
-  Dialog, DialogTitle, DialogContent, DialogActions,
-  TextField, Button, Stack, MenuItem, Select, InputLabel,
-  FormControl, CircularProgress, Box, Typography, IconButton
-} from '@mui/material';
-import axios from 'axios';
-import { enqueueSnackbar } from 'notistack';
-import DeleteIcon from '@mui/icons-material/Delete';
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+  Stack,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+  CircularProgress,
+  Box,
+  Typography,
+  IconButton,
+} from "@mui/material";
+import axios from "axios";
+import { enqueueSnackbar } from "notistack";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
   const [formdata, setFormdata] = useState({
-    ten_san_pham: '',
-    thuong_hieu: '',
-    xuat_xu: '',
-    phong_cach: '',
-    nam_phat_hanh: '',
-    do_luu_huong: '',
-    do_toa_huong: '',
-    mo_ta: '',
-    dung_tich: '',
-    gia: '',
-    so_luong_ton: '',
-    danh_muc_id: '',
+    ten_san_pham: "",
+    thuong_hieu: "",
+    xuat_xu: "",
+    phong_cach: "",
+    nam_phat_hanh: "",
+    do_luu_huong: "",
+    do_toa_huong: "",
+    mo_ta: "",
+    dung_tich: "",
+    gia: "",
+    so_luong_ton: "",
+    danh_muc_id: "",
   });
-
-  
   const [danhmucList, setDanhmucList] = useState([]);
-
-  const [currentImage, setCurrentImage] = useState('');  
+  const [currentImage, setCurrentImage] = useState("");
   const [newImageFile, setNewImageFile] = useState(null);
-
-  const [imagesPhu, setImagesPhu] = useState([]); 
-  const [newImagesPhuFiles, setNewImagesPhuFiles] = useState([]); 
-  const [imagesPhuDeletedIds, setImagesPhuDeletedIds] = useState([]); 
-
-  const [variants, setVariants] = useState([]); // Thêm state lưu biến thể
-
+  const [imagesPhu, setImagesPhu] = useState([]);
+  const [newImagesPhuFiles, setNewImagesPhuFiles] = useState([]);
+  const [imagesPhuDeletedIds, setImagesPhuDeletedIds] = useState([]);
+  const [variants, setVariants] = useState([]);
   const [loading, setLoading] = useState(false);
 
   // Load danh mục khi mở dialog
   useEffect(() => {
     if (open) {
-      axios.get('http://127.0.0.1:8000/api/danhmuc')
-        .then(res => setDanhmucList(res.data?.data || []))
+      axios
+        .get("http://127.0.0.1:8000/api/danhmuc")
+        .then((res) => setDanhmucList(res.data?.data || []))
         .catch(console.error);
     }
   }, [open]);
@@ -50,30 +57,31 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
   // Load chi tiết sản phẩm khi mở dialog
   useEffect(() => {
     if (sanphamId && open) {
-      axios.get(`http://127.0.0.1:8000/api/sanpham/${sanphamId}`)
-        .then(res => {
+      axios
+        .get(`http://127.0.0.1:8000/api/sanpham/${sanphamId}`)
+        .then((res) => {
           const sp = res.data?.data;
           if (sp) {
             setFormdata({
-              ten_san_pham: sp.ten_san_pham || '',
-              thuong_hieu: sp.thuong_hieu || '',
-              xuat_xu: sp.xuat_xu || '',
-              phong_cach: sp.phong_cach || '',
-              nam_phat_hanh: sp.nam_phat_hanh || '',
-              do_luu_huong: sp.do_luu_huong || '',
-              do_toa_huong: sp.do_toa_huong || '',
-              mo_ta: sp.mo_ta || '',
-              dung_tich: sp.dung_tich || '',
-              gia: sp.gia || '',
-              so_luong_ton: sp.so_luong_ton || '',
-              danh_muc_id: sp.danh_muc_id || '',
+              ten_san_pham: sp.ten_san_pham || "",
+              thuong_hieu: sp.thuong_hieu || "",
+              xuat_xu: sp.xuat_xu || "",
+              phong_cach: sp.phong_cach || "",
+              nam_phat_hanh: sp.nam_phat_hanh || "",
+              do_luu_huong: sp.do_luu_huong || "",
+              do_toa_huong: sp.do_toa_huong || "",
+              mo_ta: sp.mo_ta || "",
+              dung_tich: sp.dung_tich || "",
+              gia: sp.gia || "",
+              so_luong_ton: sp.so_luong_ton || "",
+              danh_muc_id: sp.danh_muc_id || "",
             });
-            setCurrentImage(sp.hinh_anh || '');
+            setCurrentImage(sp.hinh_anh || "");
             setNewImageFile(null);
             setImagesPhu(sp.images || []);
             setNewImagesPhuFiles([]);
             setImagesPhuDeletedIds([]);
-            setVariants(sp.variants || []); // Lưu biến thể
+            setVariants(sp.variants || []);
           }
         })
         .catch(console.error);
@@ -84,20 +92,20 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
   useEffect(() => {
     if (!open) {
       setFormdata({
-        ten_san_pham: '',
-        thuong_hieu: '',
-        xuat_xu: '',
-        phong_cach: '',
-        nam_phat_hanh: '',
-        do_luu_huong: '',
-        do_toa_huong: '',
-        mo_ta: '',
-        dung_tich: '',
-        gia: '',
-        so_luong_ton: '',
-        danh_muc_id: '',
+        ten_san_pham: "",
+        thuong_hieu: "",
+        xuat_xu: "",
+        phong_cach: "",
+        nam_phat_hanh: "",
+        do_luu_huong: "",
+        do_toa_huong: "",
+        mo_ta: "",
+        dung_tich: "",
+        gia: "",
+        so_luong_ton: "",
+        danh_muc_id: "",
       });
-      setCurrentImage('');
+      setCurrentImage("");
       setNewImageFile(null);
       setImagesPhu([]);
       setNewImagesPhuFiles([]);
@@ -110,7 +118,7 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
   // Xử lý thay đổi input form
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormdata(prev => ({ ...prev, [name]: value }));
+    setFormdata((prev) => ({ ...prev, [name]: value }));
   };
 
   // Xử lý chọn file ảnh chính mới
@@ -124,35 +132,41 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
   // Xử lý chọn nhiều ảnh phụ mới
   const handleNewImagesPhuChange = (e) => {
     if (e.target.files?.length) {
-      // Thêm ảnh mới vào mảng newImagesPhuFiles
+      // Thêm ảnh mới
       const filesArray = Array.from(e.target.files);
-      setNewImagesPhuFiles(prev => [...prev, ...filesArray]);
+      setNewImagesPhuFiles((prev) => [...prev, ...filesArray]);
     }
   };
 
   // Xóa ảnh phụ hiện tại (có id)
   const handleDeleteExistingImagePhu = (id) => {
     // Thêm id ảnh bị xóa vào danh sách xóa
-    setImagesPhuDeletedIds(prev => [...prev, id]);
-   
-    setImagesPhu(prev => prev.filter(img => img.id !== id));
+    setImagesPhuDeletedIds((prev) => [...prev, id]);
+    setImagesPhu((prev) => prev.filter((img) => img.id !== id));
   };
 
-  // Xóa ảnh phụ mới (chưa upload) 
+  // Xóa ảnh phụ mới (chưa upload)
   const handleDeleteNewImagePhu = (index) => {
-    setNewImagesPhuFiles(prev => prev.filter((_, i) => i !== index));
+    setNewImagesPhuFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const getImageUrl = (path) => {
     if (!path) return null;
-    if (path.startsWith('blob:')) return path;
-    if (path.startsWith('http')) return path;
+    if (path.startsWith("blob:")) return path;
+    if (path.startsWith("http")) return path;
     return `http://127.0.0.1:8000/storage/${path}`;
   };
 
   // Xử lý thay đổi input variant
   const handleVariantChange = (idx, field, value) => {
-    setVariants(prev => prev.map((v, i) => i === idx ? { ...v, [field]: value } : v));
+    setVariants((prev) =>
+      prev.map((v, i) => (i === idx ? { ...v, [field]: value } : v))
+    );
+  };
+  //format giá
+  const formatCurrency = (value) => {
+    if (!value) return "";
+    return new Intl.NumberFormat("vi-VN").format(value);
   };
 
   // Submit form cập nhật
@@ -160,27 +174,28 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
     setLoading(true);
     try {
       const formPayload = new FormData();
-      // Thêm các trường dữ liệu
+
       Object.entries(formdata).forEach(([key, value]) => {
         formPayload.append(key, value);
       });
-     
+
       if (newImageFile) {
-        formPayload.append('hinh_anh', newImageFile);
+        formPayload.append("hinh_anh", newImageFile);
       }
-      newImagesPhuFiles.forEach((file, ) => { 
-        formPayload.append('hinh_phu[]', file);
+      newImagesPhuFiles.forEach((file) => {
+        formPayload.append("hinh_phu[]", file);
       });
-
       // Danh sách ảnh phụ bị xóa (gửi id về backend để xóa)
-      formPayload.append('images_phu_deleted', JSON.stringify(imagesPhuDeletedIds));
-
-      // Gửi từng trường của từng variant theo dạng mảng lồng
-      const variantsToSend = variants.map(v => ({
+      formPayload.append(
+        "images_phu_deleted",
+        JSON.stringify(imagesPhuDeletedIds)
+      );
+      //sửa biên thể
+      const variantsToSend = variants.map((v) => ({
         ...v,
-        dung_tich: v.dung_tich !== '' ? Number(v.dung_tich) : '',
-        gia: v.gia !== '' ? Number(v.gia) : '',
-        so_luong_ton: v.so_luong_ton !== '' ? Number(v.so_luong_ton) : '',
+        dung_tich: v.dung_tich !== "" ? Number(v.dung_tich) : "",
+        gia: v.gia !== "" ? Number(v.gia) : "",
+        so_luong_ton: v.so_luong_ton !== "" ? Number(v.so_luong_ton) : "",
       }));
       variantsToSend.forEach((v, idx) => {
         Object.entries(v).forEach(([key, value]) => {
@@ -194,18 +209,20 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
         formPayload,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
         }
       );
 
       if (response.status === 200) {
-        enqueueSnackbar('Cập nhật sản phẩm thành công!', { variant: 'success',position:"top-center" });
+        enqueueSnackbar("Cập nhật sản phẩm thành công!", {
+          variant: "success",
+          position: "top-center",
+        });
         onUpdate();
         onClose();
       } else {
-        
-        enqueueSnackbar('Cập nhật sản phẩm thất bại!', { variant: 'error' });
+        enqueueSnackbar("Cập nhật sản phẩm thất bại!", { variant: "error" });
       }
     } catch (error) {
       const res = error.response;
@@ -213,20 +230,29 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
       //  (validate)
       if (res?.status === 422 && res.data?.errors) {
         Object.values(res.data.errors).forEach((msgs) => {
-          msgs.forEach((msg) => enqueueSnackbar(msg, { variant: 'error', position: "top-center" }));
+          msgs.forEach((msg) =>
+            enqueueSnackbar(msg, { variant: "error", position: "top-center" })
+          );
         });
-      }
-      else if (res?.data?.error) {
-        enqueueSnackbar(res.data.error, { variant: 'error', position: "top-center" });
-      }
-      else if (res?.data?.message) {
-        enqueueSnackbar(res.data.message, { variant: 'error', position: "top-center" });
+      } else if (res?.data?.error) {
+        enqueueSnackbar(res.data.error, {
+          variant: "error",
+          position: "top-center",
+        });
+      } else if (res?.data?.message) {
+        enqueueSnackbar(res.data.message, {
+          variant: "error",
+          position: "top-center",
+        });
       }
       // Fallback
       else {
-        enqueueSnackbar('Cập nhật sản phẩm thất bại!', { variant: 'error', position: "top-center" });
+        enqueueSnackbar("Cập nhật sản phẩm thất bại!", {
+          variant: "error",
+          position: "top-center",
+        });
       }
-      console.error('Lỗi cập nhật:', res?.data || error.message || error);
+      console.error("Lỗi cập nhật:", res?.data || error.message || error);
     } finally {
       setLoading(false);
     }
@@ -297,48 +323,89 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
             multiline
             rows={3}
           />
-         {/* Biến thể sản phẩm */}
+          {/* Biến thể sản phẩm */}
           <Box mt={2}>
-            <Typography variant="subtitle1" mb={1}>Biến thể sản phẩm</Typography>
+            <Typography variant="subtitle1" mb={1}>
+              Biến thể sản phẩm
+            </Typography>
             {variants.length === 0 ? (
-              <Button variant="outlined" onClick={() => setVariants([{ dung_tich: '', gia: '', so_luong_ton: '' }])}>
+              <Button
+                variant="outlined"
+                onClick={() =>
+                  setVariants([{ dung_tich: "", gia: "", so_luong_ton: "" }])
+                }
+              >
                 Thêm biến thể đầu tiên
               </Button>
             ) : (
               <Stack spacing={2}>
                 {variants.map((variant, idx) => (
-                  <Box key={variant.id || idx} p={2} border={1} borderColor="#eee" borderRadius={2} position="relative">
+                  <Box
+                    key={variant.id || idx}
+                    p={2}
+                    border={1}
+                    borderColor="#eee"
+                    borderRadius={2}
+                    position="relative"
+                  >
                     <Stack direction="row" spacing={2} alignItems="center">
                       <TextField
                         label="Dung tích (ml)"
                         type="number"
                         value={variant.dung_tich}
-                        onChange={e => handleVariantChange(idx, 'dung_tich', e.target.value)}
+                        onChange={(e) =>
+                          handleVariantChange(idx, "dung_tich", e.target.value)
+                        }
                         size="small"
                       />
+
                       <TextField
-                        label="Giá (₫)"
-                        type="number"
-                        value={variant.gia}
-                        onChange={e => handleVariantChange(idx, 'gia', e.target.value)}
-                        size="small"
+                        label="Giá"
+                        value={formatCurrency(variant.gia)}
+                        onChange={(e) =>
+                          handleVariantChange(
+                            idx,
+                            "gia",
+                            e.target.value.replace(/[^\d]/g, "")
+                          )
+                        }
+                        fullWidth
                       />
                       <TextField
                         label="Số lượng tồn"
                         type="number"
                         value={variant.so_luong_ton}
-                        onChange={e => handleVariantChange(idx, 'so_luong_ton', e.target.value)}
+                        onChange={(e) =>
+                          handleVariantChange(
+                            idx,
+                            "so_luong_ton",
+                            e.target.value
+                          )
+                        }
                         size="small"
                       />
                       {variants.length > 1 && (
-                        <IconButton color="error" onClick={() => setVariants(vs => vs.filter((_, i) => i !== idx))}>
+                        <IconButton
+                          color="error"
+                          onClick={() =>
+                            setVariants((vs) => vs.filter((_, i) => i !== idx))
+                          }
+                        >
                           <DeleteIcon fontSize="small" />
                         </IconButton>
                       )}
                     </Stack>
                   </Box>
                 ))}
-                <Button variant="outlined" onClick={() => setVariants(vs => [...vs, { dung_tich: '', gia: '', so_luong_ton: '' }])}>
+                <Button
+                  variant="outlined"
+                  onClick={() =>
+                    setVariants((vs) => [
+                      ...vs,
+                      { dung_tich: "", gia: "", so_luong_ton: "" },
+                    ])
+                  }
+                >
                   Thêm biến thể
                 </Button>
               </Stack>
@@ -355,7 +422,7 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
               label="Danh mục"
               required
             >
-              {danhmucList.map(dm => (
+              {danhmucList.map((dm) => (
                 <MenuItem key={dm.id} value={dm.id}>
                   {dm.ten_danh_muc}
                 </MenuItem>
@@ -365,7 +432,9 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
           {/* Ảnh chính */}
           {currentImage && (
             <Box textAlign="center">
-              <Typography variant="subtitle2" gutterBottom>Ảnh chính hiện tại</Typography>
+              <Typography variant="subtitle2" gutterBottom>
+                Ảnh chính hiện tại
+              </Typography>
               <Box
                 component="img"
                 src={getImageUrl(currentImage)}
@@ -373,11 +442,11 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
                 sx={{
                   width: 150,
                   height: 150,
-                  objectFit: 'cover',
+                  objectFit: "cover",
                   borderRadius: 2,
                   boxShadow: 1,
-                  border: '1px solid #ccc',
-                  mx: 'auto',
+                  border: "1px solid #ccc",
+                  mx: "auto",
                 }}
               />
             </Box>
@@ -394,28 +463,34 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
           </Button>
 
           {/* Ảnh phụ */}
-          <Typography variant="subtitle1" mt={2}>Ảnh phụ hiện có</Typography>
+          <Typography variant="subtitle1" mt={2}>
+            Ảnh phụ hiện có
+          </Typography>
           <Stack direction="row" spacing={1} flexWrap="wrap">
             {imagesPhu.length === 0 && <Typography>Chưa có ảnh phụ</Typography>}
-            {imagesPhu.map(img => (
-              <Box key={img.id} position="relative" sx={{ width: 100, height: 100 }}>
+            {imagesPhu.map((img) => (
+              <Box
+                key={img.id}
+                position="relative"
+                sx={{ width: 100, height: 100 }}
+              >
                 <Box
                   component="img"
                   src={getImageUrl(img.image_path)}
                   alt="Ảnh phụ"
                   sx={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
                     borderRadius: 1,
-                    border: '1px solid #ccc',
+                    border: "1px solid #ccc",
                   }}
                 />
                 <IconButton
                   size="small"
                   color="error"
                   onClick={() => handleDeleteExistingImagePhu(img.id)}
-                  sx={{ position: 'absolute', top: 0, right: 0 }}
+                  sx={{ position: "absolute", top: 0, right: 0 }}
                 >
                   <DeleteIcon fontSize="small" />
                 </IconButton>
@@ -424,27 +499,33 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
           </Stack>
 
           {/* Thêm ảnh phụ mới */}
-          <Typography variant="subtitle1" mt={2}>Thêm ảnh phụ mới</Typography>
+          <Typography variant="subtitle1" mt={2}>
+            Thêm ảnh phụ mới
+          </Typography>
           <Stack direction="row" spacing={1} flexWrap="wrap" mb={1}>
             {newImagesPhuFiles.map((file, idx) => (
-              <Box key={idx} position="relative" sx={{ width: 100, height: 100 }}>
+              <Box
+                key={idx}
+                position="relative"
+                sx={{ width: 100, height: 100 }}
+              >
                 <Box
                   component="img"
                   src={URL.createObjectURL(file)}
                   alt="Ảnh phụ mới"
                   sx={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
                     borderRadius: 1,
-                    border: '1px solid #ccc',
+                    border: "1px solid #ccc",
                   }}
                 />
                 <IconButton
                   size="small"
                   color="error"
                   onClick={() => handleDeleteNewImagePhu(idx)}
-                  sx={{ position: 'absolute', top: 0, right: 0 }}
+                  sx={{ position: "absolute", top: 0, right: 0 }}
                 >
                   <DeleteIcon fontSize="small" />
                 </IconButton>
@@ -462,15 +543,14 @@ const SanphamEdit = ({ open, onClose, sanphamId, onUpdate }) => {
               onChange={handleNewImagesPhuChange}
             />
           </Button>
-
-          
-
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} disabled={loading}>Hủy</Button>
+        <Button onClick={onClose} disabled={loading}>
+          Hủy
+        </Button>
         <Button onClick={handleSubmit} variant="contained" disabled={loading}>
-          {loading ? <CircularProgress size={24} /> : 'Lưu'}
+          {loading ? <CircularProgress size={24} /> : "Lưu"}
         </Button>
       </DialogActions>
     </Dialog>

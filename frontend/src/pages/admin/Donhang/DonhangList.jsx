@@ -46,7 +46,13 @@ const DonhangList = () => {
   const [searchText, setSearchText] = useState("");
   const [searchName, setSearchName] = useState("");
 
-  const [trangthaimap, setTrangthaimap] = useState({});
+  const fixedTrangthai = {
+    "chờ xử lý": "Chờ xử lý",
+    "đang giao": "Đang giao",
+    "đã giao": "Đã giao",
+    "đã huỷ": "Đã huỷ",
+  };
+  // const [trangthaimap, setTrangthaimap] = useState({});
   const [selectedTrangthai, setSelectedTrangthai] = useState("");
 
   // Phân trang
@@ -60,11 +66,11 @@ const DonhangList = () => {
       const res = await axios.get(`${API_BASE}donhang`);
       if (res.data?.data && Array.isArray(res.data.data)) {
         setDonhang(res.data.data);
-        const maptt = {};
-        res.data.data.forEach((tt) => {
-          maptt[tt.trang_thai] = tt.trang_thai;
-        });
-        setTrangthaimap(maptt);
+        // const maptt = {};
+        // res.data.data.forEach((tt) => {
+        //   maptt[tt.trang_thai] = tt.trang_thai;
+        // });
+        // setTrangthaimap(maptt);
       } else {
         console.error("Dữ liệu đơn hàng không đúng định dạng:", res.data);
       }
@@ -291,7 +297,7 @@ const DonhangList = () => {
           sx={{ width: 200 }}
         >
           <MenuItem value="">Tất Cả </MenuItem>
-          {Object.entries(trangthaimap).map(([id, name]) => (
+          {Object.entries(fixedTrangthai).map(([id, name]) => (
             <MenuItem key={id} value={id}>
               {name}
             </MenuItem>
@@ -313,14 +319,6 @@ const DonhangList = () => {
           ))}
         </TextField>
         <Box sx={{ flexGrow: 1 }} />
-        {/* <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => setAddOpen(true)}
-          sx={{ whiteSpace: 'nowrap' }}
-        >
-          Thêm sản phẩm
-        </Button> */}
       </Stack>
 
       <Box sx={{ width: "100%", height: 600, marginTop: 2 }}>
