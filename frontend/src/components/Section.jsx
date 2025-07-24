@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
+import { toast } from "react-toastify";
 
 function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -94,7 +95,7 @@ function HeroSection() {
               <span
                 className="d-block"
                 style={{
-                  background: "linear-gradient(to right, #ff8a8a, #da8cff)",
+                  background: "pink",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   animation: `fadeInUp 1s ease-out ${
@@ -127,7 +128,7 @@ function HeroSection() {
                 variant="primary"
                 size="lg"
                 style={{
-                  background: "linear-gradient(to right, #e83e8c, #6f42c1)",
+                  background: "gray",
                   borderColor: "transparent",
                   transition: "all 0.3s ease",
                 }}
@@ -149,6 +150,14 @@ function HeroSection() {
                 href="/products"
                 style={{
                   transition: "all 0.3s ease",
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  toast.success("Đang chuyển đến bộ sưu tập...");
+
+                  setTimeout(() => {
+                    window.location.href = "/products";
+                  }, 1500);
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.transform = "translateY(-2px)";

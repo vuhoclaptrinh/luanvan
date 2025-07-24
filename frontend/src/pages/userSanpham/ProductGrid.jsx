@@ -177,7 +177,9 @@ const ProductGrid = ({
                       {product.danh_muc_ten}
                     </Badge>
                   )}
-                  {product.so_luong_ton <= 5 && product.so_luong_ton > 0 && (
+                  {product.variants?.some(
+                    (v) => v.so_luong_ton > 0 && v.so_luong_ton <= 5
+                  ) && (
                     <Badge
                       bg="warning"
                       text="dark"
@@ -186,7 +188,7 @@ const ProductGrid = ({
                       Sắp hết hàng
                     </Badge>
                   )}
-                  {product.so_luong_ton === 0 && (
+                  {product.variants?.every((v) => v.so_luong_ton === 0) && (
                     <Badge
                       bg="danger"
                       className="position-absolute top-0 end-0 m-2"

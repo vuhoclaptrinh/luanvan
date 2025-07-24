@@ -53,6 +53,8 @@ class ChitietdonhangController extends Controller
                     'don_hang_id' => $item->don_hang_id,
                     'ten_khach_hang' => $item->donhang->khachhang->ho_ten ?? null,
                     'san_pham_id' => $item->san_pham_id,
+                    'bien_the_id' => $item->bien_the_id,
+                    'ten_bien_the' => $item->bienthe->dung_tich ?? null,
                     'ten_san_pham' => $item->sanpham->ten_san_pham ?? null,
                     'so_luong' => $item->so_luong,
                     'gia' => $item->gia,

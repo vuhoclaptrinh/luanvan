@@ -257,6 +257,7 @@ class DonhangController extends Controller
                     'tong_tien' => $item->tong_tien,
                     'trang_thai' => $item->trang_thai,
                     'ma_giam_gia_id' => $item->ma_giam_gia_id,
+                    'created_at' => $item->created_at,
                 ];
             });
             return response()->json([

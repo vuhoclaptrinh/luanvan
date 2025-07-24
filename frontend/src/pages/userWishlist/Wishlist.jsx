@@ -129,7 +129,7 @@ const Wishlist = () => {
                               {product.thuong_hieu || "Thương hiệu"}
                             </span>
                             <span className="size">
-                              {product.dung_tich || "100ml"}
+                              {product.dung_tich || "100ml"}ml
                             </span>
 
                             <span className="size">
@@ -162,7 +162,7 @@ const Wishlist = () => {
                             <Button
                               size="sm"
                               variant="info"
-                              onClick={() => setSelectedProduct(product)}
+                              onClick={() => navigate(`/sanpham/${product.id}`)}
                             >
                               Xem chi tiết
                             </Button>
@@ -304,31 +304,7 @@ const Wishlist = () => {
                     <strong>Độ toả hương:</strong>{" "}
                     {selectedProduct.do_toa_huong}
                   </p>
-                  {/* <p>
-                    <strong>Tình trạng:</strong>{" "}
-                    <td>
-                          {(() => {
-                            let total = 0;
-                            if (Array.isArray(selectedProduct.variants) && selectedProduct.variants.length > 0) {
-                              total = selectedProduct.variants.reduce((sum, v) => sum + (Number(v.so_luong_ton) || 0), 0);
-                            } else {
-                              total = Number(selectedProduct.so_luong_ton) || 0;
-                            }
-                            return total > 0 ? (
-                              <span className="text-success">
-                                <i className="bi bi-check-circle me-1"></i>
-                                Còn hàng ({total})
-                              </span>
-                            ) : (
-                              <span className="text-danger">
-                                <i className="bi bi-x-circle me-1"></i>
-                                Hết hàng
-                              </span>
-                            );
-                          })()}
-                        </td>
-                   
-                </p> */}
+
                   <div className="d-grid gap-2 mt-3">
                     <Button
                       variant="primary"

@@ -12,8 +12,9 @@ const HomePage = () => {
         <Header />
         <main className="flex-grow-1">
           <HeroSection />
-          <FeaturedCategories />
+
           <ProductGrid />
+          <FeaturedCategories />
         </main>
         <Footer />
       </div>

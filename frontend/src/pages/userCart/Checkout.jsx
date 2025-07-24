@@ -125,7 +125,7 @@ const Checkout = () => {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    // Get user data from session storage
+    // lấy user
     const userData = sessionStorage.getItem("user");
 
     if (!userData) {
@@ -137,7 +137,7 @@ const Checkout = () => {
       const parsedUser = JSON.parse(userData);
       setUser(parsedUser);
 
-      // Pre-fill form with user data
+      // form láy thông tin
       setFormData((prev) => ({
         ...prev,
         ho_ten:
@@ -159,7 +159,7 @@ const Checkout = () => {
     setLoading(false);
   }, [navigate]);
 
-  // Redirect if no cart data
+  // trả về không có sản phảm
   if (!loading && (!state || !state.cart || state.cart.length === 0)) {
     return (
       <>
@@ -185,7 +185,7 @@ const Checkout = () => {
     );
   }
 
-  // If order is complete, show success page
+  // kiểm tra đặt hàng thành công
   if (orderComplete) {
     return (
       <>
@@ -235,16 +235,15 @@ const Checkout = () => {
     );
   }
 
-  // Extract cart data from state
+  // lấy dữ liệu từ cart qua
   const { cart, shipping, discount, coupon, couponId, total, shippingcost } =
     state;
   const subtotal = cart.reduce(
     (total, item) => total + item.gia * item.quantity,
     0
   );
-  //const total = subtotal + shipping.price - discount
 
-  // Format price with VND
+  // Format giá
   const formatPrice = (price) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -366,7 +365,7 @@ const Checkout = () => {
 
         // Chuyển hướng tới trang thanh toán VNPAY
         window.location.href = res.data.payment_url;
-        return; // ⛔ Dừng không tạo đơn hàng phía dưới
+        return;
       }
 
       // Ngược lại là COD

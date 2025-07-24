@@ -44,12 +44,14 @@ class KhachhangController extends Controller
     {
         try {
             $request->validate([
-                'ho_ten' => 'required|string|max:255',
+                'ho_ten' => ['required', 'string', 'max:255', 'regex:/^[^\d]+$/'],
                 'email' => 'required|string|max:255',
                 'mat_khau' => 'required|string|max:255',
                 'so_dien_thoai' => 'required|string|max:255',
-
                 'dia_chi' => 'required|string|max:255'
+            ], [
+                'ho_ten.regex' => 'Họ tên không được chứa số.',
+                'ho_ten.required' => 'Vui lòng nhập họ tên.',
             ]);
             // tao
             $khachhang = new Khachhang();
@@ -167,11 +169,12 @@ class KhachhangController extends Controller
     {
         $request->validate(
             [
-                'ho_ten' => 'required|string|max:255',
+                'ho_ten' => 'required|string|max:255|regex:/^[^\d]+$/',
                 'email' => 'required|email|unique:khachhang,email',
                 'mat_khau' => 'required|string|min:6|max:255',
             ],
             [
+                'ho_ten.regex' => 'Họ tên không được chứa số',
                 'ho_ten.required' => 'Họ tên là bắt buộc',
                 'email.required' => 'Email là bắt buộc',
                 'email.email' => 'Email không hợp lệ',

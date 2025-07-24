@@ -51,6 +51,7 @@ const DonhangList = () => {
     "đang giao": "Đang giao",
     "đã giao": "Đã giao",
     "đã huỷ": "Đã huỷ",
+    "đã thanh toán": "Đã thanh toán",
   };
   // const [trangthaimap, setTrangthaimap] = useState({});
   const [selectedTrangthai, setSelectedTrangthai] = useState("");
@@ -198,6 +199,9 @@ const DonhangList = () => {
             chipColor = "info";
             break;
           case "đã giao":
+            chipColor = "success";
+            break;
+          case "đã thanh toán":
             chipColor = "success";
             break;
           default:

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { DataGrid } from '@mui/x-data-grid';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { DataGrid } from "@mui/x-data-grid";
 import {
   Box,
   Button,
@@ -8,21 +8,21 @@ import {
   Stack,
   MenuItem,
   TextField,
-} from '@mui/material';
+} from "@mui/material";
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Add as AddIcon,
   Visibility as VisibilityIcon,
-} from '@mui/icons-material';
-import ConfirmDeleteDialog from '../../../components/cfdelete';
-import { enqueueSnackbar } from 'notistack';
+} from "@mui/icons-material";
+import ConfirmDeleteDialog from "../../../components/cfdelete";
+import { enqueueSnackbar } from "notistack";
 
-import SanphamEdit from './SanphamEdit';
-import SanphamAdd from './SanphamAdd';
-import SanphamView from './SanphamView';
+import SanphamEdit from "./SanphamEdit";
+import SanphamAdd from "./SanphamAdd";
+import SanphamView from "./SanphamView";
 
-const API_BASE = 'http://127.0.0.1:8000/api/';
+const API_BASE = "http://127.0.0.1:8000/api/";
 
 const SanphamList = () => {
   const [sanpham, setSanpham] = useState([]);
@@ -40,8 +40,8 @@ const SanphamList = () => {
 
   // Lọc
   const [danhMucMap, setDanhMucMap] = useState({});
-  const [selectedDanhMuc, setSelectedDanhMuc] = useState('');
-  const [searchText, setSearchText] = useState('');
+  const [selectedDanhMuc, setSelectedDanhMuc] = useState("");
+  const [searchText, setSearchText] = useState("");
 
   // Phân trang
   const [paginationModel, setPaginationModel] = useState({
@@ -57,10 +57,10 @@ const SanphamList = () => {
         console.log("Sanpham data:", res.data.data);
         setSanpham(res.data.data);
       } else {
-        console.error('Dữ liệu sản phẩm không đúng định dạng:', res.data);
+        console.error("Dữ liệu sản phẩm không đúng định dạng:", res.data);
       }
     } catch (error) {
-      console.error('Lỗi khi lấy danh sách sản phẩm:', error);
+      console.error("Lỗi khi lấy danh sách sản phẩm:", error);
     } finally {
       setLoading(false);
     }
@@ -77,7 +77,7 @@ const SanphamList = () => {
         setDanhMucMap(map);
       }
     } catch (error) {
-      console.error('Lỗi khi lấy danh mục:', error);
+      console.error("Lỗi khi lấy danh mục:", error);
     }
   };
 
@@ -104,15 +104,17 @@ const SanphamList = () => {
   const handleConfirmDelete = async () => {
     try {
       await axios.delete(`${API_BASE}sanpham/${deleteId}`);
-      enqueueSnackbar('Xoá sản phẩm thành công!', { variant: 'success' });
+      enqueueSnackbar("Xoá sản phẩm thành công!", { variant: "success" });
       setSanpham((prev) => prev.filter((sp) => sp.id !== deleteId));
     } catch (error) {
       if (error.response?.status === 409) {
-             enqueueSnackbar(error.response.data.message || 'Không thể xoá do ràng buộc dữ liệu', {
-               variant: 'error',
-             });
-           } else 
-      enqueueSnackbar('Xóa thất bại!', { variant: 'error' });
+        enqueueSnackbar(
+          error.response.data.message || "Không thể xoá do ràng buộc dữ liệu",
+          {
+            variant: "error",
+          }
+        );
+      } else enqueueSnackbar("Xóa thất bại!", { variant: "error" });
     } finally {
       setOpenConfirm(false);
       setDeleteId(null);
@@ -134,53 +136,66 @@ const SanphamList = () => {
   };
 
   const sanphamFiltered = sanpham.filter((sp) => {
-    const matchSearch = sp.ten_san_pham.toLowerCase().includes(searchText.toLowerCase());
-    const matchThuongHieu = sp.thuong_hieu.toLowerCase().includes(searchText.toLowerCase());
-    const matchDanhMuc = selectedDanhMuc ? sp.danh_muc_id === parseInt(selectedDanhMuc) : true;
+    const matchSearch = sp.ten_san_pham
+      .toLowerCase()
+      .includes(searchText.toLowerCase());
+    const matchThuongHieu = sp.thuong_hieu
+      .toLowerCase()
+      .includes(searchText.toLowerCase());
+    const matchDanhMuc = selectedDanhMuc
+      ? sp.danh_muc_id === parseInt(selectedDanhMuc)
+      : true;
     return (matchSearch || matchThuongHieu) && matchDanhMuc;
   });
 
   const columns = [
-    { field: 'id', headerName: 'ID', width: 70 },
-    { field: 'ten_san_pham', headerName: 'Tên sản phẩm', width: 200 },
-    { field: 'thuong_hieu', headerName: 'Thương hiệu', width: 150 },
-    { field: 'mo_ta', headerName: 'Mô tả', width: 200 },
+    { field: "id", headerName: "ID", width: 70 },
+    { field: "ten_san_pham", headerName: "Tên sản phẩm", width: 200 },
+    { field: "thuong_hieu", headerName: "Thương hiệu", width: 150 },
+    { field: "mo_ta", headerName: "Mô tả", width: 200 },
     {
-       field: 'dung_tich',
-      headerName: 'Dung tích / Giá / SL tồn',
+      field: "dung_tich",
+      headerName: "Dung tích | Giá | SL tồn",
       width: 260,
       renderCell: (params) => {
-        if (!params.row.variants || params.row.variants.length === 0) return 'Không có biến thể';
+        if (!params.row.variants || params.row.variants.length === 0)
+          return "Không có biến thể";
         return (
           <Box>
             {params.row.variants.map((v, idx) => (
-              <Typography key={idx} variant="body2">  
-                {v.dung_tich}: {parseInt(v.gia).toLocaleString('vi-VN')} ₫ — SL: {v.so_luong_ton}
+              <Typography key={idx} variant="body2">
+                {v.dung_tich}: {parseInt(v.gia).toLocaleString("vi-VN")} ₫ — SL:{" "}
+                {v.so_luong_ton}
               </Typography>
             ))}
           </Box>
         );
-      }
+      },
     },
 
     {
-      field: 'hinh_anh',
-      headerName: 'Hình ảnh',
+      field: "hinh_anh",
+      headerName: "Hình ảnh",
       width: 120,
       renderCell: (params) => {
         if (!params.value) return null;
         let imagePath = params.value;
-        if (imagePath.startsWith('images/')) {
-          imagePath = imagePath.replace(/^images\//, '');
+        if (imagePath.startsWith("images/")) {
+          imagePath = imagePath.replace(/^images\//, "");
         }
-        const url = imagePath.startsWith('http')
+        const url = imagePath.startsWith("http")
           ? imagePath
           : `http://127.0.0.1:8000/storage/images/${imagePath}`;
         return (
           <img
             src={url}
             alt="ảnh sản phẩm"
-            style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 4 }}
+            style={{
+              width: 50,
+              height: 50,
+              objectFit: "cover",
+              borderRadius: 4,
+            }}
           />
         );
       },
@@ -188,27 +203,30 @@ const SanphamList = () => {
       filterable: false,
     },
     {
-      field: 'danh_muc_id',
-      headerName: 'Danh mục',
+      field: "danh_muc_id",
+      headerName: "Danh mục",
       width: 150,
-      renderCell: (params) => danhMucMap[params.value] || 'Không xác định',
+      renderCell: (params) => danhMucMap[params.value] || "Không xác định",
     },
     {
-      field: 'actions',
-      headerName: 'Thao tác',
+      field: "actions",
+      headerName: "Thao tác",
       width: 250,
       sortable: false,
       filterable: false,
       renderCell: (params) => (
-        <Stack direction="row" spacing={1}  sx={{
-        width: '100%',
-        height: '100%', 
-        alignItems: 'center',       
-        justifyContent: 'center',
-         
-      }}>
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{
+            width: "100%",
+            height: "100%",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <Button
-            size='small'
+            size="small"
             variant="outlined"
             color="info"
             onClick={() => handleView(params.row)}
@@ -217,7 +235,7 @@ const SanphamList = () => {
             <VisibilityIcon fontSize="small" />
           </Button>
           <Button
-            size='small'
+            size="small"
             variant="outlined"
             color="warning"
             onClick={() => handleEdit(params.row)}
@@ -226,7 +244,7 @@ const SanphamList = () => {
             <EditIcon fontSize="small" />
           </Button>
           <Button
-            size='small'  
+            size="small"
             variant="outlined"
             color="error"
             onClick={() => handleDelete(params.row.id)}
@@ -240,7 +258,7 @@ const SanphamList = () => {
   ];
 
   return (
-    <Box >
+    <Box>
       <Typography
         variant="h4"
         fontWeight="bold"
@@ -250,8 +268,14 @@ const SanphamList = () => {
       >
         Danh Sách Sản Phẩm
       </Typography>
-     
-      <Stack direction="row" spacing={2} alignItems="center" mb={2} flexWrap="wrap">
+
+      <Stack
+        direction="row"
+        spacing={2}
+        alignItems="center"
+        mb={2}
+        flexWrap="wrap"
+      >
         <TextField
           label="Tìm kiếm theo tên"
           size="small"
@@ -262,13 +286,15 @@ const SanphamList = () => {
           select
           label="Lọc theo danh mục"
           size="small"
-          value={selectedDanhMuc} 
+          value={selectedDanhMuc}
           onChange={(e) => setSelectedDanhMuc(e.target.value)}
-           sx={{ width: 200  }}
+          sx={{ width: 200 }}
         >
-          <MenuItem value="" >Tất Cả</MenuItem>
+          <MenuItem value="">Tất Cả</MenuItem>
           {Object.entries(danhMucMap).map(([id, name]) => (
-            <MenuItem key={id} value={id}>{name}</MenuItem>
+            <MenuItem key={id} value={id}>
+              {name}
+            </MenuItem>
           ))}
         </TextField>
         <Box sx={{ flexGrow: 1 }} />
@@ -276,13 +302,13 @@ const SanphamList = () => {
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => setAddOpen(true)}
-          sx={{ whiteSpace: 'nowrap' }}
+          sx={{ whiteSpace: "nowrap" }}
         >
           Thêm sản phẩm
         </Button>
       </Stack>
 
-      <Box sx={{ width: '100%', overflowX: 'auto' }}>
+      <Box sx={{ width: "100%", overflowX: "auto" }}>
         <DataGrid
           rows={sanphamFiltered}
           columns={columns}
@@ -297,9 +323,22 @@ const SanphamList = () => {
       </Box>
 
       {/* Dialogs */}
-      <SanphamAdd open={addOpen} onClose={handleCloseAdd} onUpdate={fetchSanpham} />
-      <SanphamEdit open={editOpen} onClose={handleCloseEdit} sanphamId={selectedSanphamId} onUpdate={fetchSanpham} />
-      <SanphamView open={viewOpen} onClose={handleCloseView} sanphamId={selectedSanphamId} />
+      <SanphamAdd
+        open={addOpen}
+        onClose={handleCloseAdd}
+        onUpdate={fetchSanpham}
+      />
+      <SanphamEdit
+        open={editOpen}
+        onClose={handleCloseEdit}
+        sanphamId={selectedSanphamId}
+        onUpdate={fetchSanpham}
+      />
+      <SanphamView
+        open={viewOpen}
+        onClose={handleCloseView}
+        sanphamId={selectedSanphamId}
+      />
       <ConfirmDeleteDialog
         open={openConfirm}
         onClose={() => setOpenConfirm(false)}

@@ -87,10 +87,10 @@ const Detailcart = () => {
       );
     }
 
-    // Sort by date
+    // sắp xếp mới nhất
     filtered.sort((a, b) => {
-      const dateA = new Date(a.ngay_dat);
-      const dateB = new Date(b.ngay_dat);
+      const dateA = new Date(a.created_at);
+      const dateB = new Date(b.created_at);
       return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
     });
 
@@ -239,10 +239,12 @@ const Detailcart = () => {
                       Tất cả trạng thái
                     </Dropdown.Item>
                     <Dropdown.Divider />
-
                     <Dropdown.Item
-                      onClick={() => setStatusFilter("đang xử lý")}
+                      onClick={() => setStatusFilter("đã thanh toán")}
                     >
+                      Đã thanh toán
+                    </Dropdown.Item>
+                    <Dropdown.Item onClick={() => setStatusFilter("chờ xử lý")}>
                       Chờ xử lý
                     </Dropdown.Item>
                     <Dropdown.Item onClick={() => setStatusFilter("đang giao")}>

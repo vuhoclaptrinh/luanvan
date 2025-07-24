@@ -424,12 +424,22 @@ export default function ProductDetail() {
                     >
                       <Minus size={16} />
                     </Button>
-                    <span
-                      className="px-3 py-2 border rounded text-center"
-                      style={{ minWidth: "60px" }}
-                    >
-                      {quantity}
-                    </span>
+
+                    <input
+                      type="number"
+                      className="form-control text-center"
+                      style={{ width: "80px" }}
+                      value={quantity}
+                      min={1}
+                      max={displayStock}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value, 10);
+                        if (!isNaN(val)) {
+                          setQuantity(Math.min(Math.max(val, 1), displayStock)); // ràng buộc min/max
+                        }
+                      }}
+                    />
+
                     <Button
                       variant="outline-secondary"
                       size="sm"
@@ -439,6 +449,7 @@ export default function ProductDetail() {
                       <Plus size={16} />
                     </Button>
                   </div>
+
                   {displayStock <= 0 && (
                     <small className="text-danger">Chọn dung tích</small>
                   )}

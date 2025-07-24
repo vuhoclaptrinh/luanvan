@@ -53,6 +53,7 @@ const ProductDetailModal = ({
           );
           setReviews(res.data.data || []);
         } catch (error) {
+          console.error("Lỗi khi tải đánh giá:", error);
           setReviews([]);
         } finally {
           setLoadingReviews(false);
@@ -108,6 +109,7 @@ const ProductDetailModal = ({
                       objectFit: "contain",
                     }}
                   />
+
                   {product.images?.length > 1 && (
                     <>
                       <Button
@@ -246,21 +248,53 @@ const ProductDetailModal = ({
                   {/* Chọn số lượng */}
                   <div className="mb-3">
                     <label className="form-label fw-semibold">Số lượng:</label>
-                    <input
-                      type="number"
-                      className="form-control"
-                      min={1}
-                      max={displayStock || 1}
-                      value={quantity}
-                      onChange={(e) => {
-                        let val = Number(e.target.value);
-                        if (val < 1) val = 1;
-                        if (val > (displayStock || 1)) val = displayStock || 1;
-                        setQuantity(val);
-                      }}
-                      disabled={displayStock <= 0}
-                      style={{ width: 120 }}
-                    />
+
+                    <div
+                      className="d-flex align-items-center gap-2"
+                      style={{ width: "fit-content" }}
+                    >
+                      <button
+                        type="button"
+                        className="btn btn-outline-secondary"
+                        onClick={() =>
+                          setQuantity((prev) => Math.max(1, prev - 1))
+                        }
+                        disabled={quantity <= 1 || displayStock <= 0}
+                      >
+                        -
+                      </button>
+
+                      <input
+                        type="number"
+                        className="form-control text-center"
+                        style={{ width: 80 }}
+                        value={quantity}
+                        min={1}
+                        max={displayStock || 1}
+                        onChange={(e) => {
+                          let val = Number(e.target.value);
+                          if (isNaN(val)) return;
+                          if (val < 1) val = 1;
+                          if (val > displayStock) val = displayStock;
+                          setQuantity(val);
+                        }}
+                        disabled={displayStock <= 0}
+                      />
+
+                      <button
+                        type="button"
+                        className="btn btn-outline-secondary"
+                        onClick={() =>
+                          setQuantity((prev) =>
+                            Math.min(displayStock, prev + 1)
+                          )
+                        }
+                        disabled={quantity >= displayStock || displayStock <= 0}
+                      >
+                        +
+                      </button>
+                    </div>
+
                     {displayStock <= 0 && (
                       <div className="text-danger small mt-1">Hết hàng</div>
                     )}

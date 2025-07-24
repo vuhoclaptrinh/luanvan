@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -20,7 +20,7 @@ import {
   Divider,
   Chip,
   Paper,
-} from '@mui/material';
+} from "@mui/material";
 import {
   Person,
   Phone,
@@ -31,11 +31,11 @@ import {
   LocalOffer,
   ShoppingCart,
   Close,
-} from '@mui/icons-material';
-import axios from 'axios';
+} from "@mui/icons-material";
+import axios from "axios";
 
-const API_BASE = 'http://127.0.0.1:8000/api/';
-const IMAGE_BASE_URL = 'http://127.0.0.1:8000/storage/';
+const API_BASE = "http://127.0.0.1:8000/api/";
+const IMAGE_BASE_URL = "http://127.0.0.1:8000/storage/";
 
 const DonhangView = ({ open, onClose, donhangId }) => {
   const [loading, setLoading] = useState(false);
@@ -55,12 +55,18 @@ const DonhangView = ({ open, onClose, donhangId }) => {
         setDonhangInfo(donhang);
 
         // 2. Lấy chi tiết đơn hàng
-        const resChiTiet = await axios.get(`${API_BASE}chitietdonhang?don_hang_id=${donhangId}`);
-        const chitiet = resChiTiet.data.data.filter(item => item.don_hang_id === donhangId);
+        const resChiTiet = await axios.get(
+          `${API_BASE}chitietdonhang/donhang/${donhangId}`
+        );
+        const chitiet = resChiTiet.data.data.filter(
+          (item) => item.don_hang_id === donhangId
+        );
         setChiTietDonhang(chitiet);
 
         // 3. Lấy thông tin các sản phẩm
-        const productIds = [...new Set(chitiet.map(item => item.san_pham_id))];
+        const productIds = [
+          ...new Set(chitiet.map((item) => item.san_pham_id)),
+        ];
         const productsData = {};
         await Promise.all(
           productIds.map(async (id) => {
@@ -70,7 +76,7 @@ const DonhangView = ({ open, onClose, donhangId }) => {
         );
         setProductsMap(productsData);
       } catch (error) {
-        console.error('Lỗi khi lấy chi tiết đơn hàng hoặc sản phẩm:', error);
+        console.error("Lỗi khi lấy chi tiết đơn hàng hoặc sản phẩm:", error);
       } finally {
         setLoading(false);
       }
@@ -80,40 +86,51 @@ const DonhangView = ({ open, onClose, donhangId }) => {
   }, [open, donhangId]);
 
   // Tách tỉnh và quận/huyện từ địa chỉ
-    
-   const sendToGHTK = async () => {
-  try {
-    const res = await axios.post(`${API_BASE}donhang/${donhangId}/create-ghtk`);
-    alert(`Tạo đơn thành công! Mã vận đơn: ${res.data.tracking_code}`);
-  } catch (err) {
-    console.error("Lỗi tạo đơn GHTK:", err.response?.data || err.message);
-    alert("Tạo đơn hàng GHTK thất bại.");
-  }
-};
+
+  const sendToGHTK = async () => {
+    try {
+      const res = await axios.post(
+        `${API_BASE}donhang/${donhangId}/create-ghtk`
+      );
+      alert(`Tạo đơn thành công! Mã vận đơn: ${res.data.tracking_code}`);
+    } catch (err) {
+      console.error("Lỗi tạo đơn GHTK:", err.response?.data || err.message);
+      alert("Tạo đơn hàng GHTK thất bại.");
+    }
+  };
 
   const InfoItem = ({ icon, label, value, color = "primary" }) => (
     <Box display="flex" alignItems="center" mb={2}>
-      <Box 
-        sx={{ 
-          mr: 2, 
-          p: 1, 
-          borderRadius: 2, 
+      <Box
+        sx={{
+          mr: 2,
+          p: 1,
+          borderRadius: 2,
           bgcolor: `${color}.light`,
           color: `${color}.contrastText`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           minWidth: 40,
-          height: 40
+          height: 40,
         }}
       >
         {icon}
       </Box>
       <Box flex={1}>
-        <Typography variant="caption" color="textSecondary" display="block" sx={{ fontSize: '0.75rem' }}>
+        <Typography
+          variant="caption"
+          color="textSecondary"
+          display="block"
+          sx={{ fontSize: "0.75rem" }}
+        >
           {label}
         </Typography>
-        <Typography variant="body1" fontWeight="medium" sx={{ wordBreak: 'break-word' }}>
+        <Typography
+          variant="body1"
+          fontWeight="medium"
+          sx={{ wordBreak: "break-word" }}
+        >
           {value}
         </Typography>
       </Box>
@@ -122,43 +139,43 @@ const DonhangView = ({ open, onClose, donhangId }) => {
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
-      case 'completed':
-      case 'đã giao':
-        return 'success';
-      case 'đã huỷ':
-        return 'error';
-      case 'pending':
-      case 'chờ xử lý':
-        return 'warning';
-      case 'cancelled':
-      case 'đang giao':
-        return 'primary';
+      case "completed":
+      case "đã giao":
+        return "success";
+      case "đã huỷ":
+        return "error";
+      case "pending":
+      case "chờ xử lý":
+        return "warning";
+      case "cancelled":
+      case "đang giao":
+        return "primary";
       default:
-        return 'primary';
+        return "primary";
     }
   };
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose} 
-      maxWidth="lg" 
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="lg"
       fullWidth
       PaperProps={{
         sx: {
           borderRadius: 3,
-          boxShadow: '0 24px 48px rgba(0,0,0,0.12)',
-        }
+          boxShadow: "0 24px 48px rgba(0,0,0,0.12)",
+        },
       }}
     >
-      <DialogTitle 
-        sx={{ 
-          bgcolor: 'primary.main', 
-          color: 'primary.contrastText',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          py: 2.5
+      <DialogTitle
+        sx={{
+          bgcolor: "primary.main",
+          color: "primary.contrastText",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          py: 2.5,
         }}
       >
         <Box display="flex" alignItems="center">
@@ -169,11 +186,11 @@ const DonhangView = ({ open, onClose, donhangId }) => {
         </Box>
         <Button
           onClick={onClose}
-          sx={{ 
-            color: 'inherit',
-            minWidth: 'auto',
+          sx={{
+            color: "inherit",
+            minWidth: "auto",
             p: 1,
-            borderRadius: 2
+            borderRadius: 2,
           }}
         >
           <Close />
@@ -182,29 +199,47 @@ const DonhangView = ({ open, onClose, donhangId }) => {
 
       <DialogContent sx={{ p: 0 }}>
         {loading ? (
-          <Box display="flex" justifyContent="center" alignItems="center" minHeight={400}>
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            minHeight={400}
+          >
             <Box textAlign="center">
               <CircularProgress size={48} sx={{ mb: 2 }} />
-              <Typography color="textSecondary">Đang tải thông tin...</Typography>
+              <Typography color="textSecondary">
+                Đang tải thông tin...
+              </Typography>
             </Box>
           </Box>
         ) : (
           <>
             {/* Thông tin khách hàng */}
             {donhangInfo && (
-              <Card sx={{ m: 3, mb: 2, borderRadius: 3, boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
+              <Card
+                sx={{
+                  m: 3,
+                  mb: 2,
+                  borderRadius: 3,
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                }}
+              >
                 <CardContent sx={{ p: 3 }}>
                   <Box display="flex" alignItems="center" mb={3}>
-                    <Person sx={{ mr: 1, color: 'primary.main' }} />
-                    <Typography variant="h6" fontWeight="bold" color="primary.main">
+                    <Person sx={{ mr: 1, color: "primary.main" }} />
+                    <Typography
+                      variant="h6"
+                      fontWeight="bold"
+                      color="primary.main"
+                    >
                       Thông tin khách hàng
                     </Typography>
                     {donhangInfo.trang_thai && (
-                      <Chip 
+                      <Chip
                         label={donhangInfo.trang_thai}
                         color={getStatusColor(donhangInfo.trang_thai)}
                         size="small"
-                        sx={{ ml: 'auto' }}
+                        sx={{ ml: "auto" }}
                       />
                     )}
                   </Box>
@@ -277,31 +312,43 @@ const DonhangView = ({ open, onClose, donhangId }) => {
                       </Grid>
                     </Grid>
                   </Grid>
-                    
                 </CardContent>
               </Card>
             )}
 
             {/* Chi tiết sản phẩm */}
-            <Card sx={{ m: 3, mt: 2, borderRadius: 3, boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
+            <Card
+              sx={{
+                m: 3,
+                mt: 2,
+                borderRadius: 3,
+                boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+              }}
+            >
               <CardContent sx={{ p: 3 }}>
                 <Box display="flex" alignItems="center" mb={3}>
-                  <ShoppingCart sx={{ mr: 1, color: 'primary.main' }} />
-                  <Typography variant="h6" fontWeight="bold" color="primary.main">
+                  <ShoppingCart sx={{ mr: 1, color: "primary.main" }} />
+                  <Typography
+                    variant="h6"
+                    fontWeight="bold"
+                    color="primary.main"
+                  >
                     Chi tiết sản phẩm
                   </Typography>
-                  <Chip 
+                  <Chip
                     label={`${chiTietDonhang.length} sản phẩm`}
                     color="primary"
                     variant="outlined"
                     size="small"
-                    sx={{ ml: 'auto' }}
+                    sx={{ ml: "auto" }}
                   />
                 </Box>
 
                 {chiTietDonhang.length === 0 ? (
                   <Box textAlign="center" py={4}>
-                    <ShoppingCart sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
+                    <ShoppingCart
+                      sx={{ fontSize: 64, color: "text.disabled", mb: 2 }}
+                    />
                     <Typography color="textSecondary">
                       Không có chi tiết đơn hàng
                     </Typography>
@@ -309,13 +356,44 @@ const DonhangView = ({ open, onClose, donhangId }) => {
                 ) : (
                   <Paper variant="outlined" sx={{ borderRadius: 2 }}>
                     <Table>
-                      <TableHead sx={{ bgcolor: 'grey.50' }}>
+                      <TableHead sx={{ bgcolor: "grey.50" }}>
                         <TableRow>
-                          <TableCell sx={{ fontWeight: 'bold', py: 2 }}>Hình ảnh</TableCell>
-                          <TableCell sx={{ fontWeight: 'bold', py: 2 }}>Tên sản phẩm</TableCell>
-                          <TableCell sx={{ fontWeight: 'bold', py: 2, textAlign: 'center' }}>Số lượng</TableCell>
-                          <TableCell sx={{ fontWeight: 'bold', py: 2, textAlign: 'right' }}>Đơn giá</TableCell>
-                          <TableCell sx={{ fontWeight: 'bold', py: 2, textAlign: 'right' }}>Thành tiền</TableCell>
+                          <TableCell sx={{ fontWeight: "bold", py: 2 }}>
+                            Hình ảnh
+                          </TableCell>
+                          <TableCell sx={{ fontWeight: "bold", py: 2 }}>
+                            Tên sản phẩm
+                          </TableCell>
+                          <TableCell sx={{ fontWeight: "bold", py: 2 }}>
+                            Dung tích
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              fontWeight: "bold",
+                              py: 2,
+                              textAlign: "center",
+                            }}
+                          >
+                            Số lượng
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              fontWeight: "bold",
+                              py: 2,
+                              textAlign: "right",
+                            }}
+                          >
+                            Đơn giá
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              fontWeight: "bold",
+                              py: 2,
+                              textAlign: "right",
+                            }}
+                          >
+                            Thành tiền
+                          </TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -326,15 +404,15 @@ const DonhangView = ({ open, onClose, donhangId }) => {
                               ? IMAGE_BASE_URL + product.images[0].image_path
                               : IMAGE_BASE_URL + product.hinh_anh
                             : null;
-
+                          // console.log("Chi tiết:", item);
                           const thanhTien = Number(item.gia) * item.so_luong;
 
                           return (
-                            <TableRow 
+                            <TableRow
                               key={item.id}
-                              sx={{ 
-                                '&:nth-of-type(odd)': { bgcolor: 'grey.25' },
-                                '&:hover': { bgcolor: 'primary.50' }
+                              sx={{
+                                "&:nth-of-type(odd)": { bgcolor: "grey.25" },
+                                "&:hover": { bgcolor: "primary.50" },
                               }}
                             >
                               <TableCell sx={{ py: 2 }}>
@@ -343,27 +421,30 @@ const DonhangView = ({ open, onClose, donhangId }) => {
                                     variant="rounded"
                                     src={imgSrc}
                                     alt={product?.ten_san_pham}
-                                    sx={{ 
-                                      width: 64, 
+                                    sx={{
+                                      width: 64,
                                       height: 64,
-                                      border: '2px solid',
-                                      borderColor: 'grey.200',
-                                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                                      border: "2px solid",
+                                      borderColor: "grey.200",
+                                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
                                     }}
                                   />
                                 ) : (
-                                  <Box 
-                                    sx={{ 
-                                      width: 64, 
-                                      height: 64, 
-                                      bgcolor: 'grey.100',
+                                  <Box
+                                    sx={{
+                                      width: 64,
+                                      height: 64,
+                                      bgcolor: "grey.100",
                                       borderRadius: 2,
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'center'
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
                                     }}
                                   >
-                                    <Typography variant="caption" color="textSecondary">
+                                    <Typography
+                                      variant="caption"
+                                      color="textSecondary"
+                                    >
                                       Không có ảnh
                                     </Typography>
                                   </Box>
@@ -371,33 +452,37 @@ const DonhangView = ({ open, onClose, donhangId }) => {
                               </TableCell>
                               <TableCell sx={{ py: 2 }}>
                                 <Typography variant="body1" fontWeight="medium">
-                                  {product ? product.ten_san_pham : 'Đang tải...'}
+                                  {product?.ten_san_pham || "Đang tải..."}
                                 </Typography>
-                                {product?.mo_ta && (
-                                  <Typography variant="caption" color="textSecondary" display="block">
-                                    {product.mo_ta.length > 50 
-                                      ? product.mo_ta.substring(0, 50) + '...' 
-                                      : product.mo_ta
-                                    }
-                                  </Typography>
-                                )}
                               </TableCell>
-                              <TableCell sx={{ py: 2, textAlign: 'center' }}>
-                                <Chip 
+                              <TableCell sx={{ py: 2 }}>
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                >
+                                  {item.ten_bien_the || "—"}
+                                </Typography>
+                              </TableCell>
+                              <TableCell sx={{ py: 2, textAlign: "center" }}>
+                                <Chip
                                   label={item.so_luong}
                                   color="primary"
                                   variant="outlined"
                                   size="small"
                                 />
                               </TableCell>
-                              <TableCell sx={{ py: 2, textAlign: 'right' }}>
+                              <TableCell sx={{ py: 2, textAlign: "right" }}>
                                 <Typography variant="body2" fontWeight="medium">
-                                  {Number(item.gia).toLocaleString('vi-VN')} ₫
+                                  {Number(item.gia).toLocaleString("vi-VN")} ₫
                                 </Typography>
                               </TableCell>
-                              <TableCell sx={{ py: 2, textAlign: 'right' }}>
-                                <Typography variant="body1" fontWeight="bold" color="primary.main">
-                                  {thanhTien.toLocaleString('vi-VN')} ₫
+                              <TableCell sx={{ py: 2, textAlign: "right" }}>
+                                <Typography
+                                  variant="body1"
+                                  fontWeight="bold"
+                                  color="primary.main"
+                                >
+                                  {thanhTien.toLocaleString("vi-VN")} ₫
                                 </Typography>
                               </TableCell>
                             </TableRow>
@@ -406,48 +491,101 @@ const DonhangView = ({ open, onClose, donhangId }) => {
                         {/* Tổng tiền, giảm giá, tổng thanh toán */}
                         {chiTietDonhang.length > 0 && (
                           <TableRow>
-                            <TableCell colSpan={4} align="right" sx={{ fontWeight: 'bold', border: 0 }}>
+                            <TableCell
+                              colSpan={5}
+                              align="right"
+                              sx={{ fontWeight: "bold", border: 0 }}
+                            >
                               Tổng tiền gốc:
                             </TableCell>
-                            <TableCell align="right" sx={{ fontWeight: 'bold', border: 0 }}>
-                              {chiTietDonhang.reduce((sum, item) => sum + Number(item.gia) * item.so_luong, 0).toLocaleString('vi-VN')} ₫
+                            <TableCell
+                              align="right"
+                              sx={{ fontWeight: "bold", border: 0 }}
+                            >
+                              {chiTietDonhang
+                                .reduce(
+                                  (sum, item) =>
+                                    sum + Number(item.gia) * item.so_luong,
+                                  0
+                                )
+                                .toLocaleString("vi-VN")}{" "}
+                              ₫
                             </TableCell>
                           </TableRow>
                         )}
-                        {donhangInfo && donhangInfo.ten_ma_giam_gia && chiTietDonhang.length > 0 && (
+                        {donhangInfo &&
+                          donhangInfo.ten_ma_giam_gia &&
+                          chiTietDonhang.length > 0 && (
+                            <TableRow>
+                              <TableCell
+                                colSpan={5}
+                                align="right"
+                                sx={{ fontWeight: "bold", border: 0 }}
+                              >
+                                Mã giảm giá ({donhangInfo.ten_ma_giam_gia}):
+                              </TableCell>
+                              <TableCell
+                                align="right"
+                                sx={{
+                                  fontWeight: "bold",
+                                  color: "warning.main",
+                                  border: 0,
+                                }}
+                              >
+                                -{" "}
+                                {Number(
+                                  donhangInfo.giam_gia_tien
+                                ).toLocaleString("vi-VN")}{" "}
+                                ₫
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        {donhangInfo && chiTietDonhang.length > 0 && (
                           <TableRow>
-                            <TableCell colSpan={4} align="right" sx={{ fontWeight: 'bold', border: 0 }}>
-                              Mã giảm giá ({donhangInfo.ten_ma_giam_gia}):
-                            </TableCell>
-                            <TableCell align="right" sx={{ fontWeight: 'bold', color: 'warning.main', border: 0 }}>
-                              - {(
-                                 Number(donhangInfo.giam_gia_tien)
-                              ).toLocaleString('vi-VN')} ₫
-                            </TableCell>
-                            
-                          </TableRow>
-                          
-                          
-                        )}
-                        {donhangInfo && chiTietDonhang.length>0 &&(
-                          <TableRow>
-                            <TableCell colSpan={4} align="right" sx={{ fontWeight: 'bold', border: 0 }}>
+                            <TableCell
+                              colSpan={5}
+                              align="right"
+                              sx={{ fontWeight: "bold", border: 0 }}
+                            >
                               Phí vận chuyển ({donhangInfo.phi_van_chuyen}):
                             </TableCell>
-                            <TableCell align="right" sx={{ fontWeight: 'bold', color: 'success.main', border: 0 }}>
-                              + {(
-                                Number(donhangInfo.phi_van_chuyen)
-                              ).toLocaleString('vi-VN')} ₫
+                            <TableCell
+                              align="right"
+                              sx={{
+                                fontWeight: "bold",
+                                color: "success.main",
+                                border: 0,
+                              }}
+                            >
+                              +{" "}
+                              {Number(
+                                donhangInfo.phi_van_chuyen
+                              ).toLocaleString("vi-VN")}{" "}
+                              ₫
                             </TableCell>
                           </TableRow>
                         )}
                         {donhangInfo && chiTietDonhang.length > 0 && (
                           <TableRow>
-                            <TableCell colSpan={4} align="right" sx={{ fontWeight: 'bold', border: 0 }}>
+                            <TableCell
+                              colSpan={5}
+                              align="right"
+                              sx={{ fontWeight: "bold", border: 0 }}
+                            >
                               Tổng thanh toán:
                             </TableCell>
-                            <TableCell align="right" sx={{ fontWeight: 'bold', color: 'primary.main', border: 0 }}>
-                              {Number(donhangInfo.tong_tien).toLocaleString('vi-VN')} ₫
+                            <TableCell
+                              align="right"
+                              sx={{
+                                fontWeight: "bold",
+                                color: "primary.main",
+                                border: 0,
+                              }}
+                            >
+                              {Number(donhangInfo.tong_tien).toLocaleString(
+                                "vi-VN"
+                              )}{" "}
+                              ₫
                             </TableCell>
                           </TableRow>
                         )}
@@ -461,29 +599,29 @@ const DonhangView = ({ open, onClose, donhangId }) => {
         )}
       </DialogContent>
 
-      <DialogActions sx={{ p: 3, bgcolor: 'grey.50' }}>
-        <Button 
+      <DialogActions sx={{ p: 3, bgcolor: "grey.50" }}>
+        <Button
           onClick={sendToGHTK}
           variant="contained"
           color="success"
           size="large"
-          sx={{ 
+          sx={{
             borderRadius: 2,
             px: 4,
-            fontWeight: 'bold',
-            mr: 2
+            fontWeight: "bold",
+            mr: 2,
           }}
         >
           Lên đơn GHTK
         </Button>
-        <Button 
-          onClick={onClose} 
+        <Button
+          onClick={onClose}
           variant="contained"
           size="large"
-          sx={{ 
+          sx={{
             borderRadius: 2,
             px: 4,
-            fontWeight: 'bold'
+            fontWeight: "bold",
           }}
         >
           Đóng

@@ -14,6 +14,7 @@ import {
   Gift,
 } from "lucide-react";
 import "./cart.css";
+import { toast } from "react-toastify";
 
 const Cart = () => {
   const [cart, setCart] = useState([]);
@@ -77,31 +78,46 @@ const Cart = () => {
   const total = subtotal + shippingCost - discountAmount;
 
   const updateQuantity = (id, newQuantity, variant_id = null) => {
+    let valid = true; // Cờ kiểm tra
+
     const updatedCart = cart.map((item) => {
       const isMatch = variant_id
-        ? item.id === id && item.variant_id === variant_id
-        : item.id === id && !item.variant_id;
+        ? item.id === id && item.bien_the_id === variant_id
+        : item.id === id && !item.bien_the_id;
+
       if (isMatch) {
+        // Nếu vượt quá tồn kho
         if (newQuantity > item.so_luong_ton) {
           alert(
             `Chỉ còn ${item.so_luong_ton} sản phẩm "${item.ten_san_pham}" trong kho!`
           );
+          valid = false;
+          return item; // giữ nguyên
+        }
+
+        // Nếu nhỏ hơn 1 thì cũng giữ nguyên
+        if (newQuantity < 1) {
+          valid = false;
           return item;
         }
-        if (newQuantity < 1) return item;
+
         return { ...item, quantity: newQuantity };
       }
+
       return item;
     });
-    sessionStorage.setItem("cart", JSON.stringify(updatedCart));
-    setCart(updatedCart);
+
+    if (valid) {
+      sessionStorage.setItem("cart", JSON.stringify(updatedCart));
+      setCart(updatedCart);
+    }
   };
 
   const removeFromCart = (id, variant_id = null) => {
     const updatedCart = cart.filter((item) => {
       if (variant_id)
-        return !(item.id === id && item.variant_id === variant_id);
-      return !(item.id === id && !item.variant_id);
+        return !(item.id === id && item.bien_the_id === variant_id);
+      return !(item.id === id && !item.bien_the_id);
     });
     sessionStorage.setItem("cart", JSON.stringify(updatedCart));
     setCart(updatedCart);
@@ -148,6 +164,7 @@ const Cart = () => {
     setDiscountAmount(discount);
     setCouponApplied(true);
     console.log(coupons);
+    toast.success("Mã giảm giá đã được áp dụng thành công!");
   };
 
   const formatPrice = (price) => {
@@ -176,7 +193,7 @@ const Cart = () => {
     const selectedCoupon = coupons.find(
       (c) => c.ma === couponCode.trim().toUpperCase()
     );
-    const couponId = selectedCoupon ? selectedCoupon.id : null; // bạn cần lấy id từ API
+    const couponId = selectedCoupon ? selectedCoupon.id : null;
     navigate("/checkout", {
       state: {
         cart,
@@ -243,7 +260,7 @@ const Cart = () => {
                 <div className="luxury-items-list">
                   {cart.map((item) => (
                     <div
-                      key={`sp-${item.id}-v-${item.variant_id}`}
+                      key={`sp-${item.id}-v-${item.bien_the_id}`}
                       className="luxury-item"
                     >
                       {/* <div key={item.variant_id ? `${item.id}_${item.variant_id}` : `${item.id}_${item.dung_tich || ''}`} className="luxury-item"> */}
@@ -270,7 +287,7 @@ const Cart = () => {
                                 updateQuantity(
                                   item.id,
                                   item.quantity - 1,
-                                  item.variant_id
+                                  item.bien_the_id
                                 )
                               }
                               disabled={item.quantity <= 1}
@@ -284,7 +301,7 @@ const Cart = () => {
                                 updateQuantity(
                                   item.id,
                                   item.quantity + 1,
-                                  item.variant_id
+                                  item.bien_the_id
                                 )
                               }
                               disabled={item.quantity >= item.so_luong_ton}
@@ -303,8 +320,9 @@ const Cart = () => {
                           <button
                             className="remove-item"
                             onClick={() =>
-                              removeFromCart(item.id, item.variant_id)
+                              removeFromCart(item.id, item.bien_the_id)
                             }
+                            s
                           >
                             <X size={18} />
                           </button>
@@ -409,22 +427,27 @@ const Cart = () => {
                     </button>
                   </div>
                   {couponApplied && (
-                    <div className="coupon-success">
+                    <div
+                      className="coupon-success"
+                      style={{ color: "green", marginTop: "10px" }}
+                    >
                       Mã giảm giá đã được áp dụng thành công!
                     </div>
                   )}
                   {coupons.length > 0 && (
                     <div className="coupon-examples">
-                      {coupons.map((c) => (
-                        <div className="example" key={c.ma}>
-                          <span className="code">{c.ma}</span>
-                          <span className="desc">{c.mo_ta}</span>
-                          <span className="validity">
-                            Áp dụng từ {formatDate(c.bat_dau)} đến{" "}
-                            {formatDate(c.ket_thuc)}
-                          </span>
-                        </div>
-                      ))}
+                      {coupons
+                        .filter((c) => subtotal >= c.dieu_kien_tien) // ⚠️ Lọc theo điều kiện đơn hàng
+                        .map((c) => (
+                          <div className="example" key={c.ma}>
+                            <span className="code">{c.ma}</span>
+                            <span className="desc">{c.mo_ta}</span>
+                            <span className="validity">
+                              Áp dụng từ {formatDate(c.bat_dau)} đến{" "}
+                              {formatDate(c.ket_thuc)}
+                            </span>
+                          </div>
+                        ))}
                     </div>
                   )}
                 </div>

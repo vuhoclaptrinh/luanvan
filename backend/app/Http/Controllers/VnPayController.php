@@ -71,13 +71,20 @@ class VnpayController extends Controller
         $hashData = rtrim($hashData, '&');
         $secureHash = hash_hmac('sha512', $hashData, $this->vnp_HashSecret);
 
-        // So sánh chữ ký bảo mật
-        if ($secureHash === $vnp_SecureHash && $request->vnp_ResponseCode === '00') {
-            // ✅ Thành công → chuyển về FE kèm tất cả query
+        $responseCode = $request->vnp_ResponseCode;
+        $transactionStatus = $request->vnp_TransactionStatus;
+
+        if (
+            $secureHash === $vnp_SecureHash &&
+            $responseCode === '00' &&
+            $transactionStatus === '00'
+        ) {
+            // ✅ Thanh toán thành công: redirect kèm đủ thông tin
             return redirect()->to('http://localhost:5173/vnpay-return?' . http_build_query($request->all()));
         } else {
-            // ❌ Thất bại → chuyển về React báo lỗi
+            // ❌ Thất bại: redirect kèm thông báo lỗi
             return redirect()->to('http://localhost:5173/vnpay-return?vnp_ResponseCode=fail');
         }
     }
+
 }

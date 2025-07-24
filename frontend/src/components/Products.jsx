@@ -62,7 +62,7 @@ const ProductList = () => {
             }
           })
         );
-        // Lọc và sắp xếp sản phẩm có đánh giá, ưu tiên nhiều sao hơn
+        // Lọc và sắp xếp
         const filtered = productsWithAvgStar
           .filter(Boolean)
           .sort((a, b) => b.avgStar - a.avgStar);
@@ -186,7 +186,7 @@ const ProductList = () => {
                       {product.ten_san_pham}
                     </Card.Title>
                     {/* Hiển thị số sao trung bình và số lượt đánh giá */}
-                    <div className="d-flex align-items-center mt-1 mb-2">
+                    <div className="d-flex justify-content-center align-items-center mt-1 mb-2">
                       <span className="text-warning me-1">
                         {Array.from({ length: 5 }, (_, i) => (
                           <i
@@ -199,22 +199,14 @@ const ProductList = () => {
                           ></i>
                         ))}
                       </span>
-                      <span className="small text-muted">
+                      <span className="small text-muted text-center">
                         {product.avgStar.toFixed(1)}/5 ({product.reviewCount}{" "}
                         đánh giá)
                       </span>
                     </div>
                   </div>
                   <div className="mt-auto">
-                    {product.dung_tich && (
-                      <small className="text-muted d-block mb-2">
-                        Dung tích: {product.dung_tich}
-                      </small>
-                    )}
-                    <div className="d-flex justify-content-between align-items-center">
-                      <span className="fs-5 fw-bold text-primary">
-                        {product.gia_format}
-                      </span>
+                    <div className="d-flex justify-content-center align-items-center">
                       <Button
                         variant="outline-primary"
                         size="sm"

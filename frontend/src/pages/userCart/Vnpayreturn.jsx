@@ -13,38 +13,46 @@ function VnpayReturn() {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
+    let isProcessed = false;
+
     const query = new URLSearchParams(location.search);
     const responseCode = query.get("vnp_ResponseCode");
     const transactionStatus = query.get("vnp_TransactionStatus");
 
     console.log("✅ Debug:", { responseCode, transactionStatus });
 
-    // Chỉ xử lý nếu thanh toán thực sự thành công
     if (responseCode === "00" && transactionStatus === "00") {
-      const orderData = localStorage.getItem("vnpay_order_data");
+      const waitForOrderData = async () => {
+        let retries = 10;
+        let orderData = null;
 
-      if (!orderData) {
-        console.error(
-          "⚠️ Không tìm thấy dữ liệu đơn hàng trong sessionStorage."
-        );
-        setSuccess(false);
-        setLoading(false);
-        return;
-      }
-      localStorage.removeItem("vnpay_order_data");
-      const parsed = JSON.parse(orderData);
-      parsed.trang_thai = "đã thanh toán";
+        while (retries > 0) {
+          orderData = localStorage.getItem("vnpay_order_data");
+          if (orderData) break;
 
-      axios
-        .post("http://127.0.0.1:8000/api/donhang", parsed)
-        .then(async (res) => {
+          console.warn("⏳ Chờ dữ liệu vnpay_order_data...");
+          await new Promise((res) => setTimeout(res, 300)); // đợi 300ms
+          retries--;
+        }
+
+        if (!orderData || isProcessed) return;
+
+        isProcessed = true;
+
+        localStorage.removeItem("vnpay_order_data");
+        const parsed = JSON.parse(orderData);
+        parsed.trang_thai = "đã thanh toán";
+
+        try {
+          const res = await axios.post(
+            "http://127.0.0.1:8000/api/donhang",
+            parsed
+          );
           const newOrderId = res.data?.data?.id;
-          if (!newOrderId)
-            throw new Error("Không nhận được ID đơn hàng từ server.");
+          if (!newOrderId) throw new Error("Không nhận được ID đơn hàng");
 
           setOrderId(newOrderId);
 
-          // 🔁 Gửi từng chi tiết đơn hàng
           const chiTiet = parsed.chi_tiet || [];
           for (const item of chiTiet) {
             await axios.post("http://127.0.0.1:8000/api/chitietdonhang", {
@@ -57,18 +65,20 @@ function VnpayReturn() {
           }
 
           setSuccess(true);
-          localStorage.removeItem("vnpay_order_data");
           sessionStorage.removeItem("cart");
           window.dispatchEvent(new Event("cart-updated"));
-        })
-        .catch((err) => {
+        } catch (err) {
           console.error(
             "❌ Lỗi lưu đơn hàng:",
             err?.response?.data || err.message
           );
           setSuccess(false);
-        })
-        .finally(() => setLoading(false));
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      waitForOrderData();
     } else {
       console.warn("⚠️ Thanh toán không thành công hoặc sai trạng thái.");
       setSuccess(false);

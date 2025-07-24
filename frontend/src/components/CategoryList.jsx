@@ -2,194 +2,193 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Container, Row, Col, Card, Spinner, Badge } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Spinner,
+  Button,
+  Badge,
+} from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { addToCart } from "./../pages/userCart/Addcart";
+import { addToWishlist } from "../pages/userWishlist/Addwishlist";
+import ProductDetailModal from "./ProductDetail";
 
 const API_BASE = "http://127.0.0.1:8000/api/";
-
-const categoryColors = [
-  "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-  "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-  "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
-  "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
-  "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
-  "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
-  "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)",
-  "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
-];
-
-const getCategoryIcon = (name) => {
-  const lower = name.toLowerCase();
-  if (lower.includes("nam")) return "👨";
-  if (lower.includes("nữ")) return "👩";
-  if (lower.includes("unisex")) return "👫";
-  if (lower.includes("mini")) return "🧴";
-  if (lower.includes("cao cấp")) return "💎";
-  if (lower.includes("trẻ em")) return "👶";
-  return "🧴";
+const getImageUrl = (path) => {
+  if (!path) return "/placeholder.svg?height=300&width=300";
+  if (path.startsWith("http")) return path;
+  return `http://127.0.0.1:8000/storage/images/${path.replace(
+    /^images\//,
+    ""
+  )}`;
 };
 
 function FeaturedCategories() {
-  const [categories, setCategories] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(6);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
-  //  Lấy danh sách danh mục + số lượng sản phẩm
-  useEffect(() => {
-    const fetchCategories = async () => {
-      setLoading(true);
-      try {
-        const res = await axios.get(`${API_BASE}danhmuc`);
-        const danhmucs = res.data?.data || [];
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-        const detailedData = await Promise.all(
-          danhmucs.map(async (dm, i) => {
-            const detail = await axios.get(`${API_BASE}danhmuc/${dm.id}`);
-            const count = detail.data?.sanphams?.length || 0;
-            return {
-              id: dm.id,
-              name: dm.ten_danh_muc,
-              count,
-              gradient: categoryColors[i % categoryColors.length],
-              icon: getCategoryIcon(dm.ten_danh_muc),
-            };
-          })
+  useEffect(() => {
+    setLoading(true);
+    axios
+      .get(`${API_BASE}sanpham`)
+      .then((response) => {
+        const allProducts = response.data.data || [];
+
+        const sortedByDate = [...allProducts].sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
         );
 
-        setCategories(detailedData);
-      } catch (err) {
-        console.error("Lỗi khi tải danh mục:", err);
-      } finally {
+        setProducts(sortedByDate);
         setLoading(false);
-      }
-    };
-
-    fetchCategories();
+      })
+      .catch(() => {
+        setError("Không thể tải dữ liệu sản phẩm.");
+        setLoading(false);
+      });
   }, []);
+
+  const handleCardClick = (product) => {
+    setSelectedProduct(product);
+  };
+
+  if (loading) {
+    return (
+      <Container className="text-center py-5">
+        <Spinner
+          animation="border"
+          role="status"
+          variant="primary"
+          style={{ width: "3rem", height: "3rem" }}
+        >
+          <span className="visually-hidden">Đang tải...</span>
+        </Spinner>
+        <p className="mt-3">Đang tải sản phẩm...</p>
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container className="text-center py-5">
+        <div className="alert alert-danger" role="alert">
+          <i className="bi bi-exclamation-triangle-fill me-2"></i>
+          {error}
+        </div>
+      </Container>
+    );
+  }
 
   return (
     <section className="py-5 bg-light">
       <Container>
-        {/*  Tiêu đề */}
         <div className="text-center mb-5">
-          <h2 className="display-5 fw-bold mb-3">
-            <span className="text-primary">Danh mục</span> nổi bật
-          </h2>
-          <p className="text-muted mx-auto lead" style={{ maxWidth: "700px" }}>
-            Khám phá các dòng nước hoa với hàng trăm sản phẩm chất lượng
+          <h2 className="display-6 fw-bold">Sản phẩm mới nhất</h2>
+          <p className="text-muted mx-auto" style={{ maxWidth: "700px" }}>
+            Khám phá những sản phẩm vừa được thêm gần đây
           </p>
-          <div className="d-flex justify-content-center mt-3">
-            <div
-              style={{
-                width: "100px",
-                height: "4px",
-                background: "blue",
-                borderRadius: "2px",
-              }}
-            ></div>
-          </div>
         </div>
-        {/*  Loading */}
-        {loading ? (
-          <div className="text-center py-5">
-            <Spinner
-              animation="border"
-              variant="primary"
-              style={{ width: "3rem", height: "3rem" }}
-            />
-            <p className="mt-3 text-muted">Đang tải danh mục...</p>
-          </div>
-        ) : (
-          //  Hiển thị danh sách danh mục
-          <Row className="g-4">
-            {categories.map((cat) => (
-              <Col key={cat.id} xs={12} sm={6} lg={4} xl={3}>
-                <Card
-                  className="border-0 h-100 category-card shadow-sm"
-                  style={{
-                    borderRadius: "15px",
-                    overflow: "hidden",
-                    cursor: "pointer",
-                    transition: "all 0.3s ease",
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.transform = "translateY(-6px)";
-                    e.currentTarget.style.boxShadow =
-                      "0 12px 24px rgba(0,0,0,0.15)";
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.transform = "translateY(0)";
-                    e.currentTarget.style.boxShadow =
-                      "0 0.125rem 0.25rem rgba(0,0,0,0.075)";
-                  }}
-                >
-                  <div
-                    className="position-relative p-4 text-white text-center"
-                    style={{
-                      background: cat.gradient,
-                      minHeight: "200px",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <div
-                      className="mb-3"
-                      style={{
-                        fontSize: "3rem",
-                        filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.2))",
-                      }}
-                    >
-                      {cat.icon}
-                    </div>
-                    <h4 className="fw-bold mb-2 text-shadow">{cat.name}</h4>
-                    <Badge
-                      bg="light"
-                      text="dark"
-                      className="px-3 py-2"
-                      style={{
-                        fontSize: "0.9rem",
-                        borderRadius: "20px",
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                      }}
-                    >
-                      {cat.count} sản phẩm
-                    </Badge>
-                  </div>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        )}
 
-        {/*  Thống kê  */}
-        {!loading && categories.length > 0 && (
-          <div className="text-center mt-5 pt-4 border-top">
-            <Row className="justify-content-center">
-              <Col md={8}>
-                <div className="d-flex justify-content-around align-items-center flex-wrap">
-                  <div className="text-center mb-3">
-                    <div className="fs-2 fw-bold text-primary">
-                      {categories.length}
-                    </div>
-                    <small className="text-muted">Danh mục</small>
-                  </div>
-                  <div className="text-center mb-3">
-                    <div className="fs-2 fw-bold text-success">
-                      {categories.reduce((sum, cat) => sum + cat.count, 0)}
-                    </div>
-                    <small className="text-muted">Sản phẩm</small>
-                  </div>
-                  <div className="text-center mb-3">
-                    <div className="fs-2 fw-bold text-warning">⭐</div>
-                    <small className="text-muted">Chất lượng cao</small>
-                  </div>
-                  <div className="text-center mb-3">
-                    <div className="fs-2 fw-bold text-info">🚚</div>
-                    <small className="text-muted">Giao hàng nhanh</small>
-                  </div>
+        <Row className="g-4">
+          {products.slice(0, visibleCount).map((product) => (
+            <Col key={product.id} xs={12} sm={6} lg={4}>
+              <Card
+                className="h-100 product-card border-0 shadow-sm"
+                onClick={() => handleCardClick(product)}
+                style={{
+                  cursor: "pointer",
+                  transition: "transform 0.3s, box-shadow 0.3s",
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = "translateY(-5px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 10px 20px rgba(0,0,0,0.1)";
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow =
+                    "0 0.125rem 0.25rem rgba(0,0,0,0.075)";
+                }}
+              >
+                <div className="position-relative">
+                  <Card.Img
+                    variant="top"
+                    src={getImageUrl(product.hinh_anh)}
+                    alt={product.ten_san_pham}
+                    style={{ height: "280px", objectFit: "cover" }}
+                  />
+                  {product.danh_muc_ten && (
+                    <Badge
+                      bg="primary"
+                      className="position-absolute top-0 start-0 m-2"
+                    >
+                      {product.danh_muc_ten}
+                    </Badge>
+                  )}
+                  {product.variants?.some(
+                    (v) => v.so_luong_ton > 0 && v.so_luong_ton <= 5
+                  ) && (
+                    <Badge
+                      bg="warning"
+                      text="dark"
+                      className="position-absolute top-0 end-0 m-2"
+                    >
+                      Sắp hết hàng
+                    </Badge>
+                  )}
+                  {product.variants?.every((v) => v.so_luong_ton === 0) && (
+                    <Badge
+                      bg="danger"
+                      className="position-absolute top-0 end-0 m-2"
+                    >
+                      Hết hàng
+                    </Badge>
+                  )}
                 </div>
-              </Col>
-            </Row>
-          </div>
-        )}
+                <Card.Body className="d-flex flex-column">
+                  <div className="mb-2">
+                    {product.thuong_hieu && (
+                      <small className="text-muted d-block mb-1">
+                        {product.thuong_hieu}
+                      </small>
+                    )}
+                    <Card.Title className="fs-5 text-truncate">
+                      {product.ten_san_pham}
+                    </Card.Title>
+                  </div>
+                  <div className="mt-auto">
+                    <div className="d-flex justify-content-center  align-items-center">
+                      <Button
+                        variant="outline-primary"
+                        size="sm"
+                        onClick={() => {
+                          navigate(`/sanpham/${product.id}`);
+                        }}
+                      >
+                        <i className="bi bi-eye"></i>
+                      </Button>
+                    </div>
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+
+        {/* Modal xem chi tiết sản phẩm */}
+        <ProductDetailModal
+          product={selectedProduct}
+          show={selectedProduct !== null}
+          onHide={() => setSelectedProduct(null)}
+          addToCart={addToCart}
+          addToWishlist={addToWishlist}
+        />
       </Container>
     </section>
   );

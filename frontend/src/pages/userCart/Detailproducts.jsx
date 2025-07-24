@@ -135,6 +135,8 @@ const Detailproducts = () => {
         return "success";
       case "đã huỷ":
         return "danger";
+      case "đã thanh toán":
+        return "success";
       default:
         return "secondary";
     }
