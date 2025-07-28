@@ -61,7 +61,7 @@ const ViewDM = () => {
       setLoading(true);
 
       try {
-        // B1: Lấy thông tin danh mục và danh sách sản phẩm cơ bản
+        //  Lấy thông tin danh mục và danh sách sản phẩm cơ bản
         const categoryResponse = await axios.get(
           `http://127.0.0.1:8000/api/danhmuc/${id}`
         );
@@ -82,7 +82,7 @@ const ViewDM = () => {
           return;
         }
 
-        // B2: Lấy thông tin chi tiết tất cả sản phẩm
+        //  Lấy thông tin chi tiết tất cả sản phẩm
         const productIds = basicProducts.map((p) => p.id);
         const allProductsResponse = await axios.get(
           "http://127.0.0.1:8000/api/sanpham"
@@ -96,7 +96,7 @@ const ViewDM = () => {
         setProducts(detailedProducts);
         setFilteredProducts(detailedProducts);
 
-        // B3: Xử lý lọc danh mục, thương hiệu, giá
+        // Xử lý lọc danh mục, thương hiệu, giá
         const uniqueCategories = [
           ...new Set(
             detailedProducts.map((p) => p.danh_muc_ten).filter(Boolean)

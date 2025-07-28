@@ -244,7 +244,6 @@ const ProductGrid = ({
                             Đánh giá
                           </Button>
                         )}
-
                         {daMuaMap[product.id] === false && (
                           <div className="text-muted small">
                             Chỉ khách đã mua mới được đánh giá
@@ -252,6 +251,11 @@ const ProductGrid = ({
                         )}
 
                         {daMuaMap[product.id] === true && (
+                          <div className="text-success small">
+                            Bạn có thể đánh giá trong trang chi tiết
+                          </div>
+                        )}
+                        {/* {daMuaMap[product.id] === true && (
                           <form
                             onClick={(e) => e.stopPropagation()}
                             onSubmit={async (e) => {
@@ -345,7 +349,7 @@ const ProductGrid = ({
                               Gửi đánh giá
                             </Button>
                           </form>
-                        )}
+                        )} */}
                       </>
                     )}
                     {khachHangId && reviewedMap[product.id] && (

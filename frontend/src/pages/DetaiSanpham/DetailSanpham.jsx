@@ -54,11 +54,17 @@ export default function ProductDetail() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedVariantId, setSelectedVariantId] = useState(null);
   const [quantity, setQuantity] = useState(1);
+
   const [reviews, setReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(false);
+  const [canReview, setCanReview] = useState(false);
+  const [reviewStar, setReviewStar] = useState(5);
+  const [reviewContent, setReviewContent] = useState("");
+
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loadingRelated, setLoadingRelated] = useState(false);
 
+  const [filterStar, setFilterStar] = useState(0);
   // Fetch product data from API
   useEffect(() => {
     const fetchProduct = async () => {
@@ -140,12 +146,52 @@ export default function ProductDetail() {
     fetchReviews();
   }, [product?.id]);
 
+  useEffect(() => {
+    const user = JSON.parse(sessionStorage.getItem("user"));
+    const khachHangId = user?.id;
+
+    if (product?.id && khachHangId) {
+      const fetchPermission = async () => {
+        try {
+          const [res1, res2] = await Promise.all([
+            fetch(
+              `http://127.0.0.1:8000/api/danhgia/kiemtra-da-mua/${khachHangId}/${product.id}`
+            ),
+            fetch(
+              `http://127.0.0.1:8000/api/danhgia/da-danh-gia/${khachHangId}/${product.id}`
+            ),
+          ]);
+
+          if (!res1.ok || !res2.ok) {
+            throw new Error("API check quyền đánh giá lỗi");
+          }
+
+          const daMua = await res1.json();
+          const daDanhGia = await res2.json();
+
+          setCanReview(daMua.da_mua && !daDanhGia.da_danh_gia);
+        } catch (err) {
+          console.error("Lỗi kiểm tra đánh giá:", err);
+          setCanReview(false);
+        }
+      };
+
+      fetchPermission();
+    }
+  }, [product?.id]);
+  //lọcdanhgia
+  const filteredReviews =
+    filterStar === 0 ? reviews : reviews.filter((r) => r.so_sao === filterStar);
+  //hạn chế đánh giá
+  const [showAllReviews, setShowAllReviews] = useState(false);
+
   const selectedVariant = product?.variants?.find(
     (v) => v.id === selectedVariantId
   );
   const displayPrice = selectedVariant
     ? `${Number(selectedVariant.gia).toLocaleString("vi-VN")} ₫`
     : product?.gia_format || "";
+
   const displayStock = selectedVariant
     ? selectedVariant.so_luong_ton
     : product?.so_luong_ton || 0;
@@ -160,6 +206,51 @@ export default function ProductDetail() {
 
   const handleAddToWishlist = () => {
     addToWishlist(product);
+  };
+
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+    const user = JSON.parse(sessionStorage.getItem("user"));
+    const khachHangId = user?.id;
+    if (!khachHangId) return toast.error("Bạn cần đăng nhập");
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/danhgia", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          khach_hang_id: khachHangId,
+          san_pham_id: product.id,
+          so_sao: reviewStar,
+          noi_dung: reviewContent,
+          ngay_danh_gia: new Date().toISOString().split("T")[0],
+        }),
+      });
+
+      if (!response.ok) throw new Error("Gửi thất bại");
+
+      const data = await response.json();
+      toast.success("Gửi đánh giá thành công!");
+
+      setReviews((prev) => [
+        ...prev,
+        {
+          ten_khach_hang: "Bạn",
+          so_sao: reviewStar,
+          noi_dung: reviewContent,
+          ngay_danh_gia: new Date().toLocaleDateString("vi-VN"),
+        },
+      ]);
+
+      setReviewStar(5);
+      setReviewContent("");
+      setCanReview(false); // Chỉ cho đánh giá 1 lần
+    } catch (error) {
+      toast.error("Không gửi được đánh giá");
+      console.error(error);
+    }
   };
 
   const handleGoBack = () => {
@@ -588,6 +679,48 @@ export default function ProductDetail() {
 
               <Tab eventKey="reviews" title="Đánh giá">
                 <div>
+                  {canReview && (
+                    <Card className="mb-4">
+                      <Card.Body>
+                        <h5 className="mb-3">Gửi đánh giá của bạn</h5>
+                        <form onSubmit={handleSubmitReview}>
+                          <div className="mb-3">
+                            <div className="d-flex justify-content-center gap-2">
+                              {Array.from({ length: 5 }, (_, i) => (
+                                <Star
+                                  key={i}
+                                  size={24}
+                                  className={
+                                    i < reviewStar
+                                      ? "text-warning"
+                                      : "text-muted"
+                                  }
+                                  fill={
+                                    i < reviewStar ? "currentColor" : "none"
+                                  }
+                                  onClick={() => setReviewStar(i + 1)}
+                                  style={{ cursor: "pointer" }}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          <div className="mb-3">
+                            <label className="form-label">Nội dung:</label>
+                            <textarea
+                              className="form-control"
+                              rows="3"
+                              value={reviewContent}
+                              onChange={(e) => setReviewContent(e.target.value)}
+                              placeholder="Nhập nội dung đánh giá..."
+                            />
+                          </div>
+                          <Button type="submit" variant="primary">
+                            Gửi đánh giá
+                          </Button>
+                        </form>
+                      </Card.Body>
+                    </Card>
+                  )}
                   {loadingReviews ? (
                     <div className="text-center py-5">
                       <Spinner animation="border" />
@@ -598,41 +731,84 @@ export default function ProductDetail() {
                     </div>
                   ) : (
                     <div className="d-flex flex-column gap-3">
-                      {reviews.map((review) => (
-                        <Card key={review.id} className="border-light">
-                          <Card.Body>
-                            <div className="d-flex align-items-center justify-content-between mb-2">
-                              <span className="fw-semibold">
-                                {review.ten_khach_hang}
-                              </span>
-                              <div className="d-flex align-items-center gap-2">
-                                <div className="d-flex">
-                                  {Array.from({ length: 5 }, (_, i) => (
-                                    <Star
-                                      key={i}
-                                      size={16}
-                                      className={
-                                        i < review.so_sao
-                                          ? "text-warning"
-                                          : "text-muted"
-                                      }
-                                      fill={
-                                        i < review.so_sao
-                                          ? "currentColor"
-                                          : "none"
-                                      }
-                                    />
-                                  ))}
+                      {/* Bộ lọc số sao */}
+                      <div className="mb-3 d-flex gap-2 align-items-center">
+                        <span>Lọc theo số sao:</span>
+                        {[0, 5, 4, 3, 2, 1].map((s) => (
+                          <Button
+                            key={s}
+                            size="sm"
+                            variant={
+                              filterStar === s ? "primary" : "outline-secondary"
+                            }
+                            onClick={() => setFilterStar(s)}
+                          >
+                            {s === 0 ? "Tất cả" : `${s}★`}
+                          </Button>
+                        ))}
+                      </div>
+
+                      {filteredReviews.length === 0 ? (
+                        <div className="text-center text-muted py-5">
+                          Không có đánh giá phù hợp với bộ lọc.
+                        </div>
+                      ) : (
+                        filteredReviews
+                          .slice(0, showAllReviews ? filteredReviews.length : 3)
+                          .map((review) => (
+                            <Card
+                              key={review.id || Math.random()}
+                              className="border-light"
+                            >
+                              <Card.Body>
+                                <div className="d-flex align-items-center justify-content-between mb-2">
+                                  <span className="fw-semibold">
+                                    {review.ten_khach_hang}
+                                  </span>
+                                  <div className="d-flex align-items-center gap-2">
+                                    <div className="d-flex">
+                                      {Array.from({ length: 5 }, (_, i) => (
+                                        <Star
+                                          key={`star-${review.id}-${i}`}
+                                          size={16}
+                                          className={
+                                            i < review.so_sao
+                                              ? "text-warning"
+                                              : "text-muted"
+                                          }
+                                          fill={
+                                            i < review.so_sao
+                                              ? "currentColor"
+                                              : "none"
+                                          }
+                                        />
+                                      ))}
+                                    </div>
+                                    <small className="text-muted">
+                                      {new Date(
+                                        review.ngay_danh_gia
+                                      ).toLocaleDateString("vi-VN")}
+                                    </small>
+                                  </div>
                                 </div>
-                                <small className="text-muted">
-                                  {review.ngay_danh_gia}
-                                </small>
-                              </div>
-                            </div>
-                            <p className="text-muted mb-0">{review.noi_dung}</p>
-                          </Card.Body>
-                        </Card>
-                      ))}
+                                <p className="text-muted mb-0">
+                                  {review.noi_dung}
+                                </p>
+                              </Card.Body>
+                            </Card>
+                          ))
+                      )}
+                      {filteredReviews.length > 5 && (
+                        <div className="text-center mt-3">
+                          <Button
+                            variant="outline-primary"
+                            size="sm"
+                            onClick={() => setShowAllReviews(!showAllReviews)}
+                          >
+                            {showAllReviews ? "Ẩn bớt" : "Xem thêm đánh giá"}
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

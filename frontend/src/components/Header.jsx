@@ -92,7 +92,6 @@ function Header({ cartCount = 0 }) {
       const cartItems = JSON.parse(sessionStorage.getItem("cart")) || [];
 
       return cartItems.reduce((total, item) => total + item.quantity, 0); //tổng tất cả sản phẩm
-      //return cartItems.length
     } catch (error) {
       console.error("Lỗi khi đọc giỏ hàng:", error);
       return 0;
