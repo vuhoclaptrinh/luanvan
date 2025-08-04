@@ -120,8 +120,6 @@ function App() {
             <Route path="/wishlist" element={<WishlistUser />} />
             <Route path="/sanpham/:id" element={<DetailSanphamUser />} />
             <Route path="/vnpay-return" element={<VnpayReturn />} />
-            {/* http://localhost:5173/checkout?vnp_ResponseCode=00 */}
-            {/* <Route path="/wishlist/:id" element={<Wishlist />} /> */}
 
             {/* Protected Routes */}
             <Route element={<PrivateRoute />}>
@@ -130,16 +128,14 @@ function App() {
                 <Route index element={<Dashboard />} />
                 <Route path="sanpham" element={<SanphamList />} />
                 <Route path="bienthe" element={<BientheList />} />
-
                 <Route path="danhmuc" element={<DanhmucList />} />
-                <Route path="magiamgia" element={<MagiamgiaList />} />
+                <Route path="magiamgia" element={<MagiamgiaList />} />s
                 <Route path="donhang" element={<DonhangList />} />
                 <Route path="nguoidung" element={<NguoidungList />} />
                 <Route path="profile" element={<Profile />} />
                 <Route path="danhgia" element={<DanhgiaList />} />
                 <Route path="thongke" element={<Thongke />} />
                 {/* <Route path="list" element={<DSlist/>}></Route> */}
-
                 {/* Nested Routes for Nguoidung */}
               </Route>
 

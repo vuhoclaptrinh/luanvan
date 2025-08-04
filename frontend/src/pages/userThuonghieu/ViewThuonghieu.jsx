@@ -480,6 +480,7 @@ const ViewBrand = () => {
                 resetFilters={resetFilters}
                 mobileFiltersVisible={mobileFiltersVisible}
                 toggleMobileFilters={toggleMobileFilters}
+                showPriceFilter={false}
               />
             </Col>
 

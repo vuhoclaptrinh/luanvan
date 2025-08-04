@@ -49,12 +49,12 @@ const DonhangView = ({ open, onClose, donhangId }) => {
     const fetchDetails = async () => {
       setLoading(true);
       try {
-        // 1. Lấy thông tin đơn hàng (có kèm khách hàng)
+        // Lấy thông tin đơn hàng
         const resDonhang = await axios.get(`${API_BASE}donhang/${donhangId}`);
         const donhang = resDonhang.data;
         setDonhangInfo(donhang);
 
-        // 2. Lấy chi tiết đơn hàng
+        //  Lấy chi tiết đơn hàng
         const resChiTiet = await axios.get(
           `${API_BASE}chitietdonhang/donhang/${donhangId}`
         );
@@ -63,7 +63,7 @@ const DonhangView = ({ open, onClose, donhangId }) => {
         );
         setChiTietDonhang(chitiet);
 
-        // 3. Lấy thông tin các sản phẩm
+        //  Lấy thông tin các sản phẩm
         const productIds = [
           ...new Set(chitiet.map((item) => item.san_pham_id)),
         ];

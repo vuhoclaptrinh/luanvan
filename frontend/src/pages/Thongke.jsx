@@ -1,5 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography, Grid, Paper, CircularProgress } from "@mui/material";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+} from "@mui/material";
 
 import {
   BarChart as BarChartIcon,
@@ -26,6 +39,44 @@ import axios from "axios";
 const API_BASE = "http://127.0.0.1:8000/api/";
 
 const Thongke = () => {
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
+  const [productStats, setProductStats] = useState([]);
+
+  const [detailData, setDetailData] = useState([]);
+  const [openDetail, setOpenDetail] = useState(false);
+  const formatCurrency = (value) =>
+    new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+      minimumFractionDigits: 0,
+    }).format(value);
+  const handleViewDetails = async (productId) => {
+    try {
+      const res = await axios.get(`${API_BASE}thongke/sanpham/${productId}`);
+      setDetailData(res.data.data || []);
+      setOpenDetail(true);
+    } catch (err) {
+      console.error("Lỗi khi lấy chi tiết biến thể:", err);
+    }
+  };
+  const fetchProductStats = async () => {
+    try {
+      const res = await axios.get(`${API_BASE}thongke/sanpham`, {
+        params: {
+          date: selectedDate,
+          month: selectedMonth,
+          year: selectedYear,
+        },
+      });
+      setProductStats(res.data.data || []);
+    } catch (err) {
+      console.error("Lỗi khi lấy thống kê sản phẩm:", err);
+    }
+  };
+  console.log({ selectedDate, selectedMonth, selectedYear });
+
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalOrder: 0,
@@ -204,8 +255,135 @@ const Thongke = () => {
               </BarChart>
             </ResponsiveContainer>
           </Box>
+
+          {/* Thống kê sản phẩm đã bán */}
+          <Box mt={5} component={Paper} p={3} borderRadius={3}>
+            <Typography variant="h6" fontWeight="bold" mb={2}>
+              📊 Thống kê sản phẩm đã bán
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={4}>
+                <label>Chọn ngày</label>
+                <input
+                  type="date"
+                  className="form-control"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={6} md={4}>
+                <label>Chọn tháng</label>
+                <select
+                  className="form-control"
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(e.target.value)}
+                >
+                  <option value="">Tất cả</option>
+                  {[...Array(12)].map((_, i) => (
+                    <option key={i + 1} value={i + 1}>
+                      Tháng {i + 1}
+                    </option>
+                  ))}
+                </select>
+              </Grid>
+              <Grid item xs={6} md={4}>
+                <label>Chọn năm</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  placeholder="VD: 2025"
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(e.target.value)}
+                />
+              </Grid>
+            </Grid>
+
+            <button
+              className="btn btn-primary mt-3"
+              onClick={fetchProductStats}
+            >
+              Thống kê
+            </button>
+
+            {productStats.length > 0 && (
+              <Box mt={3}>
+                <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                  Kết quả:
+                </Typography>
+                <TableContainer component={Paper}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>STT</TableCell>
+                        <TableCell>Tên sản phẩm</TableCell>
+                        <TableCell align="center">Số lượng đã bán</TableCell>
+                        <TableCell align="center">Hành động</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {productStats.map((item, index) => (
+                        <TableRow key={index}>
+                          <TableCell>{index + 1}</TableCell>
+                          <TableCell>{item.ten_san_pham}</TableCell>
+                          <TableCell align="center">
+                            {item.tong_so_luong}
+                          </TableCell>
+                          <TableCell align="center">
+                            <Button
+                              variant="outlined"
+                              size="small"
+                              onClick={() => handleViewDetails(item.id)}
+                            >
+                              Xem
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Box>
+            )}
+          </Box>
         </>
       )}
+      <Dialog
+        open={openDetail}
+        onClose={() => setOpenDetail(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Chi tiết biến thể đã bán</DialogTitle>
+        <DialogContent>
+          {detailData.length === 0 ? (
+            <Typography>Không có dữ liệu.</Typography>
+          ) : (
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Dung tích</TableCell>
+                  <TableCell align="right">Giá</TableCell>
+                  <TableCell align="right">Số lượng đã bán</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {detailData.map((item, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{item.dung_tich}</TableCell>
+                    <TableCell align="right">
+                      {formatCurrency(item.gia)}
+                    </TableCell>
+                    <TableCell align="right">{item.so_luong_ban}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDetail(false)}>Đóng</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

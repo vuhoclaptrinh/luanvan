@@ -277,5 +277,27 @@ class DanhgiaController extends Controller
             'da_danh_gia' => $tonTai
         ]);
     }
+    //tối ưu
+    public function daDanhGiaNhieu(Request $request)
+    {
+        $request->validate([
+            'khach_hang_id' => 'required|exists:khachhang,id',
+            'san_pham_ids' => 'required|array',
+            'san_pham_ids.*' => 'integer|exists:sanpham,id',
+        ]);
+
+        $khachHangId = $request->khach_hang_id;
+        $sanPhamIds = $request->san_pham_ids;
+
+        $danhGiaIds = Danhgia::where('khach_hang_id', $khachHangId)
+            ->whereIn('san_pham_id', $sanPhamIds)
+            ->pluck('san_pham_id')
+            ->toArray();
+
+        return response()->json([
+            'status' => true,
+            'data' => $danhGiaIds
+        ]);
+    }
 
 }

@@ -42,6 +42,7 @@ const SanphamList = () => {
   const [danhMucMap, setDanhMucMap] = useState({});
   const [selectedDanhMuc, setSelectedDanhMuc] = useState("");
   const [searchText, setSearchText] = useState("");
+  const [minSoLuongTon, setMinSoLuongTon] = useState("");
 
   // Phân trang
   const [paginationModel, setPaginationModel] = useState({
@@ -145,7 +146,11 @@ const SanphamList = () => {
     const matchDanhMuc = selectedDanhMuc
       ? sp.danh_muc_id === parseInt(selectedDanhMuc)
       : true;
-    return (matchSearch || matchThuongHieu) && matchDanhMuc;
+    const matchSoLuongTon =
+      minSoLuongTon === "" ||
+      (sp.variants &&
+        sp.variants.some((v) => v.so_luong_ton === parseInt(minSoLuongTon)));
+    return (matchSearch || matchThuongHieu) && matchDanhMuc && matchSoLuongTon;
   });
 
   const columns = [
@@ -297,6 +302,14 @@ const SanphamList = () => {
             </MenuItem>
           ))}
         </TextField>
+        <TextField
+          label="Lọc theo SL tồn"
+          type="number"
+          size="small"
+          value={minSoLuongTon}
+          onChange={(e) => setMinSoLuongTon(e.target.value)}
+          sx={{ width: 200 }}
+        />
         <Box sx={{ flexGrow: 1 }} />
         <Button
           variant="contained"

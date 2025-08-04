@@ -17,9 +17,9 @@ const ProductGrid = ({
 }) => {
   const [khachHangId, setKhachHangId] = useState(null);
 
-  const [reviewContent, setReviewContent] = useState({});
+  // const [reviewContent, setReviewContent] = useState({});
   const [ratings, setRatings] = useState({});
-  const [selectedStars, setSelectedStars] = useState({});
+  // const [selectedStars, setSelectedStars] = useState({});
   const [daMuaMap, setDaMuaMap] = useState({});
   const [reviewedMap, setReviewedMap] = useState({});
   const [_, setReviewCounts] = useState({});
@@ -76,23 +76,38 @@ const ProductGrid = ({
 
   // Kiểm tra đã đánh giá
   const fetchReviewed = async () => {
-    if (!khachHangId) return;
-    const newReviewed = {};
-    await Promise.all(
-      filteredProducts.map(async (product) => {
-        try {
-          const res = await fetch(
-            `http://127.0.0.1:8000/api/danhgia/da-danh-gia/${khachHangId}/${product.id}`
-          );
-          const data = await res.json();
-          newReviewed[product.id] = data.da_danh_gia || false;
-        } catch (err) {
-          console.log(err);
-          newReviewed[product.id] = false;
+    if (!khachHangId || filteredProducts.length === 0) return;
+
+    const ids = filteredProducts.map((p) => p.id);
+
+    try {
+      const res = await fetch(
+        "http://127.0.0.1:8000/api/danhgia/da-danh-gia-nhieu",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            khach_hang_id: khachHangId,
+            san_pham_ids: ids,
+          }),
         }
-      })
-    );
-    setReviewedMap(newReviewed);
+      );
+
+      const data = await res.json();
+
+      const reviewedIds = Array.isArray(data.data) ? data.data : [];
+
+      const reviewedMapUpdate = {};
+      ids.forEach((id) => {
+        reviewedMapUpdate[id] = reviewedIds.includes(id);
+      });
+
+      setReviewedMap(reviewedMapUpdate);
+    } catch (err) {
+      console.error("Lỗi fetchReviewed:", err);
+    }
   };
 
   useEffect(() => {

@@ -20,6 +20,7 @@ const FilterSidebar = ({
   resetFilters,
   mobileFiltersVisible,
   toggleMobileFilters,
+  showPriceFilter = true,
 }) => {
   const handleCategoryChange = (category) => {
     setSelectedCategories((prev) => {
@@ -134,67 +135,69 @@ const FilterSidebar = ({
           </Accordion.Body>
         </Accordion.Item>
 
-        <Accordion.Item eventKey="2">
-          <Accordion.Header>Giá</Accordion.Header>
-          <Accordion.Body className="py-3 px-2">
-            <div className="price-range-slider mb-3">
-              <Range
-                step={50000}
-                min={0}
-                max={maxPrice}
-                values={priceRange}
-                onChange={(values) => setPriceRange(values)}
-                renderTrack={({ props, children }) => (
-                  <div
-                    {...props}
-                    style={{
-                      ...props.style,
-                      height: "6px",
-                      width: "100%",
-                      backgroundColor: "#e9ecef",
-                    }}
-                  >
+        {showPriceFilter !== false && (
+          <Accordion.Item eventKey="2">
+            <Accordion.Header>Giá</Accordion.Header>
+            <Accordion.Body className="py-3 px-2">
+              <div className="price-range-slider mb-3">
+                <Range
+                  step={50000}
+                  min={0}
+                  max={maxPrice}
+                  values={priceRange}
+                  onChange={(values) => setPriceRange(values)}
+                  renderTrack={({ props, children }) => (
                     <div
+                      {...props}
                       style={{
+                        ...props.style,
                         height: "6px",
-                        width: `${
-                          ((priceRange[1] - priceRange[0]) * 100) / maxPrice
-                        }%`,
-                        left: `${(priceRange[0] * 100) / maxPrice}%`,
-                        position: "absolute",
-                        backgroundColor: "#6f42c1",
-                        borderRadius: "3px",
+                        width: "100%",
+                        backgroundColor: "#e9ecef",
                       }}
-                    />
-                    {children}
-                  </div>
-                )}
-                renderThumb={({ props }) => {
-                  const { key, ...rest } = props;
-                  return (
-                    <div
-                      key={key}
-                      {...rest}
-                      style={{
-                        ...rest.style,
-                        height: "20px",
-                        width: "20px",
-                        backgroundColor: "#ffffff",
-                        border: "2px solid #6f42c1",
-                        borderRadius: "50%",
-                        boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.15)",
-                      }}
-                    />
-                  );
-                }}
-              />
-            </div>
-            <div className="d-flex justify-content-between">
-              <span>{formatPrice(priceRange[0])}</span>
-              <span>{formatPrice(priceRange[1])}</span>
-            </div>
-          </Accordion.Body>
-        </Accordion.Item>
+                    >
+                      <div
+                        style={{
+                          height: "6px",
+                          width: `${
+                            ((priceRange[1] - priceRange[0]) * 100) / maxPrice
+                          }%`,
+                          left: `${(priceRange[0] * 100) / maxPrice}%`,
+                          position: "absolute",
+                          backgroundColor: "#6f42c1",
+                          borderRadius: "3px",
+                        }}
+                      />
+                      {children}
+                    </div>
+                  )}
+                  renderThumb={({ props }) => {
+                    const { key, ...rest } = props;
+                    return (
+                      <div
+                        key={key}
+                        {...rest}
+                        style={{
+                          ...rest.style,
+                          height: "20px",
+                          width: "20px",
+                          backgroundColor: "#ffffff",
+                          border: "2px solid #6f42c1",
+                          borderRadius: "50%",
+                          boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.15)",
+                        }}
+                      />
+                    );
+                  }}
+                />
+              </div>
+              <div className="d-flex justify-content-between">
+                <span>{formatPrice(priceRange[0])}</span>
+                <span>{formatPrice(priceRange[1])}</span>
+              </div>
+            </Accordion.Body>
+          </Accordion.Item>
+        )}
       </Accordion>
 
       <div className="mt-3">

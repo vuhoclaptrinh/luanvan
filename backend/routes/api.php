@@ -100,10 +100,12 @@ Route::delete('/danhgia/{id}', [DanhgiaController::class, 'delete']);
 Route::get('/danhgia/sanpham/{id}', [DanhgiaController::class, 'getBySanPham']);
 //getby kahch hàng
 Route::get('/danhgia/khachhang/{id}', [DanhgiaController::class, 'getByKhachHang']);
-Route::get('/danhgia/trungbinh/{sanPhamId}', [DanhGiaController::class, 'getTrungBinhSoSao']);
-Route::get('/danhgia/kiemtra-da-mua/{khachHangId}/{sanPhamId}', [DanhGiaController::class, 'checkDaMua']);
-Route::get('/danhgia/da-danh-gia/{khachHangId}/{sanPhamId}', [DanhGiaController::class, 'daDanhGia']);
+Route::get('/danhgia/trungbinh/{sanPhamId}', [DanhgiaController::class, 'getTrungBinhSoSao']);
+Route::get('/danhgia/kiemtra-da-mua/{khachHangId}/{sanPhamId}', [DanhgiaController::class, 'checkDaMua']);
+Route::get('/danhgia/da-danh-gia/{khachHangId}/{sanPhamId}', [DanhgiaController::class, 'daDanhGia']);
 
+Route::get('/danhgia/da-danh-gia-nhieu', [DanhgiaController::class, 'daDanhGiaNhieu']);
+Route::post('/danhgia/da-danh-gia-nhieu', [DanhgiaController::class, 'daDanhGiaNhieu']);
 //-----------------------------------------------------------------------------------------------------
 
 //DON HÀNG
@@ -125,6 +127,8 @@ Route::get('/donhang/khachhang/{id}', [DonhangController::class, 'getByKhachHang
 
 //thong ke doanh thu
 Route::get('/doanhthutheothang/{year?}', [DonhangController::class, 'getDoanhThuTheoThang']);
+Route::get('/thongke/sanpham', [DonhangController::class, 'thongKeSanPham']);
+Route::get('/thongke/sanpham/{id}', [DonhangController::class, 'chiTietSanPhamDaBan']);
 
 Route::post('/donhang/{id}/create-ghtk', [DonhangController::class, 'createGHTK']);
 Route::put('/donhang/{id}/huy', [DonHangController::class, 'huyDonHang']);
@@ -165,3 +169,5 @@ Route::put('/bienthe/{id}', [BienTheController::class, 'update']);
 
 // Xóa biến thể
 Route::delete('/bienthe/{id}', [BienTheController::class, 'delete']);
+
+Route::get('/bienthe/dungtich/{dung_tich}', [BienTheController::class, 'getbyDungtich']);

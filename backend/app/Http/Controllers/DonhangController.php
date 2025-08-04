@@ -6,6 +6,7 @@ use App\Models\BienThe;
 use App\Models\Donhang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -488,6 +489,105 @@ class DonhangController extends Controller
 
         return response()->json(['message' => 'Đã huỷ đơn hàng và hoàn trả tồn kho thành công']);
     }
+
+    // thống kê
+    public function getSanPhamBanTrongNgay()
+    {
+        try {
+            $today = now()->toDateString();
+
+            $items = DB::table('chitietdonhang')
+                ->join('donhang', 'donhang.id', '=', 'chitietdonhang.don_hang_id')
+                ->join('sanpham', 'sanpham.id', '=', 'chitietdonhang.san_pham_id')
+                ->whereDate('donhang.ngay_dat', $today)
+                ->where('donhang.trang_thai', 'đã giao')
+                ->select('sanpham.ten_san_pham', DB::raw('SUM(chitietdonhang.so_luong) as tong_so_luong'))
+                ->groupBy('sanpham.ten_san_pham')
+                ->get();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Lấy sản phẩm bán trong ngày thành công',
+                'data' => $items
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Có lỗi xảy ra: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function thongKeSanPham(Request $request)
+    {
+        try {
+            $query = DB::table('chitietdonhang')
+                ->join('donhang', 'donhang.id', '=', 'chitietdonhang.don_hang_id')
+                ->join('sanpham', 'sanpham.id', '=', 'chitietdonhang.san_pham_id')
+                ->whereRaw('LOWER(donhang.trang_thai) = ?', ['đã giao']);
+
+            // Ưu tiên lọc theo ngày cụ thể
+            if ($request->filled('date')) {
+                $query->whereDate('donhang.created_at', $request->date);
+            } else {
+                if ($request->filled('month')) {
+                    $query->whereMonth('donhang.created_at', $request->month);
+                }
+                if ($request->filled('year')) {
+                    $query->whereYear('donhang.created_at', $request->year);
+                }
+            }
+
+            $results = $query
+                ->select(
+                    'chitietdonhang.san_pham_id as id',
+                    'sanpham.ten_san_pham',
+                    DB::raw('SUM(chitietdonhang.so_luong) as tong_so_luong')
+                )
+                ->groupBy('chitietdonhang.san_pham_id', 'sanpham.ten_san_pham')
+                ->orderByDesc('tong_so_luong')
+                ->get();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Thống kê sản phẩm thành công',
+                'data' => $results
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Lỗi: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+    public function chiTietSanPhamDaBan($id)
+    {
+        try {
+            $data = DB::table('bienthe')
+                ->join('chitietdonhang as ct', 'ct.bien_the_id', '=', 'bienthe.id')
+                ->join('donhang as dh', 'dh.id', '=', 'ct.don_hang_id')
+                ->where('bienthe.san_pham_id', $id)
+                ->whereRaw('LOWER(dh.trang_thai) = ?', ['đã giao'])
+                ->select(
+                    'bienthe.dung_tich',
+                    'bienthe.gia',
+                    DB::raw('SUM(ct.so_luong) as so_luong_ban')
+                )
+                ->groupBy('bienthe.dung_tich', 'bienthe.gia')
+                ->get();
+
+            return response()->json(['data' => $data]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Lỗi: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+
 
 
 }

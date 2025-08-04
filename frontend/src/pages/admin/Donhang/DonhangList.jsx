@@ -186,7 +186,7 @@ const DonhangList = () => {
       renderCell: (params) => {
         const { value } = params;
 
-        let chipColor = "default"; // fallback nếu không xác định
+        let chipColor = "default";
 
         switch (value.toLowerCase()) {
           case "chờ xử lý":

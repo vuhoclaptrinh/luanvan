@@ -84,4 +84,20 @@ class BienTheController extends Controller
 
         return response()->json(['message' => 'Xóa biến thể thành công!']);
     }
+    // Lấy sản phẩm có biến thể dung tích
+    public function getbyDungtich($dung_tich)
+    {
+        $sanpham = BienThe::where('dung_tich', $dung_tich)->get();
+        if ($sanpham->isEmpty()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Không tìm thấy sản phẩm với dung tích này.'
+            ], 404);
+        }
+        return response()->json([
+            'status' => true,
+            'message' => 'Lấy thành công sản phẩm với dung tích ' . $dung_tich,
+            'data' => $sanpham
+        ]);
+    }
 }

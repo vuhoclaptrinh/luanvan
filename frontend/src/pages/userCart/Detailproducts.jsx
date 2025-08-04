@@ -54,21 +54,22 @@ const Detailproducts = () => {
   useEffect(() => {
     const fetchOrderData = async () => {
       try {
-        // 1. Lấy thông tin đơn hàng (có kèm khách hàng)
+        //  Lấy thông tin đơn hàng (có kèm khách hàng)
         const resDonhang = await axios.get(`${API_BASE}donhang/${id}`);
         const donhang = resDonhang.data;
         setDonhangInfo(donhang);
 
-        // 2. Lấy chi tiết đơn hàng
+        //  Lấy chi tiết đơn hàng
         const resChiTiet = await axios.get(
-          `${API_BASE}chitietdonhang?don_hang_id=${id}`
+          `${API_BASE}chitietdonhang/donhang/${id}`
         );
         const chitiet = resChiTiet.data.data.filter(
           (item) => item.don_hang_id === Number.parseInt(id)
         );
         setChiTietDonhang(chitiet);
+        console.log(chitiet);
 
-        // 3. Lấy thông tin các sản phẩm
+        // Lấy thông tin các sản phẩm
         const productIds = [
           ...new Set(chitiet.map((item) => item.san_pham_id)),
         ];
@@ -295,9 +296,10 @@ const Detailproducts = () => {
                                   {product.thuong_hieu}
                                 </span>
                               )}
-                              {(item.dung_tich || product.dung_tich) && (
+
+                              {(item.ten_bien_the || product.ten_bien_the) && (
                                 <span className="product-size">
-                                  {item.dung_tich || product.dung_tich}
+                                  {item.ten_bien_the || product.ten_bien_the}ml
                                 </span>
                               )}
                             </div>
@@ -443,7 +445,7 @@ const Detailproducts = () => {
                     </div>
 
                     <div className="payment-status">
-                      <div className="payment-label">Trạng thái thanh toán</div>
+                      <div className="payment-label">Trạng thái đơn hàng</div>
                       <Badge
                         bg={getStatusVariant(donhangInfo.trang_thai)}
                         className="payment-badge"

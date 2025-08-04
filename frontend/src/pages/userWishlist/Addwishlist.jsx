@@ -26,7 +26,7 @@ export const addToWishlist = (product) => {
   existingWishlist.push(wishlistItem);
   sessionStorage.setItem("wishlist", JSON.stringify(existingWishlist));
 
-  // Gửi sự kiện cho component khác (nếu có)
+  // Gửi sự kiện cho component khác
   window.dispatchEvent(new Event("wishlist-updated"));
 
   toast.success(`Đã thêm "${product.ten_san_pham}" vào danh sách yêu thích.`);

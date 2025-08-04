@@ -172,29 +172,41 @@ const Detailcart = () => {
 
         {filteredOrders.length === 0 ? (
           <div className="empty-orders">
-            <div className="empty-orders-content">
-              <div className="empty-icon">
+            <div className="empty-orders-content text-center">
+              <div className="empty-icon mb-3">
                 <ShoppingBag size={60} strokeWidth={1.5} />
               </div>
+
               <h2>
                 {orders.length === 0
                   ? "Bạn chưa có đơn hàng nào"
                   : "Không tìm thấy đơn hàng nào"}
               </h2>
-              <p>
+
+              <p className="text-muted">
                 {orders.length === 0
                   ? "Hãy khám phá các sản phẩm của chúng tôi và đặt hàng ngay!"
                   : "Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc"}
               </p>
-              {orders.length === 0 && (
-                <Button
-                  variant="primary"
-                  className="shop-now-button"
-                  onClick={() => navigate("/products")}
-                >
-                  Mua sắm ngay
-                </Button>
-              )}
+
+              <div className="d-flex justify-content-center gap-2 mt-3">
+                {orders.length === 0 ? (
+                  <Button
+                    variant="primary"
+                    className="shop-now-button"
+                    onClick={() => navigate("/products")}
+                  >
+                    Mua sắm ngay
+                  </Button>
+                ) : (
+                  <Button
+                    variant="secondary"
+                    onClick={() => window.location.reload()}
+                  >
+                    Quay lại
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         ) : (
