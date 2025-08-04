@@ -417,7 +417,7 @@ export default function ProductDetail() {
                           }`}
                           style={{
                             height: "60px",
-                            objectFit: "cover",
+                            objectFit: "contain",
                             backgroundColor: "#fff",
                             cursor: "pointer",
                             opacity: index === currentImageIndex ? 1 : 0.6,

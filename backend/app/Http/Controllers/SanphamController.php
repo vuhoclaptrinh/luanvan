@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Donhang;
 use Illuminate\Http\Request;
 use App\Models\Sanpham;
 use Illuminate\Auth\Events\Validated;
@@ -380,6 +381,44 @@ class SanphamController extends Controller
         return response()->json([
             'data' => $sanPhams
         ]);
+    }
+    //de xuat danh cho an
+    public function getDeXuatSanPham($khachHangId)
+    {
+        try {
+            // Lấy danh sách ID sản phẩm đã mua (trong đơn đã giao)
+            $sanPhamDaMuaIds = Donhang::where('khach_hang_id', $khachHangId)
+                ->where('trang_thai', 'đã giao')
+                ->with('chitietdonhang')
+                ->get()
+                ->flatMap(function ($donhang) {
+                    return $donhang->chitietdonhang->pluck('san_pham_id');
+                })
+                ->unique()
+                ->toArray();
+
+            // Lấy danh sách thương hiệu đã mua
+            $thuongHieuList = Sanpham::whereIn('id', $sanPhamDaMuaIds)
+                ->pluck('thuong_hieu')
+                ->unique()
+                ->toArray();
+
+            // Đề xuất sản phẩm có cùng thương hiệu, nhưng chưa mua
+            $sanPhamDeXuat = Sanpham::whereIn('thuong_hieu', $thuongHieuList)
+                ->whereNotIn('id', $sanPhamDaMuaIds)
+                ->take(10)
+                ->get();
+
+            return response()->json([
+                'status' => true,
+                'data' => $sanPhamDeXuat
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Lỗi: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
 

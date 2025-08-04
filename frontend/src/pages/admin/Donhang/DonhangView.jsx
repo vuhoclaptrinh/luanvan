@@ -242,6 +242,14 @@ const DonhangView = ({ open, onClose, donhangId }) => {
                         sx={{ ml: "auto" }}
                       />
                     )}
+                    {donhangInfo.paymentMethod && (
+                      <Chip
+                        label={donhangInfo.paymentMethod}
+                        color={"primary"}
+                        size="small"
+                        sx={{ ml: "10px" }}
+                      />
+                    )}
                   </Box>
                   <Grid container spacing={3}>
                     <Grid item xs={12} md={6}>

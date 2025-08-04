@@ -169,8 +169,8 @@ const SanphamList = () => {
           <Box>
             {params.row.variants.map((v, idx) => (
               <Typography key={idx} variant="body2">
-                {v.dung_tich}: {parseInt(v.gia).toLocaleString("vi-VN")} ₫ — SL:{" "}
-                {v.so_luong_ton}
+                {v.dung_tich}ml: {parseInt(v.gia).toLocaleString("vi-VN")} ₫ —
+                SL: {v.so_luong_ton}
               </Typography>
             ))}
           </Box>
@@ -332,6 +332,7 @@ const SanphamList = () => {
           pageSizeOptions={[5, 10, 20, 50]}
           getRowId={(row) => row.id}
           disableRowSelectionOnClick
+          rowHeight={70}
         />
       </Box>
 

@@ -249,6 +249,7 @@ class DanhgiaController extends Controller
     {
         try {
             $daMua = Donhang::where('khach_hang_id', $khachHangId)
+                ->where('trang_thai', 'đã giao') // Chỉ tính các đơn đã giao
                 ->whereHas('chiTietDonHang', function ($query) use ($sanPhamId) {
                     $query->where('san_pham_id', $sanPhamId);
                 })
@@ -256,7 +257,7 @@ class DanhgiaController extends Controller
 
             return response()->json([
                 'status' => true,
-                'message' => $daMua ? 'Khách hàng đã mua sản phẩm này' : 'Chưa mua',
+                'message' => $daMua ? 'Khách hàng đã mua sản phẩm này' : 'Chưa mua hoặc chưa giao',
                 'da_mua' => $daMua
             ]);
         } catch (\Exception $e) {
@@ -266,6 +267,7 @@ class DanhgiaController extends Controller
             ], 500);
         }
     }
+
     //da đánh giá 
     public function daDanhGia($khachHangId, $sanPhamId)
     {

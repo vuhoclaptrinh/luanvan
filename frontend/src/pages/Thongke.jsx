@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Grid, Paper, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Grid,
+  Paper,
+  CircularProgress,
+  Alert,
+} from "@mui/material";
 import {
   Table,
   TableBody,
@@ -305,7 +312,7 @@ const Thongke = () => {
               Thống kê
             </button>
 
-            {productStats.length > 0 && (
+            {productStats.length > 0 ? (
               <Box mt={3}>
                 <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
                   Kết quả:
@@ -343,6 +350,10 @@ const Thongke = () => {
                   </Table>
                 </TableContainer>
               </Box>
+            ) : (
+              <Alert severity="info" sx={{ mt: 3 }}>
+                Không có đơn hàng nào trong tháng.
+              </Alert>
             )}
           </Box>
         </>

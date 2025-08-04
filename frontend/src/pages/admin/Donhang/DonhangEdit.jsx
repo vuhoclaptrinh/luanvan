@@ -159,8 +159,7 @@ const DonhangEdit = ({ open, onClose, donhangId, onUpdate }) => {
               onChange={handleChange}
               disabled={
                 formdata.trang_thai === "đã giao" ||
-                formdata.trang_thai === "đã huỷ" ||
-                formdata.trang_thai === "đã thanh toán"
+                formdata.trang_thai === "đã huỷ"
               }
             >
               <MenuItem
@@ -177,7 +176,7 @@ const DonhangEdit = ({ open, onClose, donhangId, onUpdate }) => {
               </MenuItem>
               <MenuItem value="đã giao">Đã giao</MenuItem>
               <MenuItem value="đã huỷ">Đã huỷ</MenuItem>
-              <MenuItem value="đã thanh toán">Đã thanh toán</MenuItem>
+              <MenuItem value="đã thanh toán">Đã thanh toán </MenuItem>
             </Select>
           </FormControl>
           <Stack direction="row" spacing={2}>

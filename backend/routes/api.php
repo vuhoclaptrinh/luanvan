@@ -37,6 +37,8 @@ Route::get('/sanpham/danhmuc/{id}', [SanphamController::class, 'getByDanhmuc']);
 //geth thuong hiue
 Route::get('/sanpham/thuonghieu', [SanphamController::class, 'getByThuongHieu']);
 
+Route::get('/sanpham/de-xuat/{khachHangId}', [SanphamController::class, 'getDeXuatSanPham']);
+
 
 //khoa
 Route::get('/khoa', [KhoaController::class, 'get']);

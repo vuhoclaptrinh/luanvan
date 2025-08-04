@@ -96,26 +96,31 @@ const ProductDetailModal = ({
           <Col md={showReviewPanel ? 7 : 12}>
             <Row>
               <Col md={6}>
-                <div className="position-relative mb-3">
+                {/* Ảnh chính */}
+                <div className="position-relative mb-4">
                   <img
                     src={getImageUrl(
                       product.images?.[currentImageIndex] || product.hinh_anh
                     )}
                     alt={product.ten_san_pham}
-                    className="img-fluid rounded"
+                    className="img-fluid rounded-4 shadow-sm"
                     style={{
                       width: "100%",
                       height: "350px",
                       objectFit: "contain",
+                      backgroundColor: "#f9f9f9",
+                      padding: "12px",
+                      transition: "all 0.3s ease-in-out",
                     }}
                   />
 
+                  {/* Nút chuyển ảnh */}
                   {product.images?.length > 1 && (
                     <>
                       <Button
                         variant="light"
                         size="sm"
-                        className="position-absolute top-50 start-0 translate-middle-y rounded-circle p-2 shadow-sm"
+                        className="position-absolute top-50 start-0 translate-middle-y rounded-circle shadow"
                         onClick={() =>
                           setCurrentImageIndex(
                             currentImageIndex === 0
@@ -123,44 +128,63 @@ const ProductDetailModal = ({
                               : currentImageIndex - 1
                           )
                         }
+                        style={{
+                          zIndex: 2,
+                          backgroundColor: "rgba(255,255,255,0.85)",
+                          border: "1px solid #ccc",
+                        }}
                       >
                         <i className="bi bi-chevron-left"></i>
                       </Button>
+
                       <Button
                         variant="light"
                         size="sm"
-                        className="position-absolute top-50 end-0 translate-middle-y rounded-circle p-2 shadow-sm"
+                        className="position-absolute top-50 end-0 translate-middle-y rounded-circle shadow"
                         onClick={() =>
                           setCurrentImageIndex(
                             (currentImageIndex + 1) % product.images.length
                           )
                         }
+                        style={{
+                          zIndex: 2,
+                          backgroundColor: "rgba(255,255,255,0.85)",
+                          border: "1px solid #ccc",
+                        }}
                       >
                         <i className="bi bi-chevron-right"></i>
                       </Button>
+
+                      {/* Chỉ số ảnh */}
                       <div className="text-center mt-2 text-muted small">
-                        <i className="bi bi-info-circle me-1"></i>
+                        <i className="bi bi-images me-1"></i>
                         Ảnh {currentImageIndex + 1} / {product.images.length}
                       </div>
                     </>
                   )}
                 </div>
 
+                {/* Thumbnail */}
                 {product.images?.length > 1 && (
-                  <Row className="g-2 mt-2">
+                  <Row className="g-2 justify-content-center">
                     {product.images.map((img, index) => (
-                      <Col key={index} xs={3}>
+                      <Col key={index} xs="auto" className="text-center">
                         <img
                           src={getImageUrl(img)}
                           alt={`Thumbnail ${index + 1}`}
-                          className={`img-thumbnail cursor-pointer ${
-                            index === currentImageIndex ? "border-primary" : ""
+                          className={`img-thumbnail ${
+                            index === currentImageIndex
+                              ? "border-primary"
+                              : "border"
                           }`}
                           style={{
                             height: "60px",
-                            objectFit: "contain",
+                            width: "60px",
+                            objectFit: "cover",
+                            borderRadius: "0.5rem",
                             cursor: "pointer",
                             opacity: index === currentImageIndex ? 1 : 0.6,
+                            transition: "opacity 0.2s ease",
                           }}
                           onClick={() => setCurrentImageIndex(index)}
                         />

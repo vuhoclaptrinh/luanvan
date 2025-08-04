@@ -89,7 +89,7 @@ function FeaturedCategories() {
     <section className="py-5 bg-light">
       <Container>
         <div className="text-center mb-5">
-          <h2 className="display-6 fw-bold">Sản phẩm mới nhất</h2>
+          <h4 className="fw-bold text-danger mb-3">️🛒 SẢN PHẨM MỚI</h4>
           <p className="text-muted mx-auto" style={{ maxWidth: "700px" }}>
             Khám phá những sản phẩm vừa được thêm gần đây
           </p>
@@ -104,6 +104,8 @@ function FeaturedCategories() {
                 style={{
                   cursor: "pointer",
                   transition: "transform 0.3s, box-shadow 0.3s",
+                  width: "100%",
+                  height: "100%",
                 }}
                 onMouseOver={(e) => {
                   e.currentTarget.style.transform = "translateY(-5px)";

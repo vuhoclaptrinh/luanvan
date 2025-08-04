@@ -177,12 +177,17 @@ const DonhangList = () => {
     },
     { field: "giam_gia_tien_fomat", headerName: "Tiền Đã Giảm  ", width: 150 },
     { field: "phi_van_chuyen_fomat", headerName: "Phí Vận Chuyển", width: 150 },
-    { field: "tong_tien_format", headerName: "Tổng tiền (VND)", width: 200 },
+    { field: "tong_tien_format", headerName: "Tổng tiền", width: 110 },
+    {
+      field: "paymentMethod",
+      headerName: "Phương thức thanh toán",
+      width: 100,
+    },
 
     {
       field: "trang_thai",
       headerName: "Trạng Thái",
-      width: 150,
+      width: 110,
       renderCell: (params) => {
         const { value } = params;
 
@@ -202,7 +207,7 @@ const DonhangList = () => {
             chipColor = "success";
             break;
           case "đã thanh toán":
-            chipColor = "success";
+            chipColor = "warning";
             break;
           default:
             chipColor = "default";

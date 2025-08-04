@@ -111,7 +111,7 @@ const ProductList = () => {
     <section className="py-5 bg-light">
       <Container>
         <div className="text-center mb-5">
-          <h2 className="display-6 fw-bold">Sản phẩm nổi bật</h2>
+          <h4 className="fw-bold text-danger mb-3">🔥 SẢN PHẨM NỔI BẬT</h4>
           <p className="text-muted mx-auto" style={{ maxWidth: "700px" }}>
             Khám phá bộ sưu tập nước hoa cao cấp được yêu thích nhất
           </p>
